@@ -1,0 +1,82 @@
+<% const items = [
+    { 
+        content: 'Productos', 
+        href: '/productos', 
+        isActive: currentRoute === '/productos'
+    },
+    { 
+        content: 'Insumos', 
+        href: '/insumos', 
+        isActive: currentRoute === '/insumos' 
+    },
+    {
+        content: 'Categorías',
+        href: '/categorias',
+        isActive: currentRoute === '/categorias'
+    },
+    {
+        content: 'Proveedores',
+        href: '/proveedores',
+        isActive: currentRoute === '/proveedores'
+    },
+    { 
+        content: 'Compras', 
+        href: '/compras', 
+        isActive: currentRoute === '/compras' 
+    },
+    { 
+        content: 'Requisiciones', 
+        href: '/requisiciones', 
+        isActive: currentRoute === '/requisiciones' 
+    },
+    { 
+        content: 'Devoluciones de requisición', 
+        href: '/devoluciones-requisicion', 
+        isActive: currentRoute === '/devoluciones-requisicion'
+    },
+    {
+        content: 'Recepciones de compra',
+        href: '/recepciones-compra',
+        isActive: currentRoute === '/recepciones-compra'
+    },
+    {
+        content: 'Devoluciones de compra',
+        href: '/devoluciones-compra',
+        isActive: currentRoute === '/devoluciones-compra'
+    },
+    {
+        content: 'Salidas de almacén',
+        href: '/salidas-almacen',
+        isActive: currentRoute === '/salidas-almacen'
+    },
+    {
+        content: 'Ajustes de inventario',
+        href: '/ajustes-inventario',
+        isActive: currentRoute === '/ajustes-inventario'
+    },
+    {
+        content: 'Reportes',
+        href: '/reportes',
+        isActive: currentRoute === '/reportes'
+    },
+    {
+        content: 'Usuarios',
+        href: '/usuarios',
+        isActive: currentRoute === '/usuarios'
+    },
+].map(item => ({
+    ...item,
+    class: `nav-link ${ item.isActive ? 'active' : ''}`
+})); %>
+
+<ul class="<%= listClass %>">
+    <% items.forEach(item => { %>
+        <li class="nav-item py-1">
+            <a class="<%= item.class %>" href="<%= item.href %>" 
+                <%= item.isActive ? 'aria-current="page"' : '' %>
+            >
+                <%- item.content %>
+            </a>
+        </li>
+    <% }); %>
+</ul>

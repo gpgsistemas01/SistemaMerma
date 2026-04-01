@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Department {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+  users User[]
+}
+
+model Role {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+  users User[]
+}
+
+model User {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  departmentId String @db.Uuid
+  department Department @relation(fields: [departmentId], references: [id])
+  roleId String @db.Uuid
+  role Role @relation(fields: [roleId], references: [id])
+  statusId String @db.Uuid
+  status Status @relation(fields: [statusId], references: [id])
+  name String @unique
+  password String
+  profiles Profile[]
+}
+
+model Profile {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String
+  lastName String
+  userId String @unique @db.Uuid
+  user User @relation(fields: [userId], references: [id])
+  statusId String @db.Uuid
+  status Status @relation(fields: [statusId], references: [id])
+}
+
+model Category {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+  products Product[]
+}
+
+model Status {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+  users User[]
+  profiles Profile[]
+  products Product[]
+}
+
+model Product {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String
+  sku String
+  unitCost Decimal
+  currentStock Decimal
+  minimunStock Decimal
+  maximunStock Decimal
+  expiryDate DateTime
+  width Decimal
+  length Decimal
+  thickness Decimal
+  color String
+  voltage Int
+  type String
+  presentation String
+  statusId String @db.Uuid
+  status Status @relation(fields: [statusId], references: [id])
+  uomId String @db.Uuid
+  uom UoM @relation(fields: [uomId], references: [id])
+  categoryId String @db.Uuid
+  category Category @relation(fields: [categoryId], references: [id])
+}
+
+model UoM {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+  abbrevation String @unique
+  product Product[]
+}

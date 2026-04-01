@@ -1,0 +1,53 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# OS / Editor system files
+.DS_Store
+Thumbs.db
+
+# dotenv environment files
+.env
+.env.local
+.env.*.local
+
+# IDE config files
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Optional build output
+/dist
+/build
+/public/build
+
+# Coverage reports
+coverage/
+
+# Optional: database / local uploads if not versioned
+/data
+/uploads
+/temp
+
+# Optional: debug dumps
+*.tgz
+*.gz
+
+# Optional: next.js output if used
+.next/
+
+# Optional: Svelte output if used
+.svelte-kit/
+/generated/prisma

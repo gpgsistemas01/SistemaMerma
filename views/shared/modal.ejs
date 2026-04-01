@@ -1,0 +1,44 @@
+<% const header = {
+    button: {
+        id: modal.header.button.id,
+        dismissTarget: 'modal'
+    },
+    class: 'modal-header',
+    title: {
+        id: modal.header.title.id,
+        content: modal.header.title.content,
+        class: 'modal-title',
+    }
+}; 
+
+button = {
+    id: 'backBtn',
+    class: 'btn btn-link',
+    attrs: {
+        'data-mdb-modal-init': '',
+        'data-mdb-target': '#modal',
+        'data-mdb-dismiss': 'modal'
+    },
+    content: 'Regresar'
+}; %>
+
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="<%= header.title.id %>">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        
+        <%- include('./header', { header }) %>
+
+        <div class="modal-body dark">
+            <form id="<%= modal.form.id %>" class="row g-3" novalidate>
+                <%- include('./outlineInputList', { inputs: modal.form.inputs }) %>
+
+                <div class="col-12">
+                    <%- include('./button', { button }) %>
+                    <%- include('./submit', { button: modal.form.submitButton }) %>
+                </div>
+            </form>
+        </div>
+
+        </div>
+    </div>
+</div>

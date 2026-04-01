@@ -1,0 +1,29 @@
+<table id="usersTable" class="display">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Área</th>
+            <th>Rol</th>
+            <th>Perfil</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% usuarios.forEach(usuario => { %>
+        <tr>
+            <td><%= usuario.nombre %></td>
+            <td><%= usuario.area.name %></td>
+            <td><%= usuario.role.name %></td>
+            <td><%= usuario.profile.name %></td>
+        </tr>
+        <% }) %>
+    </tbody>
+</table>
+
+<script src="/js/pages/users/index.js"></script>
+<script src="/js/pages/users/modals/registerUser.js"></script>
+
+<%- contentFor('title') %>
+Administración de usuarios
+<%- contentFor('layoutType') %>
+site
