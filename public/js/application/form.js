@@ -8,7 +8,7 @@ export const useForm = async ({
     selector,
     normalizeData = () => {},
     normalizeErrors = () => {},
-    getErrors= () => {},
+    getErrors = () => {},
     sendRequest,
     normalizeServerErrors = () => {},
 }) => {

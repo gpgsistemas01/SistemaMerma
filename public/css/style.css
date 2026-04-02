@@ -222,6 +222,10 @@ textarea ~ div[data-error-for] {
   margin-top: -1.5rem;
 }
 
+.modal-content {
+  color: var(--mdb-body-bg);
+}
+
 /* background styles */
 
 body section {

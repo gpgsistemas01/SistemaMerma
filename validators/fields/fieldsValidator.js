@@ -68,3 +68,15 @@ export const validateGenericText =
         .isLength({ min: 1 }).withMessage(errorCodeMessages.TEXT_TOO_SHORT)
         .isLength({ max: 500 }).withMessage(errorCodeMessages.TEXT_TOO_LONG)
 ;
+
+export const validateNumberphone =
+        body('numberphone')
+            .trim()
+            .if(body('numberphone').exists())
+            .isMobilePhone('es-MX').withMessage(errorCodeMessages.INVALID_NUMBERPHONE)
+;
+
+export const validateIsActive = 
+    body('isActive')
+        .notEmpty().withMessage(errorCodeMessages.EMPTY_ACTIVE)
+        .isBoolean().withMessage(errorCodeMessages.INVALID_ACTIVE)

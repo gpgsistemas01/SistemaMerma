@@ -30,8 +30,7 @@ model User {
   department Department @relation(fields: [departmentId], references: [id])
   roleId String @db.Uuid
   role Role @relation(fields: [roleId], references: [id])
-  statusId String @db.Uuid
-  status Status @relation(fields: [statusId], references: [id])
+  isActive Boolean @default(true)
   name String @unique
   password String
   profiles Profile[]
@@ -43,8 +42,7 @@ model Profile {
   lastName String
   userId String @unique @db.Uuid
   user User @relation(fields: [userId], references: [id])
-  statusId String @db.Uuid
-  status Status @relation(fields: [statusId], references: [id])
+  isActive Boolean @default(true)
 }
 
 model Category {
@@ -56,9 +54,6 @@ model Category {
 model Status {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name String @unique
-  users User[]
-  profiles Profile[]
-  products Product[]
 }
 
 model Product {
@@ -70,15 +65,14 @@ model Product {
   minimunStock Decimal
   maximunStock Decimal
   expiryDate DateTime
-  width Decimal
-  length Decimal
-  thickness Decimal
-  color String
-  voltage Int
-  type String
-  presentation String
-  statusId String @db.Uuid
-  status Status @relation(fields: [statusId], references: [id])
+  width Decimal?
+  length Decimal?
+  thickness Decimal?
+  color String?
+  voltage Int?
+  type String?
+  presentation String?
+  isActive Boolean @default(true)
   uomId String @db.Uuid
   uom UoM @relation(fields: [uomId], references: [id])
   categoryId String @db.Uuid
@@ -90,4 +84,11 @@ model UoM {
   name String @unique
   abbrevation String @unique
   product Product[]
+}
+
+model Supplier {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+  numberphone String?
+  isActive Boolean @default(true)
 }

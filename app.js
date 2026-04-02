@@ -1,24 +1,18 @@
 import 'dotenv/config.js';
 
 import authApiRoutes from './routes/api/authApiRoute.js';
-import categoryApiRoutes from './routes/api/warehouse/categoryApiRoute.js';
+import productApiRoutes from './routes/api/warehouse/productApiRoute.js';
+import supplierApiRoutes  from './routes/api/warehouse/supplierApiRoute.js';
 
 import loginWebRoutes from './routes/web/auth/loginWebRoute.js';
 import logoutWebRoutes from './routes/web/auth/logoutWebRoute.js';
 import refreshWebRoutes from './routes/web/auth/refreshWebRoute.js';
 import homeWebRoutes from './routes/web/homeWebRoute.js';
 import productWebRoutes from './routes/web/warehouse/productWebRoute.js';
-import supplyWebRoutes from './routes/web/warehouse/supplyWebRoute.js';
-import categoryWebRoutes from './routes/web/warehouse/categoryWebRoute.js';
 import supplierWebRoutes from './routes/web/warehouse/supplierWebRoute.js';
-import purchaseOrderWebRoutes from './routes/web/warehouse/purchaseOrderWebRoute.js';
 import purchaseRequisitionWebRoutes from './routes/web/warehouse/purchaseRequisitionWebRoute.js';
-import requisitionReturnWebRoutes from './routes/web/warehouse/requisitionReturnWebRoute.js';
 import goodsReceiptWebRoutes from './routes/web/warehouse/goodsReceiptWebRoute.js';
-import orderReturnsWebRoutes from './routes/web/warehouse/orderReturnsWebRoute.js';
 import goodsIssueWebRoutes from './routes/web/warehouse/goodsIssueWebRoute.js';
-import inventoryAdjustmentWebRoutes from './routes/web/warehouse/inventoryAdjustmentWebRoute.js';
-import reportWebRoutes from './routes/web/warehouse/reportWebRoute.js';
 import userWebRoutes from './routes/web/admin/userWebRoute.js';
 
 import { checkTypeContentJson, checkTypeContentFile, checkContentTypePlainText } from './middleware/contentTypeMiddleware.js';
@@ -69,26 +63,16 @@ app.use('/inicio-sesion', loginWebRoutes);
 app.use('/revocar-sesion', refreshWebRoutes);
 app.use('/cerrar-sesion', logoutWebRoutes);
 app.use('/productos', productWebRoutes);
-app.use('/insumos', supplyWebRoutes);
-app.use('/categorias', categoryWebRoutes);
 app.use('/proveedores', supplierWebRoutes);
-app.use('/compras', purchaseOrderWebRoutes);
 app.use('/requisiciones', purchaseRequisitionWebRoutes);
-app.use('/devoluciones-requisicion', requisitionReturnWebRoutes);
 app.use('/recepciones-compra', goodsReceiptWebRoutes);
-app.use('/devoluciones-compra', orderReturnsWebRoutes);
 app.use('/salidas-almacen', goodsIssueWebRoutes);
-app.use('/ajustes-inventario', inventoryAdjustmentWebRoutes);
-app.use('/reportes', reportWebRoutes);
 app.use('/usuarios', userWebRoutes);
 
 // api routes
 app.use(apiRoute + authRoute, authApiRoutes);
-app.use(apiRoute + warehouse + '/categories', categoryApiRoutes);
-
-app.use((req, res, next) => {
-    res.status(405).json({ message: 'Método HTTP no permitido.' });
-});
+app.use(apiRoute + warehouse + '/products', productApiRoutes);
+app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada.' });

@@ -41,7 +41,11 @@ const errorMessages = {
     MESSAGE_NOT_STRING: 'El mensaje debe ser una cadena de texto.',
     MESSAGE_TOO_SHORT: 'El mensaje es muy corto.',
     MESSAGE_TOO_LONG: 'El mensaje debe tener un máximo de 500 caracteres.',
-    CATEGORY_NOT_FOUND: 'Categoría no encontrada.'
+    PRODUCT_NOT_FOUND: 'Producto no encontrado.',
+    SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
+    INVALID_NUMBERPHONE: 'El teléfono no es un formato válido.',
+    EMPTY_ACTIVE: 'El valor Activo es requerido.',
+    INVALID_ACTIVE: 'El valor Activo debe ser un valor booleano.'
 };
 
 const successMessages = {
@@ -50,8 +54,10 @@ const successMessages = {
     UPDATED_ACCOUNT_PASSWORD: '¡Contraseña actualizada con éxito!',
     SUCCESS_LOGIN: '¡Inicio de sesión exitoso!',
     SUCCESS_LOGOUT: 'Sesión cerrada exitosamente.',
-    CREATED_CATEGORY: '¡Categoría creada exitosamente!',
-    UPDATED_CATEGORY: '¡Categoría actuallizada exitosamente!'
+    CREATED_PRODUCT: '¡Producto creada exitosamente!',
+    UPDATED_PRODUCT: '¡Producto actuallizada exitosamente!',
+    CREATED_SUPPLIER: '¡Proveedor creada exitosamente!',
+    UPDATED_SUPPLIER: '¡Proveedor actuallizada exitosamente!',
 };
 
 export const getErrorMessage = (code) => errorMessages[code] ?? null;

@@ -25,13 +25,6 @@ export const isNumber = (value, fieldName) => {
     return `${ fieldName } no es un número válido`;
 };
 
-export const isBoolean = (value, fieldName) => {
-    
-    if (typeof value === 'boolean') return null;
-
-    return `${ fieldName } no es un booleano válido`;
-};
-
 export const isLengthInRangeMin = (value, min, fieldName) => {
 
     const length = value.length;
@@ -63,3 +56,12 @@ export const includeUppercase = (value, fieldName) => {
 
     return null;
 };
+
+export const isNumberphone = (value) => {
+
+    const regex = /^(\+52\s?)?(\d{2,3}[- ]?\d{3}[- ]?\d{4})$/;
+
+    if (!regex.test(value)) return 'El teléfono es inválido';
+
+    return null;
+}

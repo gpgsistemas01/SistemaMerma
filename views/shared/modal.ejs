@@ -31,6 +31,9 @@ button = {
         <div class="modal-body dark">
             <form id="<%= modal.form.id %>" class="row g-3" novalidate>
                 <%- include('./outlineInputList', { inputs: modal.form.inputs }) %>
+                <% if (modal.form.checkbox) { %>
+                    <%- include('./checkbox', { input: modal.form.checkbox }) %>
+                <% } %>
 
                 <div class="col-12">
                     <%- include('./button', { button }) %>
