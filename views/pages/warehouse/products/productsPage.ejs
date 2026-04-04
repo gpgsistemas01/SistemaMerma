@@ -1,129 +1,105 @@
-<% const modal = {
-    header: {
-        button: {
-            id: 'productCloseBtn'
+<% const form = {
+    selects: [
+        {
+            id: 'categoryInput',
+            name: 'categoryId',
+            label: 'Categoría',
+            col: '6'
         },
-        title: {
-            id: 'productModalTitle'
+        {
+            id: 'uomInput',
+            name: 'uomId',
+            label: 'Unidad de Medida',
+            col: '6'
         }
-    },
-    form: {
-        id: 'productForm',
-        selects: [
-            {
-                id: 'categoryProductInput',
-                name: 'categoryId',
-                label: 'Categoría',
-            },
-            {
-                id: 'uomProductInput',
-                name: 'uomId',
-                label: 'Unidad de Medida',
-            }
-        ],
-        inputs: [
-            {
-                id: 'nameProductInput',
-                type: 'text',
-                name: 'name',
-                label: {
-                    content: 'Nombre'
-                }
-            },
-            {
-                id: 'unitCostProductInput',
-                type: 'number',
-                name: 'unitCost',
-                label: {
-                    content: 'Costo Unitario'
-                }
-            },
-            {
-                id: 'minStockProductInput',
-                type: 'number',
-                name: 'minStock',
-                label: {
-                    content: 'Stock Mínimo'
-                }
-            },
-            {
-                id: 'maxStockProductInput',
-                type: 'number',
-                name: 'maxStock',
-                label: {
-                    content: 'Stock Máximo'
-                }
-            },
-            {
-                id: 'expiryDateProductInput',
-                type: 'date',
-                name: 'expiryDate',
-                label: {
-                    content: 'Fecha de Vencimiento'
-                }
-            },
-            {
-                id: 'thicknessProductInput',
-                type: 'number',
-                name: 'thickness',
-                label: {
-                    content: 'Espesor'
-                }
-            },
-            {
-                id: 'baseProductInput',
-                type: 'number',
-                name: 'base',
-                label: {
-                    content: 'Base'
-                }
-            },
-            {
-                id: 'heightProductInput',
-                type: 'number',
-                name: 'height',
-                label: {
-                    content: 'Altura'
-                }
-            },
-            {
-                id: 'colorProductInput',
-                type: 'text',
-                name: 'color',
-                label: {
-                    content: 'Color'
-                }
-            },
-            {
-                id: 'typeProductInput',
-                type: 'text',
-                name: 'type',
-                label: {
-                    content: 'Tipo'
-                }
-            },
-            {
-                id: 'presentationProductInput',
-                type: 'text',
-                name: 'presentation',
-                label: {
-                    content: 'Presentación'
-                }
-            },
-        ],
-        checkboxes: [
-            {
-                id: 'isActiveProductInput',
-                type: 'checkbox',
-                name: 'isActive',
-                content: 'Activo'
-            }
-        ],
-        submitButton: {
-            id: 'saveProductBtn',
-            content: 'Guardar'
+    ],
+    inputs: [
+        {
+            id: 'nameInput',
+            type: 'text',
+            name: 'name',
+            label: 'Nombre',
+            col: '6'
+        },
+        {
+            id: 'unitCostInput',
+            type: 'number',
+            name: 'unitCost',
+            label: 'Costo Unitario',
+            col: '6'
+        },
+        {
+            id: 'minStockInput',
+            type: 'number',
+            name: 'minStock',
+            label: 'Stock Mínimo',
+            col: '6'
+        },
+        {
+            id: 'maxStockInput',
+            type: 'number',
+            name: 'maxStock',
+            label: 'Stock Máximo',
+            col: '6'
+        },
+        {
+            id: 'expiryDateInput',
+            type: 'date',
+            name: 'expiryDate',
+            label: 'Fecha de Vencimiento',
+            col: '6'
+        },
+        {
+            id: 'thicknessInput',
+            type: 'number',
+            name: 'thickness',
+            label: 'Espesor',
+            col: '6'
+        },
+        {
+            id: 'baseInput',
+            type: 'number',
+            name: 'base',
+            label: 'Base',
+            col: '6'
+        },
+        {
+            id: 'heightInput',
+            type: 'number',
+            name: 'height',
+            label: 'Altura',
+            col: '6'
+        },
+        {
+            id: 'colorInput',
+            type: 'text',
+            name: 'color',
+            label: 'Color',
+            col: '6'
+        },
+        {
+            id: 'typeInput',
+            type: 'text',
+            name: 'type',
+            label: 'Tipo',
+            col: '6'
+        },
+        {
+            id: 'presentationInput',
+            type: 'text',
+            name: 'presentation',
+            label: 'Presentación',
+            col: '6'
+        },
+    ],
+    checkboxes: [
+        {
+            id: 'isActiveInput',
+            type: 'checkbox',
+            name: 'isActive',
+            label: 'Activo'
         }
-    }
+    ]
 } %>
 
 <table id="productTable" class="display">
@@ -144,7 +120,7 @@
     <tbody></tbody>
 </table>
 
-<%- include('../../../shared/modal', { modal }) %>
+<%- include('../../../shared/modal', { form }) %>
 
 <script type="module" src="/js/pages/warehouse/products/index.js"></script>
 

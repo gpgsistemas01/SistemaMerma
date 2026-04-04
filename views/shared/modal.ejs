@@ -1,12 +1,11 @@
 <% const header = {
     button: {
-        id: modal.header.button.id,
+        id: 'closeBtn',
         dismissTarget: 'modal'
     },
     class: 'modal-header',
     title: {
-        id: modal.header.title.id,
-        content: modal.header.title.content,
+        id: 'modalTitle',
         class: 'modal-title',
     }
 }; 
@@ -29,20 +28,20 @@ button = {
         <%- include('./header', { header }) %>
 
         <div class="modal-body dark">
-            <form id="<%= modal.form.id %>" class="row g-3" novalidate>
-                <% if (modal.form.selects) { %>
-                    <%- include('./selectList', { inputs: modal.form.selects }) %>
+            <form id="form" class="row g-3" novalidate>
+                <% if (form.selects) { %>
+                    <%- include('./selectList', { inputs: form.selects }) %>
                 <% } %>
 
-                <%- include('./outlineInputList', { inputs: modal.form.inputs }) %>
+                <%- include('./outlineInputList', { inputs: form.inputs }) %>
 
-                <% if (modal.form.checkboxes) { %>
-                    <%- include('./checkboxList', { inputs: modal.form.checkboxes }) %>
+                <% if (form.checkboxes) { %>
+                    <%- include('./checkboxList', { inputs: form.checkboxes }) %>
                 <% } %>
 
                 <div class="col-12">
                     <%- include('./button', { button }) %>
-                    <%- include('./submit', { button: modal.form.submitButton }) %>
+                    <button id="submitBtn" type="submit" data-mdb-ripple-init class="btn btn-primary"></button>
                 </div>
             </form>
         </div>

@@ -2,8 +2,11 @@ import { initbaseSelect2 } from "./baseSelect.js";
 
 export const initProductSelect2 = async (data = null) => {
 
+    const categorySelector = '#categoryInput';
+    const uomSelect = '#uomInput';
+
     initbaseSelect2({
-        selector: '#categoryProductInput',
+        selector: categorySelector,
         url: '/api/warehouse/categories/',
         placeholder: 'Buscar categoría...',
         processResults: (data) => {
@@ -19,7 +22,7 @@ export const initProductSelect2 = async (data = null) => {
     });
 
     initbaseSelect2({
-        selector: '#uomProductInput',
+        selector: uomSelect,
         url: '/api/warehouse/uoms/',
         placeholder: 'Buscar unidad de medida...',
         processResults: (data) => {
@@ -37,13 +40,13 @@ export const initProductSelect2 = async (data = null) => {
     if (data) {
 
         const option = new Option(data.uom.name, data.uom.id, true, true);
-        $('#uomProductInput').append(option).trigger('change');
+        $(uomSelect).append(option).trigger('change');
         const categoryOption = new Option(data.category.name, data.category.id, true, true);
-        $('#categoryProductInput').append(categoryOption).trigger('change');
+        $(categorySelector).append(categoryOption).trigger('change');
 
     } else {
 
-        $('#categoryProductInput').empty().trigger('change');
-        $('#uomProductInput').empty().trigger('change');
+        $(categorySelector).empty().trigger('change');
+        $(uomSelect).empty().trigger('change');
     }
 }

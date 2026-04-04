@@ -34,3 +34,22 @@ export const validateFields = (validators, formData) => {
 
     return errors;
 }
+
+export const setFormReadOnly = ({
+    form,
+    isReadOnly
+}) => {
+    
+    const elements = form.querySelectorAll('input, select, textarea');
+
+    elements.forEach(el => {
+        if (isReadOnly) {
+            el.setAttribute('disabled', 'disabled');
+        } else {
+            el.removeAttribute('disabled');
+        }
+    });
+
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.style.display = isReadOnly ? 'none' : 'block';
+};

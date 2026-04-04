@@ -1,44 +1,29 @@
 <% const modal = {
-    header: {
-        button: {
-            id: 'supplierCloseBtn'
-        },
-        title: {
-            id: 'supplierModalTitle'
-        }
-    },
     form: {
-        id: 'supplierForm',
         inputs: [
             {
-                id: 'nameSupplierInput',
+                id: 'nameInput',
                 type: 'text',
                 name: 'name',
-                label: {
-                    content: 'Nombre'
-                }
+                label: 'Nombre',
+                col: '6'
             },
             {
-                id: 'numberphoneSupplierInput',
+                id: 'numberphoneInput',
                 type: 'tel',
                 name: 'numberphone',
-                label: {
-                    content: 'Teléfono'
-                }
+                label: 'Teléfono',
+                col: '6'
             },
         ],
         checkboxes: [
             {
-                id: 'isActiveSupplierInput',
+                id: 'isActiveInput',
                 type: 'checkbox',
                 name: 'isActive',
-                content: 'Activo'
+                label: 'Activo'
             }
-        ],
-        submitButton: {
-            id: 'saveSupplierBtn',
-            content: 'Guardar'
-        }
+        ]
     }
 } %>
 
@@ -55,7 +40,7 @@
     <tbody></tbody>
 </table>
 
-<%- include('../../../shared/modal', { modal }) %>
+<%- include('../../../shared/modal', { form }) %>
 
 <script type="module" src="/js/pages/warehouse/suppliers/index.js"></script>
 
