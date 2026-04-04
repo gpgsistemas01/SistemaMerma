@@ -1,6 +1,7 @@
 import { createProductDtoForRegister } from "../../../dtos/productDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { findAllProducts, createProduct, updateProduct } from "../../../services/productService.js";
+import { findAllProducts, createProduct, updateProduct } from "../../../services/warehouse/productService.js";
+import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllProducts = async (req, res) => {
 
@@ -26,8 +27,9 @@ export const getAllProducts = async (req, res) => {
 export const registerProduct = async (req, res) => {
 
     const productDto = createProductDtoForRegister(req.body);
+    const sanitizedProductDto = sanitizeEmptyStrings(productDto);
 
-    const product = await createProduct(productDto);
+    const product = await createProduct(sanitizedProductDto);
 
     return res.status(200).json({
         product,
@@ -38,8 +40,9 @@ export const registerProduct = async (req, res) => {
 export const editProduct = async (req, res) => {
 
     const productDto = createProductDtoForRegister(req.body);
+    const sanitizedProductDto = sanitizeEmptyStrings(productDto);
 
-    const product = await updateProduct(productDto, req.params.id);
+    const product = await updateProduct(sanitizedProductDto, req.params.id);
 
     return res.status(200).json({
         product,

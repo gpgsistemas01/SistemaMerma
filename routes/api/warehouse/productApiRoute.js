@@ -9,10 +9,6 @@ const router = express.Router();
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserWeb({
-        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-        departments: ['Almacén', 'Sistemas']
-    }),
     getAllProducts
 );
 

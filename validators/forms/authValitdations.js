@@ -1,5 +1,5 @@
 
-import { validatePassword, validateRepeatedPassword, validateUsername } from "../fields/fieldsValidator.js";
+import { validatePassword, validateUsername } from "../fields/fieldsValidator.js";
 
 export const loginValidation = [
     validateUsername,
@@ -9,5 +9,4 @@ export const loginValidation = [
 export const authRegisterValidation = [
     validateUsername,
     validatePassword,
-    validateRepeatedPassword,
 ];

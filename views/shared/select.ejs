@@ -1,17 +1,15 @@
 <div>
     <%- include('./labelInput', { 
-        id: selectInput.id, 
-        label: selectInput.label 
+        id: input.id, 
+        label: input.label 
     }) %>
 
-    <select id="<%= selectInput.id %>" name="<%= selectInput.name %>" class="form-select">
-        <% selectInput.options.forEach(option => { %>
-            <option value="<%= option.value %>"><%= option.label %></option>
-        <% }); %>
+    <select id="<%= input.id %>" name="<%= input.name %>" style="width: 100%" class="form-select">
+        <option></option>
     </select>
 
     <%- include('./validationMessage', { 
-        name: selectInput.name, 
-        errorClass: selectInput.errorClass || 'invalid-feedback' 
+        name: input.name, 
+        errorClass: input.errorClass || 'invalid-feedback' 
     }) %>
 </div>

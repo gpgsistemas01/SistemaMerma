@@ -1,18 +1,22 @@
 import { createProductDatatable } from "../../../plugins/datatable/productDatatable.js";
 import { useForm } from "../../../application/form.js";
 import { editProduct, registerProduct } from "../../../application/warehouse/products.js";
-import { validators } from "../../../core/validations/validators.js";
-import { hadnleSuccess } from "../../../utils/formUtils.js";
+import { productValidators } from "../../../core/validations/validators.js";
+import { hadnleSuccess, validateFields } from "../../../utils/formUtils.js";
+import { toggleInputSelectErrors } from "../../../ui/forms/formMessagesUI.js";
 
 createProductDatatable('productTable');
 
 useForm({
     selector: '#productForm',
+    normalizeData: ({ formData }) => {
+        formData.isActive = document.getElementById('isActiveProductInput').checked;
+    },
     getErrors: (formData) => {
         
-        const errors = {};
+        let errors = {};
 
-        errors.name = validators.name(formData.name);
+        errors = validateFields(productValidators, formData);
 
         return errors;
     },
@@ -25,5 +29,6 @@ useForm({
             update: editProduct,
             tableId: '#productTable'
         });
-    }
+    },
+    normalizeServerErrors: (form, serverErrors) => toggleInputSelectErrors(form, serverErrors)
 });

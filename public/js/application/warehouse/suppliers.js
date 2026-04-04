@@ -1,5 +1,5 @@
 import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
-import { editSupplierRequest, registerSupplierRequest } from "../../services/supplierService.js";
+import { editSupplierRequest, registerSupplierRequest } from "../../services/warehouse/supplierService.js";
 
 export const registerSupplier = async (formData) => {
 

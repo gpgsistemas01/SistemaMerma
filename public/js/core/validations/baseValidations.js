@@ -25,6 +25,22 @@ export const isNumber = (value, fieldName) => {
     return `${ fieldName } no es un número válido`;
 };
 
+export const isNegative = (value, fieldName) => {
+
+    if (value < 0) return `${ fieldName } no puede ser negativo`;
+
+    return null;
+}
+
+export const isDate = (value, fieldName) => {
+
+    const date = new Date(value);
+
+    if (!isNaN(date.getTime())) return null;
+
+    return `${ fieldName } no es una fecha válida`;
+}
+
 export const isLengthInRangeMin = (value, min, fieldName) => {
 
     const length = value.length;

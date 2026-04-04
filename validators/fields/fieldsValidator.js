@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import { errorCodeMessages } from "../../messages/codeMessages.js";
+import { errorMap } from "../../messages/codeMessages.js";
 
 const numberRegex = /\d/;
 const UppercaseRegex = /[A-Z]/;
@@ -8,75 +8,115 @@ const usernameRegex = /^[a-zA-Z0-9_]+$/;
 const passwordRegex = /^[A-Za-z0-9!@#\$%\^&\*]+$/;
 const nameRegex = /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u;
 
-export const validatePassword = 
-    body('password')
-        .notEmpty().withMessage(errorCodeMessages.EMPTY_PASSWORD)
-        .isString().withMessage(errorCodeMessages.PASSWORD_NOT_STRING)
-        .isLength({ min: 6 }).withMessage(errorCodeMessages.PASSWORD_TOO_SHORT)
-        .isLength({ max: 100 }).withMessage(errorCodeMessages.PASSWORD_TOO_LONG)
-        .matches(UppercaseRegex).withMessage(errorCodeMessages.PASSWORD_NEEDS_UPPERCASE)
-        .matches(numberRegex).withMessage(errorCodeMessages.PASSWORD_NEEDS_NUMBER)
-        .matches(passwordRegex).withMessage(errorCodeMessages.INVALID_PASSWORD_FORMAT)
+export const validateUsername = 
+    body('name')
+        .trim()
+        .notEmpty().withMessage(errorMap['username'].REQUIRED)
+        .isString().withMessage(errorMap['username'].INVALID_TYPE)
+        .isLength({ max: 50 }).withMessage(errorMap['username'].TOO_LONG)
+        .matches(whitespaceRegex).withMessage(errorMap['username'].NO_SPACES)
+        .matches(usernameRegex).withMessage(errorMap['username'].INVALID_FORMAT)
 ;
 
-export const validateRepeatedPassword = 
-    body('repeatedPassword')
-        .notEmpty().withMessage(errorCodeMessages.EMPTY_PASSWORD)
-        .isString().withMessage(errorCodeMessages.PASSWORD_NOT_STRING)
-        .custom((value, { req }) => {
-            if (value === req.body.password) return true;
-            throw new Error(errorCodeMessages.PASSWORDS_DO_NOT_MATCH);
-        })
+export const validatePassword = 
+    body('password')
+        .notEmpty().withMessage(errorMap['password'].REQUIRED)
+        .isString().withMessage(errorMap['password'].INVALID_TYPE)
+        .isLength({ min: 6 }).withMessage(errorMap['password'].TOO_SHORT)
+        .isLength({ max: 50 }).withMessage(errorMap['password'].TOO_LONG)
+        .matches(UppercaseRegex).withMessage(errorMap['password'].NEEDS_UPPERCASE)
+        .matches(numberRegex).withMessage(errorMap['password'].NEEDS_NUMBER)
+        .matches(passwordRegex).withMessage(errorMap['password'].INVALID_FORMAT)
 ;
 
 export const validateName = 
     body('name')
         .trim()
-        .notEmpty().withMessage(errorCodeMessages.EMPTY_NAME)
-        .isString().withMessage(errorCodeMessages.NAME_NOT_STRING)
-        .isLength({ min: 2 }).withMessage(errorCodeMessages.NAME_TOO_SHORT)
-        .isLength({ max: 50 }).withMessage(errorCodeMessages.NAME_TOO_LONG)
-        .matches(nameRegex).withMessage(errorCodeMessages.INVALID_NAME_CHARS)
-;
-
-export const validateLastName = 
-    body('lastName')
-        .trim()
-        .notEmpty().withMessage(errorCodeMessages.EMPTY_LAST_NAME)
-        .isString().withMessage(errorCodeMessages.LAST_NAME_NOT_STRING)
-        .isLength({ min: 2 }).withMessage(errorCodeMessages.LAST_NAME_TOO_SHORT)
-        .isLength({ max: 50 }).withMessage(errorCodeMessages.LAST_NAME_TOO_LONG)
-        .matches(nameRegex).withMessage(errorCodeMessages.INVALID_LAST_NAME_CHARS)
-;
-
-export const validateUsername = 
-    body('name')
-        .trim()
-        .notEmpty().withMessage(errorCodeMessages.EMPTY_USERNAME)
-        .isString().withMessage(errorCodeMessages.USERNAME_NOT_STRING)
-        .isLength({ min: 6 }).withMessage(errorCodeMessages.USERNAME_TOO_SHORT)
-        .isLength({ max: 100 }).withMessage(errorCodeMessages.USERNAME_TOO_LONG)
-        .matches(whitespaceRegex).withMessage(errorCodeMessages.USERNAME_INCLUDE_SPACE)
-        .matches(usernameRegex).withMessage(errorCodeMessages.INVALID_USERNAME_CHARS)
-;
-
-export const validateGenericText = 
-    body('q')
-        .trim()
-        .notEmpty().withMessage(errorCodeMessages.EMPTY_TEXT)
-        .isString().withMessage(errorCodeMessages.TEXT_NOT_STRING)
-        .isLength({ min: 1 }).withMessage(errorCodeMessages.TEXT_TOO_SHORT)
-        .isLength({ max: 500 }).withMessage(errorCodeMessages.TEXT_TOO_LONG)
+        .notEmpty().withMessage(errorMap['name'].REQUIRED)
+        .isString().withMessage(errorMap['name'].INVALID_TYPE)
+        .isLength({ max: 50 }).withMessage(errorMap['name'].TOO_LONG)
+        .matches(nameRegex).withMessage(errorMap['name'].INVALID_FORMAT)
 ;
 
 export const validateNumberphone =
         body('numberphone')
             .trim()
             .if(body('numberphone').exists())
-            .isMobilePhone('es-MX').withMessage(errorCodeMessages.INVALID_NUMBERPHONE)
+            .isMobilePhone('es-MX').withMessage(errorMap['numberphone'].INVALID_FORMAT)
+            .isLength({ max: 20 }).withMessage(errorMap['numberphone'].TOO_LONG)
 ;
 
 export const validateIsActive = 
     body('isActive')
-        .notEmpty().withMessage(errorCodeMessages.EMPTY_ACTIVE)
-        .isBoolean().withMessage(errorCodeMessages.INVALID_ACTIVE)
+        .notEmpty().withMessage(errorMap['isActive'].REQUIRED)
+        .isBoolean().withMessage(errorMap['isActive'].INVALID_BOOLEAN)
+        .toBoolean()
+;
+
+export const validateUUID = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isUUID('4').withMessage(errors.INVALID_UUID)
+};
+
+export const validateNumber = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isFloat().withMessage(errors.INVALID_NUMBER)
+        .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
+        .toFloat()
+};
+
+export const validateNumberOptional = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .if(body(fieldName).notEmpty())
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isFloat().withMessage(errors.INVALID_NUMBER)
+        .matches(/^\d{1,7}(\.\d{1,3})?$/).withMessage(errors.TOO_LONG)
+        .toFloat()
+};
+
+export const validateTextOptional = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .trim()
+        .if(body(fieldName).notEmpty())
+        .isString().withMessage(errors.INVALID_TYPE)
+        .isLength({ max: 50 }).withMessage(errors.TOO_LONG)
+};
+
+export const validateMinMaxStock = 
+    body('minStock')
+        .custom((value, { req }) => {
+
+            const errors = errorMap['minStock'];
+            const maxStock = parseFloat(req.body.maxStock);
+            const minStock = parseFloat(value);
+
+            if (minStock > maxStock) throw new Error(errors.MIN_GREATER_THAN_MAX);
+
+            return true;
+        })
+;
+
+export const validateDateOptional = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .if(body(fieldName).notEmpty())
+        .isISO8601().withMessage(errors.INVALID_FORMAT)
+        .custom(value => !isNaN(new Date(value))).withMessage(errors.INVALID_FORMAT)
+        .toDate()
+}

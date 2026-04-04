@@ -63,18 +63,18 @@ async function main() {
 
     await prisma.category.createMany({
         data: [
-            { id: '00000000-0000-0000-0000-000000000051', name: 'Flexibles' },
-            { id: '00000000-0000-0000-0000-000000000052', name: 'Rígidos' },
-            { id: '00000000-0000-0000-0000-000000000053', name: 'Papel' }
+            { name: 'Flexibles' },
+            { name: 'Rígidos' },
+            { name: 'Papel' }
         ],
         skipDuplicates: true
     });
 
     await prisma.uoM.createMany({
         data: [
-            { id: '00000000-0000-0000-0000-000000000061', name: 'litros', abbrevation: 'L' },
-            { id: '00000000-0000-0000-0000-000000000062', name: 'metros', abbrevation: 'm' },
-            { id: '00000000-0000-0000-0000-000000000063', name: 'milimetros', abbrevation: 'mm' }
+            { name: 'litros', abbrevation: 'L' },
+            { name: 'metros', abbrevation: 'm' },
+            { name: 'milimetros', abbrevation: 'mm' }
         ],
         skipDuplicates: true
     });

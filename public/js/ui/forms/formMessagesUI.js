@@ -20,7 +20,7 @@ export const toggleErrorMessages = (form, errors) => {
     });
 }
 
-export const setInputFileError = (form, key, message = null) => {
+export const setInputSelectError = (form, key, message = null) => {
 
     const feedback = form.querySelector(`[data-error-for='${ key }']`);
 
@@ -38,12 +38,12 @@ export const setInputFileError = (form, key, message = null) => {
     }
 }
 
-export const toggleFileErrors = (form, errors) => {
+export const toggleInputSelectErrors = (form, errors) => {
 
-    form.querySelectorAll('input[type="file"]').forEach(input => {
+    form.querySelectorAll('select').forEach(input => {
 
         const key = input.name;
         const value = errors[key];
-        setInputFileError(form, key, value);
+        setInputSelectError(form, key, value);
     });
 }

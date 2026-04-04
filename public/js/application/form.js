@@ -19,7 +19,7 @@ export const useForm = async ({
 
         const formData = Object.fromEntries(new FormData(form));
 
-        normalizeData(form, formData);
+        normalizeData({ form, formData });
 
         const errors = getErrors(formData);
 

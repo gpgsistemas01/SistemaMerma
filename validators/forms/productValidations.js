@@ -1,5 +1,19 @@
-import { validateName } from "../fields/fieldsValidator.js";
+import { validateDateOptional, validateIsActive, validateMinMaxStock, validateName, validateNumber, validateNumberOptional, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
 
 export const productValidation = [
-    validateName
+    validateUUID('categoryId'),
+    validateUUID('uomId'),
+    validateName,
+    validateNumber('unitCost'),
+    validateNumber('minStock'),
+    validateNumber('maxStock'),
+    validateMinMaxStock,
+    validateDateOptional('expiryDate'),
+    validateNumberOptional('thickness'),
+    validateNumberOptional('base'),
+    validateNumberOptional('height'),
+    validateTextOptional('color'),
+    validateTextOptional('type'),
+    validateTextOptional('presentation'),
+    validateIsActive
 ]

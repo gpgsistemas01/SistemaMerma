@@ -9,6 +9,18 @@
     },
     form: {
         id: 'productForm',
+        selects: [
+            {
+                id: 'categoryProductInput',
+                name: 'categoryId',
+                label: 'Categoría',
+            },
+            {
+                id: 'uomProductInput',
+                name: 'uomId',
+                label: 'Unidad de Medida',
+            }
+        ],
         inputs: [
             {
                 id: 'nameProductInput',
@@ -17,6 +29,94 @@
                 label: {
                     content: 'Nombre'
                 }
+            },
+            {
+                id: 'unitCostProductInput',
+                type: 'number',
+                name: 'unitCost',
+                label: {
+                    content: 'Costo Unitario'
+                }
+            },
+            {
+                id: 'minStockProductInput',
+                type: 'number',
+                name: 'minStock',
+                label: {
+                    content: 'Stock Mínimo'
+                }
+            },
+            {
+                id: 'maxStockProductInput',
+                type: 'number',
+                name: 'maxStock',
+                label: {
+                    content: 'Stock Máximo'
+                }
+            },
+            {
+                id: 'expiryDateProductInput',
+                type: 'date',
+                name: 'expiryDate',
+                label: {
+                    content: 'Fecha de Vencimiento'
+                }
+            },
+            {
+                id: 'thicknessProductInput',
+                type: 'number',
+                name: 'thickness',
+                label: {
+                    content: 'Espesor'
+                }
+            },
+            {
+                id: 'baseProductInput',
+                type: 'number',
+                name: 'base',
+                label: {
+                    content: 'Base'
+                }
+            },
+            {
+                id: 'heightProductInput',
+                type: 'number',
+                name: 'height',
+                label: {
+                    content: 'Altura'
+                }
+            },
+            {
+                id: 'colorProductInput',
+                type: 'text',
+                name: 'color',
+                label: {
+                    content: 'Color'
+                }
+            },
+            {
+                id: 'typeProductInput',
+                type: 'text',
+                name: 'type',
+                label: {
+                    content: 'Tipo'
+                }
+            },
+            {
+                id: 'presentationProductInput',
+                type: 'text',
+                name: 'presentation',
+                label: {
+                    content: 'Presentación'
+                }
+            },
+        ],
+        checkboxes: [
+            {
+                id: 'isActiveProductInput',
+                type: 'checkbox',
+                name: 'isActive',
+                content: 'Activo'
             }
         ],
         submitButton: {
@@ -30,6 +130,13 @@
     <thead>
         <tr>
             <th>Nombre</th>
+            <th>Medidas (base x altura)</th>
+            <th>Costo Unitario</th>
+            <th>Stock Actual</th>
+            <th>Stock Mínimo</th>
+            <th>Stock Máximo</th>
+            <th>Fecha de Vencimiento</th>
+            <th>Estado</th>
             <th>Acciones</th>
         </tr>
     </thead>

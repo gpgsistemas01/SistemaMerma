@@ -1,5 +1,5 @@
 import { verifyAccessToken } from "../services/jwtService.js";
-import { errorCodeMessages } from "../messages/codeMessages.js";
+import { errorMap } from "../messages/codeMessages.js";
 import { clearAuthCookies } from "../utils/cookiesUtils.js";
 import { getLoggedUser } from "../services/userService.js";
 
@@ -44,7 +44,7 @@ export const verifyApiTokenRequired = (req, res, next) => {
 
     const tokenInfo = getAuthTokenInfo(req, res);
 
-    if (!tokenInfo) return res.status(401).json({ code: errorCodeMessages.INVALID_AUTH });
+    if (!tokenInfo) return res.status(401).json({ code: errorMap.message.INVALID_AUTH });
 
     req.userId = tokenInfo.id;
     next();
@@ -67,7 +67,7 @@ const createAuthorizeMiddleware = (handler) => (permissions) => async (req, res,
 };
 
 export const authorizeUserApi = createAuthorizeMiddleware((req, res) =>
-    res.status(401).json({ code: errorCodeMessages.INVALID_AUTH })
+    res.status(401).json({ code: errorMap.message.INVALID_AUTH })
 );
 
 export const authorizeUserWeb = createAuthorizeMiddleware((req, res) =>

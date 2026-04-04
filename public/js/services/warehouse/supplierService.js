@@ -1,4 +1,4 @@
-import { apiRequest } from "./axiosInstanceApi.js";
+import { apiRequest } from "../axiosInstanceApi.js";
 
 const route = '/api/warehouse';
 

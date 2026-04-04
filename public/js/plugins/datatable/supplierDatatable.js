@@ -9,9 +9,7 @@ export const createSupplierDatatable = (tableId) => {
             { data: 'numberphone' },
             { 
                 data: 'isActive',
-                render: (data, type, row) => {
-                    return data ? 'Activo' : 'Inactivo';
-                }
+                render: (data) => data ? 'Activo' : 'Inactivo'
             },
             {
                 data: 'id',

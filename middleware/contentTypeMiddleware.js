@@ -1,4 +1,4 @@
-import { errorCodeMessages } from "../messages/codeMessages.js";
+import { errorMap } from "../messages/codeMessages.js";
 
 const checkContentType = (req, res, next, contentTypeRequired) => {
 
@@ -9,7 +9,7 @@ const checkContentType = (req, res, next, contentTypeRequired) => {
     if (!contentType || !contentType.includes(contentTypeRequired)) {
 
         return res.status(415).json({
-            code: errorCodeMessages.INVALID_CONTENT_TYPE,
+            code: errorMap.message.INVALID_CONTENT_TYPE,
             contentType: contentTypeRequired
         });
     }

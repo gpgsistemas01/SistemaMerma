@@ -3,6 +3,8 @@ import 'dotenv/config.js';
 import authApiRoutes from './routes/api/authApiRoute.js';
 import productApiRoutes from './routes/api/warehouse/productApiRoute.js';
 import supplierApiRoutes  from './routes/api/warehouse/supplierApiRoute.js';
+import categoryApiRoutes from './routes/api/warehouse/categoryApiRoute.js';
+import uomApiRoutes from './routes/api/warehouse/uomApiRoute.js';
 
 import loginWebRoutes from './routes/web/auth/loginWebRoute.js';
 import logoutWebRoutes from './routes/web/auth/logoutWebRoute.js';
@@ -13,7 +15,6 @@ import supplierWebRoutes from './routes/web/warehouse/supplierWebRoute.js';
 import purchaseRequisitionWebRoutes from './routes/web/warehouse/purchaseRequisitionWebRoute.js';
 import goodsReceiptWebRoutes from './routes/web/warehouse/goodsReceiptWebRoute.js';
 import goodsIssueWebRoutes from './routes/web/warehouse/goodsIssueWebRoute.js';
-import userWebRoutes from './routes/web/admin/userWebRoute.js';
 
 import { checkTypeContentJson, checkTypeContentFile, checkContentTypePlainText } from './middleware/contentTypeMiddleware.js';
 import cookieParser from 'cookie-parser';
@@ -21,7 +22,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import expressEjsLayouts from 'express-ejs-layouts';
 import { publicDir, viewsDir } from './utils/pathsUtils.js';
-import { errorCodeMessages } from './messages/codeMessages.js';
+import { errorMap } from './messages/codeMessages.js';
 
 const app = express();
 const rootRoute = '/';
@@ -67,12 +68,13 @@ app.use('/proveedores', supplierWebRoutes);
 app.use('/requisiciones', purchaseRequisitionWebRoutes);
 app.use('/recepciones-compra', goodsReceiptWebRoutes);
 app.use('/salidas-almacen', goodsIssueWebRoutes);
-app.use('/usuarios', userWebRoutes);
 
 // api routes
 app.use(apiRoute + authRoute, authApiRoutes);
 app.use(apiRoute + warehouse + '/products', productApiRoutes);
 app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
+app.use(apiRoute + warehouse + '/categories', categoryApiRoutes);
+app.use(apiRoute + warehouse + '/uoms', uomApiRoutes);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada.' });
@@ -80,7 +82,7 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ code: errorCodeMessages.SERVER_ERROR });
+    res.status(500).json({ code: errorMap.message.SERVER_ERROR });
 });
 
 const PORT = process.env.PORT || 3000;

@@ -1,15 +1,15 @@
 import { login } from "../../application/auth/login.js";
 import { useForm } from "../../application/form.js";
-import { validators } from "../../core/validations/validators.js";
+import { loginValidators } from "../../core/validations/validators.js";
+import { validateFields } from "../../utils/formUtils.js";
 
 useForm({
     selector: '#loginForm',
     getErrors: (formData) => {
 
-        const errors = {};
+        let errors = {};
 
-        errors.name = validators.username(formData.name);
-        errors.password = validators.password(formData.password);
+        errors = validateFields(loginValidators, formData);
 
         return errors;
     },

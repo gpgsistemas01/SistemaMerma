@@ -1,8 +1,7 @@
 import express from 'express';
-import { login, refreshAuthToken, resetPassword } from '../../controllers/api/authController.js';
+import { login, refreshAuthToken } from '../../controllers/api/authController.js';
 import { loginValidation } from '../../validators/forms/authValitdations.js';
-import { passwordValidation } from '../../validators/forms/validations.js';
-import { validate, validateLogin } from '../../middleware/validatorMiddleware.js';
+import { validateLogin } from '../../middleware/validatorMiddleware.js';
 
 const router = express.Router();
 
@@ -16,13 +15,6 @@ router.post(
 router.post(
     '/refresh', 
     refreshAuthToken
-);
-
-router.patch(
-    '/reset', 
-    passwordValidation, 
-    validate, 
-    resetPassword
 );
 
 export default router;

@@ -1,3 +1,4 @@
+import { reloadDataTable } from "../plugins/datatable/baseDatatable.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 
 export const hadnleSuccess = async ({ form, formData, create, update, tableId }) => {
@@ -20,7 +21,16 @@ export const hadnleSuccess = async ({ form, formData, create, update, tableId })
 
     modal.hide();
 
-    const table = $(tableId).DataTable();
+    reloadDataTable('productTable');
+}
 
-    table.draw(null, false);
+export const validateFields = (validators, formData) => {
+
+    const errors = {};
+
+    Object.keys(validators).forEach(field => {
+        errors[field] = validators[field](formData[field]);
+    });
+
+    return errors;
 }

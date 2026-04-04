@@ -1,6 +1,7 @@
 import { createSupplierDtoForRegister } from "../../../dtos/supplierDto.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { findAllSuppliers, createSupplier, updateSupplier } from "../../../services/supplierService.js";
+import { findAllSuppliers, createSupplier, updateSupplier } from "../../../services/warehouse/supplierService.js";
+import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllSuppliers = async (req, res) => {
 
@@ -26,8 +27,9 @@ export const getAllSuppliers = async (req, res) => {
 export const registerSupplier = async (req, res) => {
 
     const supplierDto = createSupplierDtoForRegister(req.body);
+    const sanitizedSupplierDto = sanitizeEmptyStrings(supplierDto);
 
-    const supplier = await createSupplier(supplierDto);
+    const supplier = await createSupplier(sanitizedSupplierDto);
 
     return res.status(200).json({
         supplier,
@@ -38,8 +40,9 @@ export const registerSupplier = async (req, res) => {
 export const editSupplier = async (req, res) => {
 
     const supplierDto = createSupplierDtoForRegister(req.body);
+    const sanitizedSupplierDto = sanitizeEmptyStrings(supplierDto);
 
-    const supplier = await updateSupplier(supplierDto, req.params.id);
+    const supplier = await updateSupplier(sanitizedSupplierDto, req.params.id);
 
     return res.status(200).json({
         supplier,

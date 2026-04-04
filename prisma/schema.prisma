@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -13,82 +8,81 @@ datasource db {
 }
 
 model Department {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name  String @unique @db.VarChar(50)
   users User[]
 }
 
 model Role {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name  String @unique @db.VarChar(50)
   users User[]
 }
 
 model User {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  departmentId String @db.Uuid
-  department Department @relation(fields: [departmentId], references: [id])
-  roleId String @db.Uuid
-  role Role @relation(fields: [roleId], references: [id])
-  isActive Boolean @default(true)
-  name String @unique
-  password String
-  profiles Profile[]
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  departmentId String     @db.Uuid
+  roleId       String     @db.Uuid
+  name         String     @unique @db.VarChar(50)
+  password     String     @db.VarChar(50)
+  isActive     Boolean    @default(true)
+  profiles     Profile?
+  department   Department @relation(fields: [departmentId], references: [id])
+  role         Role       @relation(fields: [roleId], references: [id])
 }
 
 model Profile {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String
-  lastName String
-  userId String @unique @db.Uuid
-  user User @relation(fields: [userId], references: [id])
+  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String  @db.VarChar(50)
+  lastName String  @db.VarChar(50)
+  userId   String  @unique @db.Uuid
   isActive Boolean @default(true)
+  user     User    @relation(fields: [userId], references: [id])
 }
 
 model Category {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique
+  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String    @unique
   products Product[]
 }
 
 model Status {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name String @unique
 }
 
 model Product {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String
-  sku String
-  unitCost Decimal
-  currentStock Decimal
-  minimunStock Decimal
-  maximunStock Decimal
-  expiryDate DateTime
-  width Decimal?
-  length Decimal?
-  thickness Decimal?
-  color String?
-  voltage Int?
-  type String?
-  presentation String?
-  isActive Boolean @default(true)
-  uomId String @db.Uuid
-  uom UoM @relation(fields: [uomId], references: [id])
-  categoryId String @db.Uuid
-  category Category @relation(fields: [categoryId], references: [id])
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String   @db.VarChar(50)
+  sku          String?   @db.VarChar(50)
+  unitCost     Decimal  @db.Decimal(10, 2)
+  currentStock Decimal  @db.Decimal(10, 2)
+  expiryDate   DateTime?
+  thickness    Decimal? @db.Decimal(10, 3)
+  color        String?  @db.VarChar(50)
+  type         String?  @db.VarChar(50)
+  presentation String?  @db.VarChar(50)
+  uomId        String   @db.Uuid
+  categoryId   String   @db.Uuid
+  isActive     Boolean  @default(true)
+  maxStock     Decimal  @db.Decimal(10, 2)
+  minStock     Decimal  @db.Decimal(10, 2)
+  base         Decimal? @db.Decimal(10, 3)
+  height       Decimal? @db.Decimal(10, 3)
+  category     Category @relation(fields: [categoryId], references: [id])
+  uom          UoM      @relation(fields: [uomId], references: [id])
 }
 
 model UoM {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique
-  abbrevation String @unique
-  product Product[]
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String    @unique @db.VarChar(10)
+  abbrevation String    @unique @db.VarChar(10)
+  product     Product[]
 }
 
 model Supplier {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique
-  numberphone String?
-  isActive Boolean @default(true)
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String  @unique @db.VarChar(50)
+  numberphone String? @db.VarChar(20)
+  isActive    Boolean @default(true)
 }

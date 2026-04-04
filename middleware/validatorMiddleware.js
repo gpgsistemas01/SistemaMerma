@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator';
-import { errorCodeMessages } from '../messages/codeMessages.js';
+import { errorMap } from '../messages/codeMessages.js';
 
 export const validate = (req, res, next) => {
 
@@ -13,7 +13,7 @@ export const validate = (req, res, next) => {
             errors[error.path] = error.msg;
         });
 
-        return res.status(400).json({ errors, code: errorCodeMessages.VALIDATION_ERROR });
+        return res.status(400).json({ errors, code: errorMap.message.VALIDATION_ERROR });
     }
 
     next();
@@ -23,7 +23,7 @@ export const validateLogin = (req, res, next) => {
 
     const errorsArray = validationResult(req).array();
 
-    if (errorsArray.length > 0) return res.status(401).json({ code: errorCodeMessages.LOGIN_ERROR });
+    if (errorsArray.length > 0) return res.status(401).json({ code: errorMap.message.LOGIN_ERROR });
 
     next();
 }

@@ -1,5 +1,5 @@
-import { SupplierNotFound } from "../errors/warehouse/supplierError.js";
-import { prisma } from "../lib/prisma.js";
+import { SupplierNotFound } from "../../errors/warehouse/supplierError.js";
+import { prisma } from "../../lib/prisma.js";
 
 export const findAllSuppliers = async ({
     skip = 0,
