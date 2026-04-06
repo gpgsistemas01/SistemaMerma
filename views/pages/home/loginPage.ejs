@@ -1,34 +1,25 @@
 <% const form = {
-    id: 'loginForm',
     inputs: [
         { 
-            id: 'nameLoginInput', 
-            label: {
-                content: 'Nombre de usuario:'
-            },
+            id: 'nameInput',
             name: 'name', 
-            type: 'name'
+            type: 'name',
+            label: 'Nombre de usuario:',
         },
         { 
-            id:'passwordLoginInput', 
-            label: {
-                content: 'Contraseña:'
-            },
+            id: 'passwordInput',
             name: 'password', 
-            type: 'password' 
+            type: 'password',
+            label: 'Contraseña:',
         }
-    ],
-    submitButton: {
-        id: 'loginBtn',
-        content: 'Ingresar'
-    }
+    ]
 } %>
 
-<form id="<%= form.id %>" class="row g-3" novalidate>
+<form id="form" class="row g-3" novalidate>
     <%- include('../../shared/outlineInputList', { inputs: form.inputs }) %>
 
     <div class="col-12">
-        <%- include('../../shared/submit', { button: form.submitButton }) %>
+        <%- include('../../shared/submit') %>
     </div>
 </form>
 

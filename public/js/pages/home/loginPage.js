@@ -3,8 +3,9 @@ import { useForm } from "../../application/form.js";
 import { loginValidators } from "../../core/validations/validators.js";
 import { validateFields } from "../../utils/formUtils.js";
 
+document.getElementById('submitBtn').textContent = 'Ingresar';
+
 useForm({
-    selector: '#loginForm',
     getErrors: (formData) => {
 
         let errors = {};

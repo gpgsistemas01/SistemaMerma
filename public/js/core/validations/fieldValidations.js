@@ -84,12 +84,22 @@ export const validateNumber = (number, fieldName) => {
     return result;
 }
 
-export const validateExpiryDate = (expiryDate) => {
+export const validateDate = (date, fieldName) => {
 
-    if (!expiryDate) return null;
+    let result = isEmptyOrNull(Date, fieldName);
 
-    const fieldName = 'La fecha de vencimiento';
-    const result = isDate(expiryDate, fieldName);
+    if (result) return result;
+
+    result = isDate(date, fieldName);
+
+    return result;
+}
+
+export const validateDateOptional = (date, fieldName) => {
+
+    if (!date) return null;
+
+    const result = isDate(date, fieldName);
 
     return result;
 }
@@ -137,3 +147,34 @@ export const validateTextOptional = (name, fieldName) => {
 }
 
 export const validateName = (name) => validateText(name, 'El nombre');
+
+export const validateDetailsArray = (details) => {
+
+    if (!Array.isArray(details) || details.length === 0) {
+        return 'La lista de detalles debe contener al menos un producto.';
+    }
+
+    for (const detail of details) {
+
+        if (!detail.productId || !detail.quantity) {
+            return 'Cada detalle debe contener un producto y una cantidad.';
+        }
+
+        if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
+            return 'La cantidad de cada detalle debe ser un número mayor a cero.';
+        }
+
+        if (detail.description) {
+
+            if (typeof detail.description !== 'string') {
+                return 'Si hay descripción, entonces debe ser texto.';
+            }
+
+            if (detail.description.length > 50) {
+                return 'Si hay descripción, entonces no debe exceder 50 caracteres.';
+            }
+        }
+    }
+
+    return null;
+};

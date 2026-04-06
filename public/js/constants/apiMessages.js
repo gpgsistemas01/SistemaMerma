@@ -15,6 +15,14 @@ export const errorMessages = {
     UOM_ID_REQUIRED: 'La unidad de medida es requerida.',
     UOM_ID_INVALID_UUID: 'La unidad de medida no es válida.',
 
+    // SUPPLIER
+    SUPPLIER_ID_REQUIRED: 'El proveedor es requerido.',
+    INVALID_UUID: 'El proveedor no es válido.',
+
+    // RECEIVED BY
+    RECEIVED_BY_ID_REQUIRED: 'La person que recibe es requerida.',
+    RECEIVED_BY_ID_INVALID_UUID: 'La persona que recibe no es válida.',
+
     // 👤 USERNAME
     USERNAME_REQUIRED: 'El nombre de usuario es requerido.',
     USERNAME_INVALID_TYPE: 'El nombre de usuario debe ser texto.',
@@ -60,6 +68,10 @@ export const errorMessages = {
     // 📅 EXPIRY DATE
     EXPIRY_DATE_INVALID_FORMAT: 'La fecha de caducidad no es válida.',
 
+    // RECEPTION DATE
+    RECEPTION_DATE_REQUIRED: 'La fecha de recepción es requerida.',
+    RECEPTION_DATE_INVALID_FORMAT: 'La fecha de recepción no es válida.',
+
     // 📏 THICKNESS
     THICKNESS_INVALID_NUMBER: 'Debe ser un número.',
     THICKNESS_TOO_LONG: 'El valor es demasiado grande.',
@@ -74,19 +86,29 @@ export const errorMessages = {
 
     // 🎨 COLOR
     COLOR_INVALID_TYPE: 'El color debe ser texto.',
-    COLOR_TOO_LONG: 'El color es demasiado largo.',
+    COLOR_TOO_LONG: 'El color no debe exceder más de 50 caracteres.',
 
     // 🏷 TYPE
     TYPE_INVALID_TYPE: 'El tipo debe ser texto.',
-    TYPE_TOO_LONG: 'El tipo es demasiado largo.',
+    TYPE_TOO_LONG: 'El tipo no debe exceder más de 50 caracteres.',
 
     // 📦 PRESENTATION
     PRESENTATION_INVALID_TYPE: 'La presentación debe ser texto.',
-    PRESENTATION_TOO_LONG: 'La presentación es demasiado larga.',
+    PRESENTATION_TOO_LONG: 'La presentación no debe exceder más de 50 caracteres.',
+
+    // OBSERVATIONS
+    OBSERVATIONS_INVALID_TYPE: 'Las observaciones deben ser texto.',
+    OBSERVATIONS_TOO_LONG: 'Las observaciones no deben exceder más de 50 caracteres.',
 
     // 🔘 ACTIVE
     ACTIVE_REQUIRED: 'El estado activo es requerido.',
     ACTIVE_INVALID_BOOLEAN: 'El estado activo debe ser verdadero o falso.',
+
+    // DETAILS
+    DETAILS_REQUIRED: 'La lista de detalles debe contener al menos un producto.',
+    DETAILS_INVALID_FORMAT_REQUIRED: 'Cada detalle debe contener un producto y una cantidad.',
+    DETAILS_INVALID_FORMAT_QUANTITY: 'La cantidad de cada detalle debe ser un número mayor a cero.',
+    INVALID_FORMAT_DESCRIPTION: 'Si hay descripción, entonces debe ser texto y no debe ser mayor a 50 caracteres.'
 };
 
 const successMessages = {
@@ -98,6 +120,8 @@ const successMessages = {
     UPDATED_PRODUCT: '¡Producto actuallizada exitosamente!',
     CREATED_SUPPLIER: '¡Proveedor creada exitosamente!',
     UPDATED_SUPPLIER: '¡Proveedor actuallizada exitosamente!',
+    CREATED_GOODS_RECEIPT: '¡Entrada de mercancía creada exitosamente!',
+    UPDATED_GOODS_RECEIPT: '¡Entrada de mercancía actualizada exitosamente!'
 };
 
 export const getErrorMessage = (code) => errorMessages[code] ?? null;

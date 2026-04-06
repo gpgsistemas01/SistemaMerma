@@ -20,7 +20,7 @@ export const toggleErrorMessages = (form, errors) => {
     });
 }
 
-export const setInputSelectError = (form, key, message = null) => {
+const setInputSelectError = (form, key, message = null) => {
 
     const feedback = form.querySelector(`[data-error-for='${ key }']`);
 
@@ -44,6 +44,38 @@ export const toggleInputSelectErrors = (form, errors) => {
 
         const key = input.name;
         const value = errors[key];
+        
         setInputSelectError(form, key, value);
+
+        if ($(input).hasClass('select2-hidden-accessible')) {
+
+            if (value) $(input).next('.select2-container').find('.select2-selection').addClass('is-invalid');
+            else $(input).next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+        }
     });
+}
+
+const setTableError = (form, key, message = null) => {
+
+    const feedback = form.querySelector(`[data-error-for=${ key }]`);
+
+    if (!feedback) return;
+
+    if (message) {
+
+        feedback.textContent = message;
+        feedback.classList.remove('d-none');
+
+    } else {
+
+        feedback.textContent = null;
+        feedback.classList.add('d-none');
+    }
+}
+
+export const toggleTableErrors = (form, errors) => {
+
+    const key = 'details';
+    const value = errors[key];
+    setTableError(form, key, value);
 }

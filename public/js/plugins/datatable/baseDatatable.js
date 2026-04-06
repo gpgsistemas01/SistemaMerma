@@ -1,6 +1,6 @@
-export const createDataTable = (tableId, options = {}) => {
+export const createDataTable = ({ selector = '#table', options = {} }) => {
 
-    return $(`#${tableId}`).DataTable({
+    return $(selector).DataTable({
         ...options,
         dom: 'Bfrtip',
         language: {
@@ -8,13 +8,13 @@ export const createDataTable = (tableId, options = {}) => {
         },
         responsive: true,
         autoWidth: false,
-        serverSide: true,
-        processing: true
+        serverSide: options.ajax ? true : false,
+        processing: options.ajax ? true : false,
     });
 }
 
-export const reloadDataTable = (tableId) => {
+export const reloadDataTable = () => {
 
-    const table = $(`#${tableId}`).DataTable();
+    const table = $('#table').DataTable();
     table.ajax.reload(null, false);
 }

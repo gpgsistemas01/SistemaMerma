@@ -1,4 +1,4 @@
-import { validateExpiryDate, validateName, validateNumberphone, validatePassword, validateNumber, validateUsername, validateTextOptional, validateDimension } from "./fieldValidations.js";
+import { validateName, validateNumberphone, validatePassword, validateNumber, validateUsername, validateTextOptional, validateDimension, validateDateOptional, validateDetailsArray, validateDate } from "./fieldValidations.js";
 
 export const supplierValidators = {
     name: validateName,
@@ -10,7 +10,7 @@ export const productValidators = {
     unitCost: (value) => validateNumber(value, 'El costo unitario'),
     minStock: (value) => validateNumber(value, 'El stock mínimo'),
     maxStock: (value) => validateNumber(value, 'El stock máximo'),
-    expiryDate: validateExpiryDate,
+    expiryDate: (value) => validateDateOptional(value, 'La fecha de vencimiento'),
     thickness: (value) => validateDimension(value, 'El espesor'),
     base: (value) => validateDimension(value, 'La base'),
     height: (value) => validateDimension(value, 'La altura'),
@@ -22,4 +22,10 @@ export const productValidators = {
 export const loginValidators = {
     name: validateUsername,
     password: validatePassword,
+}
+
+export const validateGoodsReceiptValidators = {
+    observations: (value) => validateTextOptional(value, 'Las observaciones'),
+    receptionDate: (value) => validateDate(value, 'La fecha de recepción'),
+    details: validateDetailsArray
 }

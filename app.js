@@ -5,6 +5,8 @@ import productApiRoutes from './routes/api/warehouse/productApiRoute.js';
 import supplierApiRoutes  from './routes/api/warehouse/supplierApiRoute.js';
 import categoryApiRoutes from './routes/api/warehouse/categoryApiRoute.js';
 import uomApiRoutes from './routes/api/warehouse/uomApiRoute.js';
+import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.js';
+import profileApiRoutes from './routes/api/admin/profileApiRoute.js';
 
 import loginWebRoutes from './routes/web/auth/loginWebRoute.js';
 import logoutWebRoutes from './routes/web/auth/logoutWebRoute.js';
@@ -31,6 +33,7 @@ const textRoute = '/text';
 const uploadRoute = '/upload';
 const authRoute = '/auth';
 const warehouse = '/warehouse';
+const admin = '/admin';
 
 app.set('views', viewsDir);
 app.set('view engine', 'ejs');
@@ -75,6 +78,8 @@ app.use(apiRoute + warehouse + '/products', productApiRoutes);
 app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
 app.use(apiRoute + warehouse + '/categories', categoryApiRoutes);
 app.use(apiRoute + warehouse + '/uoms', uomApiRoutes);
+app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);
+app.use(apiRoute + admin + '/profiles', profileApiRoutes);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada.' });

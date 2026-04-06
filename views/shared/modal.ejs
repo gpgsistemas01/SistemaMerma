@@ -22,7 +22,7 @@ button = {
 }; %>
 
 <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="<%= header.title.id %>">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
         
         <%- include('./header', { header }) %>
@@ -39,9 +39,26 @@ button = {
                     <%- include('./checkboxList', { inputs: form.checkboxes }) %>
                 <% } %>
 
+                <% if (form.table) { %>
+                    <div class="row g-2 mb-3 add-product-container">
+                        <div class="col-4">
+                            <%- include('./select', { input: form.table.select }) %>
+                        </div>
+
+                        <%- include('./outlineInputList', { inputs: form.table.inputs }) %>
+
+                        <div class="col-2">
+                            <%- include('./button', { button: form.table.button }) %>
+                        </div>
+                    </div>
+
+                    <%- include('./productTable') %>
+                <% } %>
+
                 <div class="col-12">
                     <%- include('./button', { button }) %>
-                    <button id="submitBtn" type="submit" data-mdb-ripple-init class="btn btn-primary"></button>
+                    
+                    <%- include('./submit') %>
                 </div>
             </form>
         </div>

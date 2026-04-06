@@ -5,7 +5,6 @@ import { toggleErrorMessages } from "../ui/forms/formMessagesUI.js";
 import { on } from "../utils/domUtils.js";
 
 export const useForm = async ({ 
-    selector,
     normalizeData = () => {},
     normalizeErrors = () => {},
     getErrors = () => {},
@@ -13,7 +12,7 @@ export const useForm = async ({
     normalizeServerErrors = () => {},
 }) => {
 
-    on('submit', selector, async (e, form) => {
+    on('submit', '#form', async (e, form) => {
 
         e.preventDefault();
 
@@ -36,24 +35,27 @@ export const useForm = async ({
 
         } catch (err) {
 
-            const { response } = err;
+            if (err.response) {
 
-            if (response) {
-
-                const { status, code } = response;
+                const { status, data } = err.response;
+                const { errors, code } = data;
 
                 const message = getErrorMessage(code);
 
                 switch (status) {
                     case 400:
-                        const errors = mapServerErrors(response.data.errors);
-                        normalizeServerErrors(form, errors);
-                        toggleErrorMessages(form, errors);
+                        const serverErrors = mapServerErrors(errors);
+                        normalizeServerErrors(form, serverErrors);
+                        toggleErrorMessages(form, serverErrors);
                         break;
 
                     case 401:
                         window.location.replace('/');
                         notifications.showError(message);
+                        break;
+                    
+                    case 404:
+                        notifications.showError(err.message);
                         break;
                     
                     default:

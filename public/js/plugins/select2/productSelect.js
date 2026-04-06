@@ -39,8 +39,8 @@ export const initProductSelect2 = async (data = null) => {
 
     if (data) {
 
-        const option = new Option(data.uom.name, data.uom.id, true, true);
-        $(uomSelect).append(option).trigger('change');
+        const uomOption = new Option(data.uom.name, data.uom.id, true, true);
+        $(uomSelect).append(uomOption).trigger('change');
         const categoryOption = new Option(data.category.name, data.category.id, true, true);
         $(categorySelector).append(categoryOption).trigger('change');
 

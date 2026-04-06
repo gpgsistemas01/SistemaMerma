@@ -3,15 +3,37 @@ import { editProductRequest, registerProductRequest } from "../../services/wareh
 
 export const registerProduct = async (formData) => {
 
-    const response = await registerProductRequest(formData);
+    try {
 
-    const { data } = response;
-    const { code } = data;
-    const message = getSuccessMessage(code);
+        const response = await registerProductRequest(formData);
 
-    return {
-        message
-    };
+        const { data } = response;
+        const { code } = data;
+        let message = getSuccessMessage(code);
+
+        return {
+            message
+        };
+
+    } catch (err) {
+
+        if (err.response) {
+
+            let message;
+            const { data, status } = err.response;
+
+            switch (status) {
+
+                case 404:
+                    message = getErrorMessage(data.code);
+                    err.message = message;
+                    throw err;
+                default:
+                    throw err;
+            }
+
+        } else throw err;
+    }
 }
 
 export const editProduct = async (formData, id) => {
@@ -30,27 +52,21 @@ export const editProduct = async (formData, id) => {
 
     } catch (err) {
 
-        let message;
-
         if (err.response) {
+
+            let message;
             const { data, status } = err.response;
 
             switch (status) {
 
                 case 404:
                     message = getErrorMessage(data.code);
-                    break;
+                    err.message = message;
+                    throw err;
                 default:
-                    message = 'Error inesperado';
+                    throw err;
             }
 
-        } else {
-
-            message = 'Error de conexión o timeout';
-        }
-
-        return {
-            message,
-        }
+        } else throw err;
     }
 }

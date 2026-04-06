@@ -1,11 +1,11 @@
-import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
-import { editSupplierRequest, registerSupplierRequest } from "../../services/warehouse/supplierService.js";
+import { getSuccessMessage } from "../../constants/apiMessages.js";
+import { editGoodsReceiptRequest, registerGoodsReceiptRequest } from "../../services/warehouse/goodsReceiptService.js";
 
-export const registerSupplier = async (formData) => {
+export const registerGoodsReceipt = async (formData) => {
 
     try {
 
-        const response = await registerSupplierRequest(formData);
+        const response = await registerGoodsReceiptRequest(formData);
 
         const { data } = response;
         const { code } = data;
@@ -32,15 +32,18 @@ export const registerSupplier = async (formData) => {
                     throw err;
             }
 
-        } else throw err;
+        } else {
+
+            throw err;
+        }
     }
 }
 
-export const editSupplier = async (formData, id) => {
+export const editGoodsReceipt = async (formData, id) => {
 
     try {
 
-        const response = await editSupplierRequest(formData, id);
+        const response = await editGoodsReceiptRequest(formData, id);
 
         const { data } = response;
         const { code } = data;
@@ -51,6 +54,7 @@ export const editSupplier = async (formData, id) => {
         };
 
     } catch (err) {
+
 
         if (err.response) {
 

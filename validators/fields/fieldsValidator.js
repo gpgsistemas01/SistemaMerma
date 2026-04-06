@@ -41,7 +41,7 @@ export const validateName =
 export const validateNumberphone =
         body('numberphone')
             .trim()
-            .if(body('numberphone').exists())
+            .if(body('numberphone').notEmpty())
             .isMobilePhone('es-MX').withMessage(errorMap['numberphone'].INVALID_FORMAT)
             .isLength({ max: 20 }).withMessage(errorMap['numberphone'].TOO_LONG)
 ;
@@ -60,7 +60,7 @@ export const validateUUID = (fieldName) => {
     return body(fieldName)
         .notEmpty().withMessage(errors.REQUIRED)
         .isUUID('4').withMessage(errors.INVALID_UUID)
-};
+}
 
 export const validateNumber = (fieldName) => {
 
@@ -71,7 +71,7 @@ export const validateNumber = (fieldName) => {
         .isFloat().withMessage(errors.INVALID_NUMBER)
         .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
-};
+}
 
 export const validateNumberOptional = (fieldName) => {
 
@@ -83,7 +83,7 @@ export const validateNumberOptional = (fieldName) => {
         .isFloat().withMessage(errors.INVALID_NUMBER)
         .matches(/^\d{1,7}(\.\d{1,3})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
-};
+}
 
 export const validateTextOptional = (fieldName) => {
 
@@ -94,7 +94,7 @@ export const validateTextOptional = (fieldName) => {
         .if(body(fieldName).notEmpty())
         .isString().withMessage(errors.INVALID_TYPE)
         .isLength({ max: 50 }).withMessage(errors.TOO_LONG)
-};
+}
 
 export const validateMinMaxStock = 
     body('minStock')
@@ -110,6 +110,17 @@ export const validateMinMaxStock =
         })
 ;
 
+export const validateDate = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isISO8601().withMessage(errors.INVALID_FORMAT)
+        .custom(value => !isNaN(new Date(value))).withMessage(errors.INVALID_FORMAT)
+        .toDate()
+}
+
 export const validateDateOptional = (fieldName) => {
 
     const errors = errorMap[fieldName];
@@ -120,3 +131,26 @@ export const validateDateOptional = (fieldName) => {
         .custom(value => !isNaN(new Date(value))).withMessage(errors.INVALID_FORMAT)
         .toDate()
 }
+
+export const validateDetailsArray = 
+    body('details')
+        .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
+        .custom(details => {
+
+            details.forEach(detail => {
+
+                if (!detail.productId || !detail.quantity) throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
+
+                const qty = Number(detail.quantity);
+
+                if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
+
+                if (detail.description) {
+
+                    if (typeof detail.description !== 'string' || detail.description.length > 50) throw new Error(errorMap['details'].INVALID_FORMAT_DESCRIPTION);
+                }
+            });
+
+            return true;
+        })
+;

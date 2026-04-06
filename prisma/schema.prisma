@@ -11,6 +11,7 @@ model Department {
   id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name  String @unique @db.VarChar(50)
   users User[]
+  goodsReceipts GoodsReceipt[]
 }
 
 model Role {
@@ -26,7 +27,7 @@ model User {
   name         String     @unique @db.VarChar(50)
   password     String     @db.VarChar(50)
   isActive     Boolean    @default(true)
-  profiles     Profile?
+  profiles     Profile[]
   department   Department @relation(fields: [departmentId], references: [id])
   role         Role       @relation(fields: [roleId], references: [id])
 }
@@ -35,9 +36,9 @@ model Profile {
   id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name     String  @db.VarChar(50)
   lastName String  @db.VarChar(50)
-  userId   String  @unique @db.Uuid
+  users User[]
   isActive Boolean @default(true)
-  user     User    @relation(fields: [userId], references: [id])
+  goodsReceipts GoodsReceipt[]
 }
 
 model Category {
@@ -49,11 +50,12 @@ model Category {
 model Status {
   id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name String @unique
+  goodsReceipts GoodsReceipt[]
 }
 
 model Product {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name         String   @db.VarChar(50)
+  name         String   @unique @db.VarChar(50)
   sku          String?   @db.VarChar(50)
   unitCost     Decimal  @db.Decimal(10, 2)
   currentStock Decimal  @db.Decimal(10, 2)
@@ -71,6 +73,7 @@ model Product {
   height       Decimal? @db.Decimal(10, 3)
   category     Category @relation(fields: [categoryId], references: [id])
   uom          UoM      @relation(fields: [uomId], references: [id])
+  detailsGoodsReceipts DetailGoodsReceiptProduct[]
 }
 
 model UoM {
@@ -85,4 +88,37 @@ model Supplier {
   name        String  @unique @db.VarChar(50)
   numberphone String? @db.VarChar(20)
   isActive    Boolean @default(true)
+  goodsReceipts GoodsReceipt[]
+}
+
+model ReferenceNumberCounter {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  prefix    String @unique @db.VarChar(10)
+  counter   Int    @default(0)
+}
+
+model GoodsReceipt {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber String     @unique @db.VarChar(50)
+  supplierId   String     @db.Uuid
+  receptionDate         DateTime
+  observations String?    @db.VarChar(50)
+  statusId     String     @db.Uuid
+  departmentId String     @db.Uuid
+  receivedById String     @db.Uuid
+  department   Department @relation(fields: [departmentId], references: [id])
+  receivedBy   Profile       @relation(fields: [receivedById], references: [id])
+  supplier     Supplier   @relation(fields: [supplierId], references: [id])
+  status       Status     @relation(fields: [statusId], references: [id])
+  details        DetailGoodsReceiptProduct[]
+}
+
+model DetailGoodsReceiptProduct {
+  id              String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId       String  @db.Uuid
+  goodsReceiptId String  @db.Uuid
+  quantity        Decimal @db.Decimal(10, 2)
+  description     String? @db.VarChar(50)
+  goodsReceipt    GoodsReceipt   @relation(fields: [goodsReceiptId], references: [id])
+  product         Product        @relation(fields: [productId], references: [id])
 }

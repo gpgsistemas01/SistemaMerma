@@ -1,33 +1,31 @@
-<% const modal = {
-    form: {
-        inputs: [
-            {
-                id: 'nameInput',
-                type: 'text',
-                name: 'name',
-                label: 'Nombre',
-                col: '6'
-            },
-            {
-                id: 'numberphoneInput',
-                type: 'tel',
-                name: 'numberphone',
-                label: 'Teléfono',
-                col: '6'
-            },
-        ],
-        checkboxes: [
-            {
-                id: 'isActiveInput',
-                type: 'checkbox',
-                name: 'isActive',
-                label: 'Activo'
-            }
-        ]
-    }
+<% const form = {
+    inputs: [
+        {
+            id: 'nameInput',
+            type: 'text',
+            name: 'name',
+            label: 'Nombre',
+            col: '6'
+        },
+        {
+            id: 'numberphoneInput',
+            type: 'tel',
+            name: 'numberphone',
+            label: 'Teléfono',
+            col: '6'
+        },
+    ],
+    checkboxes: [
+        {
+            id: 'isActiveInput',
+            type: 'checkbox',
+            name: 'isActive',
+            label: 'Activo'
+        }
+    ]
 } %>
 
-<table id="supplierTable" class="display">
+<table id="table" class="display">
     <thead>
         <tr>
             <th>Nombre</th>
@@ -42,7 +40,7 @@
 
 <%- include('../../../shared/modal', { form }) %>
 
-<script type="module" src="/js/pages/warehouse/suppliers/index.js"></script>
+<script type="module" src="/js/pages/warehouse/suppliersPage.js"></script>
 
 <%- contentFor('title') %>
 Proveedores

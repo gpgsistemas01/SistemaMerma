@@ -1,5 +1,5 @@
 export const createSupplierDtoForRegister = (body = {}) => ({
-    name: body.name,
-    numberphone: body.numberphone,
-    isActive: body.isActive
+    name: body.name.trim(),
+    numberphone: body.numberphone?.trim() || null,
+    isActive: Boolean(body.isActive)
 });

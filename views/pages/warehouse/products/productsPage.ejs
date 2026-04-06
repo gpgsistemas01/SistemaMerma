@@ -3,13 +3,11 @@
         {
             id: 'categoryInput',
             name: 'categoryId',
-            label: 'Categoría',
             col: '6'
         },
         {
             id: 'uomInput',
             name: 'uomId',
-            label: 'Unidad de Medida',
             col: '6'
         }
     ],
@@ -102,7 +100,7 @@
     ]
 } %>
 
-<table id="productTable" class="display">
+<table id="table" class="display">
     <thead>
         <tr>
             <th>Nombre</th>
@@ -122,7 +120,7 @@
 
 <%- include('../../../shared/modal', { form }) %>
 
-<script type="module" src="/js/pages/warehouse/products/index.js"></script>
+<script type="module" src="/js/pages/warehouse/productsPage.js"></script>
 
 <%- contentFor('title') %>
 Productos

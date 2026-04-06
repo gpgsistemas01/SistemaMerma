@@ -1,46 +1,52 @@
 import { setFormReadOnly } from "../../utils/formUtils.js";
 import { createDataTable } from "./baseDatatable.js";
 
-export const createSupplierDatatable = (tableId) => {
-    
-    const table = createDataTable(tableId, {
-        ajax: '/api/warehouse/suppliers',
-        columns: [
-            { data: 'name' },
-            { data: 'numberphone' },
-            { 
-                data: 'isActive',
-                render: (data) => data ? 'Activo' : 'Inactivo'
-            },
-            {
-                data: 'id',
-                render: () => {
-                    return `
-                        <button class="btn-edit">✏️</button>
-                        <button class="btn-view">👁️</button>
+const selectorTable = '#table';
 
-                    `;
+export const createSupplierDatatable = () => {
+    
+    const table = createDataTable({
+            options: {
+            ajax: '/api/warehouse/suppliers',
+            columns: [
+                { data: 'name', title: 'Nombre' },
+                { data: 'numberphone', title: 'Telefóno' },
+                { 
+                    data: 'isActive',
+                    title: 'Estado',
+                    render: (data) => data ? 'Activo' : 'Inactivo'
+                },
+                {
+                    data: 'id',
+                    title: 'Acciones',
+                    render: () => {
+                        return `
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-view">👁️</button>
+
+                        `;
+                    }
                 }
-            }
-        ],
-        buttons: [
-            {
-                text: 'Nuevo proveedor',
-                action: () => {
-                    openSupplierModal({ mode: 'create' });
+            ],
+            buttons: [
+                {
+                    text: 'Nuevo proveedor',
+                    action: () => {
+                        openSupplierModal({ mode: 'create' });
+                    }
                 }
-            }
-        ]
+            ]
+        }
     });
 
-    $(`#${ tableId } tbody`).on('click', '.btn-edit', function() {
+    $(`${ selectorTable } tbody`).on('click', '.btn-edit', function() {
 
         const data = table.row($(this).closest('tr')).data();
 
         openSupplierModal({ mode: 'edit', data });
     });
 
-    $(`#${tableId} tbody`).on('click', '.btn-view', function() {
+    $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
 
         const data = table.row($(this).closest('tr')).data();
 
@@ -67,7 +73,7 @@ const openSupplierModal = ({ mode, data = null }) => {
     if (mode === 'edit' || mode === 'view') {
 
         document.getElementById('nameInput').value = data.name;
-        document.getElementById('numberphoneInput').value = data.numberphone;
+        document.getElementById('numberphoneInput').value = data.numberphone || '';
         document.getElementById('isActiveInput').checked = data.isActive;
 
         if (mode === 'edit') {
@@ -87,4 +93,4 @@ const openSupplierModal = ({ mode, data = null }) => {
     const modalElement = document.getElementById('modal');
     const modal = mdb.Modal.getOrCreateInstance(modalElement);
     modal.show();
-};
+}

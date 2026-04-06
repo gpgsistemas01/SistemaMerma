@@ -1,7 +1,7 @@
 import { reloadDataTable } from "../plugins/datatable/baseDatatable.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 
-export const hadnleSuccess = async ({ form, formData, create, update, tableId }) => {
+export const handleSuccess = async ({ form, formData, create, update }) => {
     
     const id = form.dataset.id;
     const mode = form.dataset.mode;
@@ -21,7 +21,7 @@ export const hadnleSuccess = async ({ form, formData, create, update, tableId })
 
     modal.hide();
 
-    reloadDataTable('productTable');
+    reloadDataTable();
 }
 
 export const validateFields = (validators, formData) => {

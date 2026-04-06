@@ -15,6 +15,7 @@ async function main() {
             { id: '00000000-0000-0000-0000-000000000009', name: 'PT' },
             { id: '00000000-0000-0000-0000-000000000010', name: 'Tráfico' },
             { id: '00000000-0000-0000-0000-000000000011', name: 'Instalaciones' },
+            { id: '00000000-0000-0000-0000-000000000012', name: 'Almacén' }
         ],
         skipDuplicates: true
     });
@@ -52,7 +53,7 @@ async function main() {
         },
         update: {},
         create: {
-            id: '00000000-0000-0000-0000-000000000041',
+            id: '00000000-0000-0000-0000-000000000040',
             name: 'Soporte01',
             password: 'A%54321',
             isActive: true,
@@ -60,6 +61,15 @@ async function main() {
             roleId: '00000000-0000-0000-0000-000000000020'
         },
     });
+
+    await prisma.user.createMany({
+        data: [
+            { id: '00000000-0000-0000-0000-000000000041', name: 'Coordinador02', password: '12345', departmentId: '00000000-0000-0000-0000-000000000012', roleId: '00000000-0000-0000-0000-000000000021' },
+            { id: '00000000-0000-0000-0000-000000000042', name: 'Almacenista01', password: '12345', departmentId: '00000000-0000-0000-0000-000000000012', roleId: '00000000-0000-0000-0000-000000000026' },
+            { id: '00000000-0000-0000-0000-000000000043', name: 'Auxiliar02', password: '12345', departmentId: '00000000-0000-0000-0000-000000000012', roleId: '00000000-0000-0000-0000-000000000022' },
+        ],
+        skipDuplicates: true
+    })
 
     await prisma.category.createMany({
         data: [
@@ -77,6 +87,70 @@ async function main() {
             { name: 'milimetros', abbrevation: 'mm' }
         ],
         skipDuplicates: true
+    });
+
+    await prisma.referenceNumberCounter.createMany({
+        data: [
+            { prefix: 'REC' },
+            { prefix: 'SAL'},
+            { prefix: 'REQ' },
+        ],
+        skipDuplicates: true
+    });
+
+    await prisma.supplier.createMany({
+        data: [
+            { name: 'Proveedor 1' },
+            { name: 'Proveedor 2' },
+        ],
+        skipDuplicates: true
+    });
+
+    const uoms = await prisma.uoM.findMany();
+
+    const categories = await prisma.category.findMany();
+
+    await prisma.product.createMany({
+        data: [
+            { name: 'Producto 1', unitCost: 2, currentStock: 2, minStock: 3, maxStock: 8, categoryId: categories[0].id, uomId: uoms[0].id },
+            { name: 'Producto 2', unitCost: 4, currentStock: 3, minStock: 60, maxStock: 80, categoryId: categories[1].id, uomId: uoms[1].id },
+        ],
+        skipDuplicates: true
+    });
+
+    await prisma.profile.deleteMany();
+
+    await prisma.user.update({
+        where: { id: '00000000-0000-0000-0000-000000000041' },
+        data: {
+            profiles: {
+                create: [
+                    { name: 'Carlos', lastName: 'Hernandez' }
+                ]
+            }
+        }
+    });
+
+    await prisma.user.update({
+        where: { id: '00000000-0000-0000-0000-000000000042' },
+        data: {
+            profiles: {
+                create: [
+                    { name: 'Anastacia', lastName: 'Bustamante' }
+                ]
+            }
+        }
+    });
+
+    await prisma.user.update({
+        where: { id: '00000000-0000-0000-0000-000000000042' },
+        data: {
+            profiles: {
+                create: [
+                    { name: 'Miguel', lastName: 'Palacios' }
+                ]
+            }
+        }
     });
 }
 
