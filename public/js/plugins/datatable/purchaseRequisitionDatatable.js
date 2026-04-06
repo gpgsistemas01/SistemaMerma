@@ -111,8 +111,9 @@ const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
+    document.querySelector('.add-product-container').classList.toggle('d-none', mode === 'view');
+
     setFormReadOnly({ form, isReadOnly: false });
-    document.querySelector('.add-product-container').style.display = '';
 
     if (mode === 'create') {
 
@@ -147,7 +148,6 @@ const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
         if (mode === 'view') {
 
             document.getElementById('modalTitle').textContent = 'Ver requisición';
-            document.querySelector('.add-product-container').style.display = 'none';
 
             setFormReadOnly({ form, isReadOnly: true });
         }

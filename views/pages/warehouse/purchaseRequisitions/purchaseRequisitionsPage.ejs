@@ -76,9 +76,7 @@
 <%- include('../../../shared/modal', { form }) %>
 
 <script>
-    window.PURCHASE_REQUISITION_CONTEXT = {
-        department: '<%= department %>'
-    };
+    window.PURCHASE_REQUISITION_CONTEXT = <%- JSON.stringify(department) %>;
 </script>
 
 <script type="module" src="/js/pages/warehouse/purchaseRequisitionsPage.js"></script>

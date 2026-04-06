@@ -320,13 +320,13 @@ async function main() {
                     connect: { id: "00000000-0000-0000-0000-000000000012" }
                 },
                 approver: {
-                    connect: { id: "ba2c83b6-8b7b-4ab7-8afd-ca761bc258dc" }
+                    connect: { id: perfilAprobador.id }
                 },
                 requester: {
-                    connect: { id: "39ec9eb2-10c1-4be7-93f0-b11824a0ba34" }
+                    connect: { id: perfilSolicitante.id }
                 },
                 project: {
-                    connect: { id: "bdde585e-6ccc-4638-a4ed-84182b8f23b6" }
+                    connect: { id: proyectoDemo.id }
                 },
                 details: {
                     create: [

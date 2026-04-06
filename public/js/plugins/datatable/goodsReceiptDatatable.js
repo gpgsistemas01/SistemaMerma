@@ -71,6 +71,8 @@ const openGoodsReceiptModal = async ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
+    document.querySelector('.add-product-container').classList.toggle('d-none', mode === 'view');
+
     setFormReadOnly({ form, isReadOnly: false });
 
     if (mode === 'create') {
@@ -106,7 +108,6 @@ const openGoodsReceiptModal = async ({ mode, data = null }) => {
         if (mode === 'view') {
 
             document.getElementById('modalTitle').textContent = 'Ver recepción';
-            document.querySelector('.add-product-container').style.display = mode === 'view' ? 'none' : '';
 
             setFormReadOnly({ form, isReadOnly: true });
         }
