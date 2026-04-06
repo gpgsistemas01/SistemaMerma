@@ -138,6 +138,8 @@ const successMessages = {
     UPDATED_SUPPLIER: '¡Proveedor actuallizada exitosamente!',
     CREATED_GOODS_RECEIPT: '¡Entrada de mercancía creada exitosamente!',
     UPDATED_GOODS_RECEIPT: '¡Entrada de mercancía actualizada exitosamente!',
+    CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
+    UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!'
     CREATED_PURCHASE_REQUISITION: '¡Requisición de compra creada exitosamente!',
     UPDATED_PURCHASE_REQUISITION: '¡Requisición de compra actualizada exitosamente!'
 };

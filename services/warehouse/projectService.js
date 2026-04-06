@@ -1,47 +1,69 @@
 import { prisma } from "../../lib/prisma.js";
 
-export const findAllProjects = async ({
-    skip = 0,
-    take = 10,
-    search = '',
-    orderBy = 'name',
-    orderDir = 'asc'
-}) => {
+export const findAllProjects = async ({ search = '', department = '' }) => {
 
-    const where = search
-        ? {
+    const conditions = [];
+
+    if (search) {
+        conditions.push({
             OR: [
-                {
-                    name: {
-                        contains: search,
-                        mode: 'insensitive'
-                    }
-                },
                 {
                     referenceNumber: {
                         contains: search,
                         mode: 'insensitive'
                     }
+                },
+                {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
                 }
             ]
-        }
-        : {};
+        });
+    }
+
+    if (department) {
+        conditions.push({
+            OR: [
+                {
+                    purchaseRequisitions: {
+                        some: {
+                            department: {
+                                name: department
+                            }
+                        }
+                    }
+                },
+                {
+                    goodsIssues: {
+                        some: {
+                            department: {
+                                name: department
+                            }
+                        }
+                    }
+                }
+            ]
+        });
+    }
+
+    const where = conditions.length ? { AND: conditions } : {};
 
     const projects = await prisma.project.findMany({
-        skip,
-        take,
         where,
         orderBy: {
-            [orderBy]: orderDir
-        }
+            date: 'desc'
+        },
+        select: {
+            id: true,
+            referenceNumber: true,
+            name: true
+        },
+        take: 30
     });
 
-    const total = await prisma.project.count();
-    const filtered = await prisma.project.count({ where });
-
     return {
-        data: projects,
-        recordsTotal: total,
-        recordsFiltered: filtered
+        data: projects
     };
 };

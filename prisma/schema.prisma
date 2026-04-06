@@ -13,6 +13,7 @@ model Department {
   users User[]
   goodsReceipts GoodsReceipt[]
   purchaseRequisitions PurchaseRequisition[]
+  goodsIssues GoodsIssue[]
 }
 
 model Role {
@@ -42,6 +43,9 @@ model Profile {
   users         User[]         @relation("ProfileToUser")
   approverPurchaseRequisitions PurchaseRequisition[] @relation("ApproverRelation")
   requesterPurchaseRequisitions PurchaseRequisition[] @relation("RequesterRelation")
+  approverGoodsIssues GoodsIssue[] @relation("ApproverGoodsIssueRelation")
+  requesterGoodsIssues GoodsIssue[] @relation("RequesterGoodsIssueRelation")
+  warehouseStaffGoodsIssues GoodsIssue[] @relation("WarehouseStaffGoodsIssueRelation")
   deliveredPurchaseRequisitions PurchaseRequisition[] @relation("DeliveredByRelation")
 }
 
@@ -56,6 +60,7 @@ model Status {
   name String @unique
   goodsReceipts GoodsReceipt[]
   purchaseRequisitions PurchaseRequisition[]
+  goodsIssues GoodsIssue[]
 }
 
 model Product {
@@ -80,6 +85,7 @@ model Product {
   uom          UoM      @relation(fields: [uomId], references: [id])
   detailsGoodsReceipts DetailGoodsReceiptProduct[]
   detailsPurchaseRequisitions DetailPurchaseRequisitionProduct[]
+  detailsGoodsIssues DetailGoodsIssueProduct[]
 }
 
 model UoM {
@@ -105,6 +111,7 @@ model Project {
   name            String                @db.VarChar(50)
   date            DateTime
   purchaseRequisitions PurchaseRequisition[]
+  goodsIssues GoodsIssue[]
 }
 
 model ReferenceNumberCounter {
@@ -173,4 +180,40 @@ model DetailPurchaseRequisitionProduct {
 
   purchaseRequisition     PurchaseRequisition @relation(fields: [purchaseRequisitionId], references: [id])
   product                 Product             @relation(fields: [productId], references: [id])
+}
+
+model GoodsIssue {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber  String   @unique @db.VarChar(50)
+  authDate         DateTime?
+  requestDate      DateTime
+  deliveryDate     DateTime?
+  observations     String?  @db.VarChar(50)
+
+  statusId         String   @db.Uuid
+  departmentId     String   @db.Uuid
+  approverId       String?  @db.Uuid
+  requesterId      String   @db.Uuid
+  warehouseStaffId String?  @db.Uuid
+  projectId        String   @db.Uuid
+
+  department       Department @relation(fields: [departmentId], references: [id])
+  approver         Profile?   @relation("ApproverGoodsIssueRelation", fields: [approverId], references: [id])
+  requester        Profile    @relation("RequesterGoodsIssueRelation", fields: [requesterId], references: [id])
+  warehouseStaff   Profile?   @relation("WarehouseStaffGoodsIssueRelation", fields: [warehouseStaffId], references: [id])
+  status           Status     @relation(fields: [statusId], references: [id])
+  project          Project    @relation(fields: [projectId], references: [id])
+
+  details          DetailGoodsIssueProduct[]
+}
+
+model DetailGoodsIssueProduct {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId     String   @db.Uuid
+  goodsIssueId  String   @db.Uuid
+  quantity      Decimal  @db.Decimal(10, 2)
+  description   String?  @db.VarChar(50)
+
+  goodsIssue    GoodsIssue @relation(fields: [goodsIssueId], references: [id])
+  product       Product    @relation(fields: [productId], references: [id])
 }

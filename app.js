@@ -7,8 +7,9 @@ import categoryApiRoutes from './routes/api/warehouse/categoryApiRoute.js';
 import uomApiRoutes from './routes/api/warehouse/uomApiRoute.js';
 import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.js';
 import purchaseRequisitionApiRoutes from './routes/api/warehouse/purchaseRequisitionApiRoute.js';
-import projectApiRoutes from './routes/api/warehouse/projectApiRoute.js';
+import goodsIssueApiRoutes from './routes/api/warehouse/goodsIssueApiRoute.js';
 import profileApiRoutes from './routes/api/admin/profileApiRoute.js';
+import projectApiRoutes from './routes/api/admin/projectApiRoute.js';
 
 import loginWebRoutes from './routes/web/auth/loginWebRoute.js';
 import logoutWebRoutes from './routes/web/auth/logoutWebRoute.js';
@@ -82,8 +83,9 @@ app.use(apiRoute + warehouse + '/categories', categoryApiRoutes);
 app.use(apiRoute + warehouse + '/uoms', uomApiRoutes);
 app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);
 app.use(apiRoute + warehouse + '/purchase-requisitions', purchaseRequisitionApiRoutes);
-app.use(apiRoute + warehouse + '/projects', projectApiRoutes);
+app.use(apiRoute + warehouse + '/goods-issues', goodsIssueApiRoutes);
 app.use(apiRoute + admin + '/profiles', profileApiRoutes);
+app.use(apiRoute + admin + '/projects', projectApiRoutes);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada.' });
