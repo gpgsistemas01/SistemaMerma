@@ -5,6 +5,8 @@ import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllPurchaseRequisitions = async (req, res) => {
 
+    const { department = '' } = req.query;
+
     const start = parseInt(req.query.start) || 0;
     const length = parseInt(req.query.length) || 10;
     const search = req.query.search?.value || '';
@@ -14,6 +16,7 @@ export const getAllPurchaseRequisitions = async (req, res) => {
     const orderDir = req.query.order?.[0]?.dir || 'asc';
 
     const result = await findAllPurchaseRequisitions({
+        currentDepartment: department,
         skip: start,
         take: length,
         search,
