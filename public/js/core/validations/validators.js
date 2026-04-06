@@ -29,3 +29,9 @@ export const validateGoodsReceiptValidators = {
     receptionDate: (value) => validateDate(value, 'La fecha de recepción'),
     details: validateDetailsArray
 }
+
+export const validatePurchaseRequisitionValidators = {
+    observations: (value) => validateTextOptional(value, 'Las observaciones'),
+    requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
+    details: validateDetailsArray
+};

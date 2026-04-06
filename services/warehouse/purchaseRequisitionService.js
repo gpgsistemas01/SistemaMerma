@@ -2,6 +2,7 @@ import { ProjectNotFound, PurchaseRequisitionNotFound, RequesterProfileNotFound 
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllPurchaseRequisitions = async ({
+    currentDepartment = '',
     skip = 0,
     take = 10,
     search = '',
@@ -9,14 +10,23 @@ export const findAllPurchaseRequisitions = async ({
     orderDir = 'asc'
 }) => {
 
-    const where = search
-        ? {
-            referenceNumber: {
-                contains: search,
-                mode: 'insensitive'
+    const where = {
+        ...(search
+            ? {
+                referenceNumber: {
+                    contains: search,
+                    mode: 'insensitive'
+                }
             }
-        }
-        : {};
+            : {}),
+        ...(currentDepartment && currentDepartment !== 'Almacén'
+            ? {
+                department: {
+                    name: currentDepartment
+                }
+            }
+            : {})
+    };
 
     const purchaseRequisitions = await prisma.purchaseRequisition.findMany({
         skip,
@@ -37,7 +47,21 @@ export const findAllPurchaseRequisitions = async ({
                 select: {
                     id: true,
                     referenceNumber: true,
+                    name: true,
+                    client: true,
+                    date: true
+                }
+            },
+            department: {
+                select: {
                     name: true
+                }
+            },
+            deliveredBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    lastName: true
                 }
             },
             status: {
@@ -62,7 +86,15 @@ export const findAllPurchaseRequisitions = async ({
         }
     });
 
-    const total = await prisma.purchaseRequisition.count();
+    const total = await prisma.purchaseRequisition.count({
+        where: currentDepartment && currentDepartment !== 'Almacén'
+            ? {
+                department: {
+                    name: currentDepartment
+                }
+            }
+            : {}
+    });
     const filtered = await prisma.purchaseRequisition.count({ where });
 
     return {
