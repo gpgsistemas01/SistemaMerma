@@ -1,4 +1,4 @@
-import { validateName, validateNumberphone, validatePassword, validateNumber, validateUsername, validateTextOptional, validateDimension, validateDateOptional, validateDetailsArray, validateDate } from "./fieldValidations.js";
+import { validateName, validateNumberphone, validatePassword, validateNumber, validateUsername, validateTextOptional, validateDimension, validateDateOptional, validateDetailsArray, validateDate, validateText } from "./fieldValidations.js";
 
 export const supplierValidators = {
     name: validateName,
@@ -27,5 +27,20 @@ export const loginValidators = {
 export const validateGoodsReceiptValidators = {
     observations: (value) => validateTextOptional(value, 'Las observaciones'),
     receptionDate: (value) => validateDate(value, 'La fecha de recepción'),
+    details: validateDetailsArray
+}
+
+export const validateGoodsIssueValidators = {
+    requesterId: (value) => validateText(value, 'El solicitante'),
+    projectId: (value) => validateText(value, 'El proyecto'),
+    observations: (value) => validateTextOptional(value, 'Las observaciones'),
+    requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
+    details: validateDetailsArray
+}
+
+export const validatePurchaseRequisitionValidators = {
+    projectId: (value) => validateText(value, 'El proyecto'),
+    observations: (value) => validateTextOptional(value, 'Las observaciones'),
+    requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
     details: validateDetailsArray
 }

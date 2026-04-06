@@ -121,7 +121,9 @@ const successMessages = {
     CREATED_SUPPLIER: '¡Proveedor creada exitosamente!',
     UPDATED_SUPPLIER: '¡Proveedor actuallizada exitosamente!',
     CREATED_GOODS_RECEIPT: '¡Entrada de mercancía creada exitosamente!',
-    UPDATED_GOODS_RECEIPT: '¡Entrada de mercancía actualizada exitosamente!'
+    UPDATED_GOODS_RECEIPT: '¡Entrada de mercancía actualizada exitosamente!',
+    CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
+    UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!'
 };
 
 export const getErrorMessage = (code) => errorMessages[code] ?? null;

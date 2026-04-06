@@ -1,7 +1,7 @@
-import { ProjectNotFound, PurchaseRequisitionNotFound, RequesterProfileNotFound } from "../../errors/warehouse/purchaseRequisitionError.js";
+import { GoodsIssueNotFound, GoodsIssueProjectNotFound, GoodsIssueRequesterProfileNotFound } from "../../errors/warehouse/goodsIssueError.js";
 import { prisma } from "../../lib/prisma.js";
 
-export const findAllPurchaseRequisitions = async ({
+export const findAllGoodsIssues = async ({
     skip = 0,
     take = 10,
     search = '',
@@ -27,7 +27,7 @@ export const findAllPurchaseRequisitions = async ({
         })
     };
 
-    const purchaseRequisitions = await prisma.purchaseRequisition.findMany({
+    const goodsIssues = await prisma.goodsIssue.findMany({
         skip,
         take,
         where,
@@ -41,6 +41,13 @@ export const findAllPurchaseRequisitions = async ({
                     name: true
                 }
             },
+            requester: {
+                select: {
+                    id: true,
+                    name: true,
+                    lastName: true
+                }
+            },
             approver: {
                 select: {
                     id: true,
@@ -48,7 +55,7 @@ export const findAllPurchaseRequisitions = async ({
                     lastName: true
                 }
             },
-            requester: {
+            warehouseStaff: {
                 select: {
                     id: true,
                     name: true,
@@ -84,40 +91,36 @@ export const findAllPurchaseRequisitions = async ({
         }
     });
 
-    const total = await prisma.purchaseRequisition.count();
-    const filtered = await prisma.purchaseRequisition.count({ where });
+    const total = await prisma.goodsIssue.count();
+    const filtered = await prisma.goodsIssue.count({ where });
 
     return {
-        data: purchaseRequisitions,
+        data: goodsIssues,
         recordsTotal: total,
         recordsFiltered: filtered
     };
 };
 
-const validatePurchaseRequisitionRelations = async (purchaseRequisitionDto) => {
+const validateGoodsIssueRelations = async ({ projectId, requesterId }) => {
 
     const [project, requester] = await Promise.all([
-        prisma.project.findUnique({
-            where: { id: purchaseRequisitionDto.projectId }
-        }),
-        prisma.profile.findUnique({
-            where: { id: purchaseRequisitionDto.requesterId }
-        })
+        prisma.project.findUnique({ where: { id: projectId } }),
+        prisma.profile.findUnique({ where: { id: requesterId } })
     ]);
 
-    if (!project) throw new ProjectNotFound();
-    if (!requester) throw new RequesterProfileNotFound();
+    if (!project) throw new GoodsIssueProjectNotFound();
+    if (!requester) throw new GoodsIssueRequesterProfileNotFound();
 };
 
-export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
+export const createGoodsIssue = async (goodsIssueDto) => {
 
-    await validatePurchaseRequisitionRelations(purchaseRequisitionDto);
+    await validateGoodsIssueRelations(goodsIssueDto);
 
-    const { requesterId, projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
+    const { requesterId, projectId, details, ...goodsIssueData } = goodsIssueDto;
 
-    const result = await prisma.$transaction(async (prisma) => {
+    const result = await prisma.$transaction(async (tx) => {
 
-        const user = await prisma.user.findFirst({
+        const user = await tx.user.findFirst({
             where: {
                 profiles: {
                     some: {
@@ -130,11 +133,11 @@ export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
             }
         });
 
-        if (!user) throw new RequesterProfileNotFound();
+        if (!user) throw new GoodsIssueRequesterProfileNotFound();
 
-        const type = 'REQ';
+        const type = 'SAL';
 
-        const counter = await prisma.referenceNumberCounter.update({
+        const counter = await tx.referenceNumberCounter.update({
             where: { prefix: type },
             data: {
                 counter: {
@@ -146,9 +149,9 @@ export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
         const year = new Date().getFullYear();
         const referenceNumber = `${type}-${year}-${counter.counter.toString().padStart(6, '0')}`;
 
-        const purchaseRequisition = await prisma.purchaseRequisition.create({
+        const goodsIssue = await tx.goodsIssue.create({
             data: {
-                ...purchaseRequisitionData,
+                ...goodsIssueData,
                 status: {
                     connect: {
                         name: 'Abierta'
@@ -183,25 +186,25 @@ export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
             }
         });
 
-        return { purchaseRequisition };
+        return { goodsIssue };
     });
 
-    return result.purchaseRequisition;
+    return result.goodsIssue;
 };
 
-export const updatePurchaseRequisition = async (purchaseRequisitionDto, id) => {
+export const updateGoodsIssue = async (goodsIssueDto, id) => {
 
-    await validatePurchaseRequisitionRelations(purchaseRequisitionDto);
+    await validateGoodsIssueRelations(goodsIssueDto);
 
-    const { requesterId, projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
+    const { requesterId, projectId, details, ...goodsIssueData } = goodsIssueDto;
 
     try {
 
-        const result = await prisma.$transaction(async (prisma) => {
+        const result = await prisma.$transaction(async (tx) => {
 
-            const purchaseRequisition = await prisma.purchaseRequisition.update({
+            const goodsIssue = await tx.goodsIssue.update({
                 data: {
-                    ...purchaseRequisitionData,
+                    ...goodsIssueData,
                     project: {
                         connect: {
                             id: projectId
@@ -219,33 +222,33 @@ export const updatePurchaseRequisition = async (purchaseRequisitionDto, id) => {
             });
 
             const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);
-            const deleteFilter = { purchaseRequisitionId: id };
+            const deleteFilter = { goodsIssueId: id };
 
             if (incomingDetailsIds.length) deleteFilter.id = { notIn: incomingDetailsIds };
 
-            await prisma.detailPurchaseRequisitionProduct.deleteMany({
+            await tx.detailGoodsIssueProduct.deleteMany({
                 where: deleteFilter
             });
 
-            const detailsPurchaseRequisition = await Promise.all(details.map(async detail => {
+            const detailsGoodsIssue = await Promise.all(details.map(async detail => {
 
-                return await prisma.detailPurchaseRequisitionProduct.create({
+                return await tx.detailGoodsIssueProduct.create({
                     data: {
                         ...detail,
-                        purchaseRequisitionId: id
+                        goodsIssueId: id
                     }
                 });
             }));
 
-            purchaseRequisition.details = detailsPurchaseRequisition;
+            goodsIssue.details = detailsGoodsIssue;
 
-            return { purchaseRequisition };
+            return { goodsIssue };
         });
 
-        return result;
+        return result.goodsIssue;
     } catch (err) {
 
-        if (err.code === 'P2025') throw new PurchaseRequisitionNotFound();
+        if (err.code === 'P2025') throw new GoodsIssueNotFound();
 
         throw err;
     }
