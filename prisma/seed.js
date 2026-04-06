@@ -187,8 +187,6 @@ async function main() {
         skipDuplicates: true
     });
 
-    await prisma.profile.deleteMany();
-
     for (const userSeed of usersSeed) {
         await prisma.user.update({
             where: { name: userSeed.name },
@@ -315,11 +313,21 @@ async function main() {
                 referenceNumber: 'REQ-0001',
                 requestDate: new Date('2026-04-03T00:00:00.000Z'),
                 observations: 'Requisición inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                approverId: perfilAprobador.id,
-                requesterId: perfilSolicitante.id,
-                proectId: proyectoDemo.id,
+                status: {
+                    connect: { id: "00000000-0000-0000-0000-000000000030" }
+                },
+                department: {
+                    connect: { id: "00000000-0000-0000-0000-000000000012" }
+                },
+                approver: {
+                    connect: { id: "ba2c83b6-8b7b-4ab7-8afd-ca761bc258dc" }
+                },
+                requester: {
+                    connect: { id: "39ec9eb2-10c1-4be7-93f0-b11824a0ba34" }
+                },
+                project: {
+                    connect: { id: "bdde585e-6ccc-4638-a4ed-84182b8f23b6" }
+                },
                 details: {
                     create: [
                         { productId: productos[0].id, quantity: 2, description: 'Requisición de prueba 1' },

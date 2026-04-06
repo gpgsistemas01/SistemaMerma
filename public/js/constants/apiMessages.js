@@ -23,6 +23,18 @@ export const errorMessages = {
     RECEIVED_BY_ID_REQUIRED: 'La person que recibe es requerida.',
     RECEIVED_BY_ID_INVALID_UUID: 'La persona que recibe no es válida.',
 
+    PROJECT_ID_REQUIRED: 'El proyecto es requerido.',
+
+    PROJECT_ID_INVALID_UUID: 'El proyecto no es válido.',
+
+    REQUESTER_ID_REQUIRED: 'El solicitante es requerido.',
+
+    REQUESTER_ID_INVALID_UUID: 'El solicitante no es válido.',
+
+    REQUEST_DATE_REQUIRED: 'La fecha de solicitud es requerida.',
+
+    REQUEST_DATE_INVALID_FORMAT: 'La fecha de solicitud no es válida.',
+
     // 👤 USERNAME
     USERNAME_REQUIRED: 'El nombre de usuario es requerido.',
     USERNAME_INVALID_TYPE: 'El nombre de usuario debe ser texto.',
@@ -108,7 +120,11 @@ export const errorMessages = {
     DETAILS_REQUIRED: 'La lista de detalles debe contener al menos un producto.',
     DETAILS_INVALID_FORMAT_REQUIRED: 'Cada detalle debe contener un producto y una cantidad.',
     DETAILS_INVALID_FORMAT_QUANTITY: 'La cantidad de cada detalle debe ser un número mayor a cero.',
-    INVALID_FORMAT_DESCRIPTION: 'Si hay descripción, entonces debe ser texto y no debe ser mayor a 50 caracteres.'
+    DETAILS_INVALID_FORMAT_DESCRIPTION: 'Si hay descripción, entonces debe ser texto y no debe ser mayor a 50 caracteres.',
+
+    PROJECT_NOT_FOUND: 'Proyecto no encontrado.',
+    REQUESTER_PROFILE_NOT_FOUND: 'Perfil solicitante no encontrado.',
+    PURCHASE_REQUISITION_NOT_FOUND: 'Requisición de compra no encontrada.',
 };
 
 const successMessages = {
@@ -124,6 +140,8 @@ const successMessages = {
     UPDATED_GOODS_RECEIPT: '¡Entrada de mercancía actualizada exitosamente!',
     CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
     UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!'
+    CREATED_PURCHASE_REQUISITION: '¡Requisición de compra creada exitosamente!',
+    UPDATED_PURCHASE_REQUISITION: '¡Requisición de compra actualizada exitosamente!'
 };
 
 export const getErrorMessage = (code) => errorMessages[code] ?? null;

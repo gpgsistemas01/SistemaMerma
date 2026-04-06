@@ -29,7 +29,6 @@ model User {
   name         String     @unique @db.VarChar(50)
   password     String     @db.VarChar(50)
   isActive     Boolean    @default(true)
-  profiles     Profile[]
   department   Department @relation(fields: [departmentId], references: [id])
   role         Role       @relation(fields: [roleId], references: [id])
   profiles     Profile[]  @relation("ProfileToUser")
@@ -47,6 +46,7 @@ model Profile {
   approverGoodsIssues GoodsIssue[] @relation("ApproverGoodsIssueRelation")
   requesterGoodsIssues GoodsIssue[] @relation("RequesterGoodsIssueRelation")
   warehouseStaffGoodsIssues GoodsIssue[] @relation("WarehouseStaffGoodsIssueRelation")
+  deliveredPurchaseRequisitions PurchaseRequisition[] @relation("DeliveredByRelation")
 }
 
 model Category {
@@ -151,19 +151,22 @@ model PurchaseRequisition {
   referenceNumber  String   @unique @db.VarChar(50)
   authDate         DateTime?
   requestDate      DateTime
+  deliveryDate     DateTime?
   observations     String?  @db.VarChar(50)
 
   statusId         String   @db.Uuid
   departmentId     String   @db.Uuid
-  approverId       String   @db.Uuid
+  approverId       String?  @db.Uuid
+  deliveredById    String?  @db.Uuid
   requesterId      String   @db.Uuid
-  proectId      String   @db.Uuid
+  projectId        String   @db.Uuid
 
   department       Department @relation(fields: [departmentId], references: [id])
   approver         Profile?   @relation("ApproverRelation", fields: [approverId], references: [id]) 
+  deliveredBy      Profile?   @relation("DeliveredByRelation", fields: [deliveredById], references: [id])
   requester        Profile    @relation("RequesterRelation", fields: [requesterId], references: [id])
   status           Status     @relation(fields: [statusId], references: [id])
-  project           Project     @relation(fields: [proectId], references: [id])
+  project          Project     @relation(fields: [projectId], references: [id])
 
   details          DetailPurchaseRequisitionProduct[]
 }

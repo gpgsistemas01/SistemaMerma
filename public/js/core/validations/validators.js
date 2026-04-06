@@ -39,8 +39,7 @@ export const validateGoodsIssueValidators = {
 }
 
 export const validatePurchaseRequisitionValidators = {
-    projectId: (value) => validateText(value, 'El proyecto'),
     observations: (value) => validateTextOptional(value, 'Las observaciones'),
     requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
     details: validateDetailsArray
-}
+};
