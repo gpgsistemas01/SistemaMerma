@@ -2,6 +2,28 @@ import { createPurchaseRequisitionDtoForRegister } from "../../../dtos/purchaseR
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { createPurchaseRequisition, findAllPurchaseRequisitions, updatePurchaseRequisition } from "../../../services/warehouse/purchaseRequisitionService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import { prisma } from "../../../lib/prisma.js";
+import { RequesterProfileNotFound } from "../../../errors/warehouse/purchaseRequisitionError.js";
+
+const getRequesterIdByUser = async (userId) => {
+
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+            profiles: {
+                where: { isActive: true },
+                take: 1,
+                select: { id: true }
+            }
+        }
+    });
+
+    const requesterId = user?.profiles?.[0]?.id;
+
+    if (!requesterId) throw new RequesterProfileNotFound();
+
+    return requesterId;
+};
 
 export const getAllPurchaseRequisitions = async (req, res) => {
 
@@ -18,7 +40,9 @@ export const getAllPurchaseRequisitions = async (req, res) => {
         take: length,
         search,
         orderBy: columns[orderColumnIndex],
-        orderDir
+        orderDir,
+        userDepartment: req.user?.department,
+        userRole: req.user?.role
     });
 
     res.status(200).json(result);
@@ -28,8 +52,12 @@ export const registerPurchaseRequisition = async (req, res) => {
 
     const purchaseRequisitionDto = createPurchaseRequisitionDtoForRegister(req.body);
     const sanitizedPurchaseRequisitionDto = sanitizeEmptyStrings(purchaseRequisitionDto);
+    const requesterId = await getRequesterIdByUser(req.userId);
 
-    const purchaseRequisition = await createPurchaseRequisition(sanitizedPurchaseRequisitionDto);
+    const purchaseRequisition = await createPurchaseRequisition({
+        ...sanitizedPurchaseRequisitionDto,
+        requesterId
+    });
 
     return res.status(200).json({
         purchaseRequisition,
@@ -41,8 +69,12 @@ export const editPurchaseRequisition = async (req, res) => {
 
     const purchaseRequisitionDto = createPurchaseRequisitionDtoForRegister(req.body);
     const sanitizedPurchaseRequisitionDto = sanitizeEmptyStrings(purchaseRequisitionDto);
+    const requesterId = await getRequesterIdByUser(req.userId);
 
-    const purchaseRequisition = await updatePurchaseRequisition(sanitizedPurchaseRequisitionDto, req.params.id);
+    const purchaseRequisition = await updatePurchaseRequisition({
+        ...sanitizedPurchaseRequisitionDto,
+        requesterId
+    }, req.params.id);
 
     return res.status(200).json({
         purchaseRequisition,
