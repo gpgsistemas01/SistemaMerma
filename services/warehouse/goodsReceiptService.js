@@ -50,6 +50,7 @@ export const findAllGoodsReceipts = async ({
                     id: true,
                     product: {
                         select: {
+                            id: true,
                             name: true,
                         }
                     },
@@ -167,7 +168,7 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
     await validateGoodsReceiptRelations(goodsReceiptDto);
 
-    const { receivedById, supplierId, detailsGoodsReceipt, ...goodsReceiptData } = goodsReceiptDto;
+    const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
 
     try {
 
@@ -185,43 +186,35 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
                         connect: {
                             id: receivedById
                         }
-                    }
+                    },
                 },
                 where: {
                     id: id
                 }
             });
 
-            const incomingDetailsIds = detailsGoodsReceipt.map(detail => detail.id).filter(id => id);
+            const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);
+            const deleteFilter = { goodsReceiptId: id };
+            
+            if (incomingDetailsIds.length) deleteFilter.id = { notIn: incomingDetailsIds };
 
             await prisma.detailGoodsReceiptProduct.deleteMany({
-                where: {
-                    goodsReceiptId: id,
-                    id: {
-                        notIn: incomingDetailsIds.length ? incomingDetailsIds : [0]
-                    }
-                }
+                where: deleteFilter
             });
 
-            const details = await Promise.all(detailsGoodsReceipt.map(async detail => {
+            const detailsGoodsReceipt = await Promise.all(details.map(async detail => {
 
-                const { goodsReceiptId, ...detailData } = detail;
-
-                return await prisma.detailGoodsReceiptProduct.upsert({
-                    create: {
-                        ...detailData,
-                        goodsReceiptId: goodsReceipt.id
-                    },
-                    update: {
-                        ...detailData
-                    },
-                    where: {
-                        id: detail.id ?? 0
+                return await prisma.detailGoodsReceiptProduct.create({
+                    data: { 
+                        ...detail,
+                        goodsReceiptId: id
                     }
                 });
             }));
 
-            return { goodsReceipt, details };
+            goodsReceipt.details = detailsGoodsReceipt;
+
+            return { goodsReceipt };
         });
 
         return result;

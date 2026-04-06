@@ -90,9 +90,9 @@ const openGoodsReceiptModal = async ({ mode, data = null }) => {
         details = data.details.map(detail => ({
             id: detail.id,
             name: detail.product.name,
+            productId: detail.product.id,
             quantity: detail.quantity,
-            description: detail.description,
-            productId: detail.productId
+            description: detail.description
         }));
 
         await initGoodsReceiptSelect2(data);
