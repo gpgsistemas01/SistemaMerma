@@ -28,7 +28,6 @@ model User {
   name         String     @unique @db.VarChar(50)
   password     String     @db.VarChar(50)
   isActive     Boolean    @default(true)
-  profiles     Profile[]
   department   Department @relation(fields: [departmentId], references: [id])
   role         Role       @relation(fields: [roleId], references: [id])
   profiles     Profile[]  @relation("ProfileToUser")
