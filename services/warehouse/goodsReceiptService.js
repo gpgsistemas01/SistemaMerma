@@ -71,14 +71,14 @@ export const findAllGoodsReceipts = async ({
     };
 };
 
-const validateGoodsReceiptRelations = async (goodsReceiptDto) => {
+const validateGoodsReceiptRelations = async ({ receivedById, supplierId }) => {
 
     const [supplier, receivedBy] = await Promise.all([
         prisma.supplier.findUnique({
-            where: { id: goodsReceiptDto.supplierId }
+            where: { id: supplierId }
         }),
         prisma.profile.findUnique({
-            where: { id: goodsReceiptDto.receivedById }
+            where: { id: receivedById }
         })
     ]);
 
@@ -88,13 +88,13 @@ const validateGoodsReceiptRelations = async (goodsReceiptDto) => {
 
 export const createGoodsReceipt = async (goodsReceiptDto) => {
 
-    await validateGoodsReceiptRelations(goodsReceiptDto);
-
     const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
 
-    const result = await prisma.$transaction(async (prisma) => {
+    await validateGoodsReceiptRelations({ receivedById, supplierId });
 
-        const user = await prisma.user.findFirst({
+    const result = await prisma.$transaction(async (tx) => {
+
+        const user = await tx.user.findFirst({
             where: {
                 profiles: {
                     some: {
@@ -109,7 +109,7 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
 
         const type = 'REC';
 
-        const counter = await prisma.referenceNumberCounter.update({
+        const counter = await tx.referenceNumberCounter.update({
             where: { prefix: type },
             data: { 
                 counter: { 
@@ -121,7 +121,7 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
         const year = new Date().getFullYear();
         const referenceNumber = `${type}-${year}-${counter.counter.toString().padStart(6, '0')}`;
 
-        const goodsReceipt = await prisma.goodsReceipt.create({
+        const goodsReceipt = await tx.goodsReceipt.create({
             data: {
                 ...goodsReceiptData,
                 status: {
@@ -166,9 +166,9 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
 
 export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
-    await validateGoodsReceiptRelations(goodsReceiptDto);
-
     const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
+
+    await validateGoodsReceiptRelations({ receivedById, supplierId });
 
     try {
 

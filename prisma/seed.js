@@ -64,6 +64,24 @@ async function main() {
         },
     });
 
+    const soporte = await prisma.user.findUnique({
+        where: { name: 'Soporte01' }
+        });
+
+        await prisma.user.update({
+            where: { id: soporte.id },
+            data: {
+                profiles: {
+                    create: [
+                        {
+                            name: 'Administrador',
+                            lastName: 'Sistema'
+                        }
+                    ]
+                }
+            }
+        });
+
     const departamentos = await prisma.department.findMany({
         select: { id: true, name: true },
         orderBy: { id: 'asc' }
@@ -111,7 +129,7 @@ async function main() {
         if (!isVentas && !isDiseno) {
             usersSeed.push({
                 name: `${safeName}_${numero}_auxiliar`,
-                password: '12345',
+                password: 'A%54321',
                 departmentId: departamento.id,
                 roleId: roleByName['Auxiliar'],
                 profileName: 'Auxiliar',
@@ -268,7 +286,7 @@ async function main() {
         productos.length >= 2
     ) {
         await prisma.goodsReceipt.upsert({
-            where: { referenceNumber: 'REC-0001' },
+            where: { referenceNumber: 'REC-2026-0001' },
             update: {
                 details: {
                     deleteMany: {},

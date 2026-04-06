@@ -117,47 +117,45 @@ export const findAllPurchaseRequisitions = async ({
     };
 };
 
-const validatePurchaseRequisitionRelations = async (purchaseRequisitionDto) => {
+const validatePurchaseRequisitionRelations = async ({ projectId, userId }) => {
 
-    const [project, requester] = await Promise.all([
-        prisma.project.findUnique({
-            where: { id: purchaseRequisitionDto.projectId }
+    const [project, user] = await Promise.all([
+        prisma.project.findFirst({
+            where: { id: projectId }
         }),
-        prisma.profile.findUnique({
-            where: { id: purchaseRequisitionDto.requesterId }
+        prisma.user.findUnique({
+            where: { 
+                id: userId
+            },
+            include: {
+                profiles: true
+            }
         })
     ]);
+console.log(user)
+    const requester = user?.profiles[0];
+    const departmentId = user?.departmentId;
 
     if (!project) throw new ProjectNotFound();
     if (!requester) throw new RequesterProfileNotFound();
+
+    return { project, requester, departmentId };
 };
 
-export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
+export const createPurchaseRequisition = async ({
+    purchaseRequisitionDto,
+    userId
+}) => {
 
-    await validatePurchaseRequisitionRelations(purchaseRequisitionDto);
+    const { projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
 
-    const { requesterId, projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
+    const { requester, departmentId } = await validatePurchaseRequisitionRelations({ projectId, userId });
 
-    const result = await prisma.$transaction(async (prisma) => {
-
-        const user = await prisma.user.findFirst({
-            where: {
-                profiles: {
-                    some: {
-                        id: requesterId
-                    }
-                }
-            },
-            select: {
-                departmentId: true
-            }
-        });
-
-        if (!user) throw new RequesterProfileNotFound();
+    const result = await prisma.$transaction(async (tx) => {
 
         const type = 'REQ';
 
-        const counter = await prisma.referenceNumberCounter.update({
+        const counter = await tx.referenceNumberCounter.update({
             where: { prefix: type },
             data: {
                 counter: {
@@ -169,7 +167,7 @@ export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
         const year = new Date().getFullYear();
         const referenceNumber = `${type}-${year}-${counter.counter.toString().padStart(6, '0')}`;
 
-        const purchaseRequisition = await prisma.purchaseRequisition.create({
+        const purchaseRequisition = await tx.purchaseRequisition.create({
             data: {
                 ...purchaseRequisitionData,
                 status: {
@@ -184,12 +182,12 @@ export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
                 },
                 requester: {
                     connect: {
-                        id: requesterId
+                        id: requester.id
                     }
                 },
                 department: {
                     connect: {
-                        id: user.departmentId
+                        id: departmentId
                     }
                 },
                 referenceNumber,
@@ -212,11 +210,15 @@ export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
     return result.purchaseRequisition;
 };
 
-export const updatePurchaseRequisition = async (purchaseRequisitionDto, id) => {
+export const updatePurchaseRequisition = async ({
+    purchaseRequisitionDto, 
+    id,
+    userId
+}) => {
 
-    await validatePurchaseRequisitionRelations(purchaseRequisitionDto);
+    const { projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
 
-    const { requesterId, projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
+    const { requester } = await validatePurchaseRequisitionRelations({ projectId, userId });
 
     try {
 
@@ -232,7 +234,7 @@ export const updatePurchaseRequisition = async (purchaseRequisitionDto, id) => {
                     },
                     requester: {
                         connect: {
-                            id: requesterId
+                            id: requester.id
                         }
                     }
                 },
@@ -266,6 +268,7 @@ export const updatePurchaseRequisition = async (purchaseRequisitionDto, id) => {
         });
 
         return result;
+
     } catch (err) {
 
         if (err.code === 'P2025') throw new PurchaseRequisitionNotFound();

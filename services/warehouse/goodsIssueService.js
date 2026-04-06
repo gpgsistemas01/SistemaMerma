@@ -114,9 +114,9 @@ const validateGoodsIssueRelations = async ({ projectId, requesterId }) => {
 
 export const createGoodsIssue = async (goodsIssueDto) => {
 
-    await validateGoodsIssueRelations(goodsIssueDto);
-
     const { requesterId, projectId, details, ...goodsIssueData } = goodsIssueDto;
+
+    await validateGoodsIssueRelations({ projectId, requesterId });
 
     const result = await prisma.$transaction(async (tx) => {
 
@@ -194,9 +194,9 @@ export const createGoodsIssue = async (goodsIssueDto) => {
 
 export const updateGoodsIssue = async (goodsIssueDto, id) => {
 
-    await validateGoodsIssueRelations(goodsIssueDto);
-
     const { requesterId, projectId, details, ...goodsIssueData } = goodsIssueDto;
+
+    await validateGoodsIssueRelations({ projectId, requesterId });
 
     try {
 
