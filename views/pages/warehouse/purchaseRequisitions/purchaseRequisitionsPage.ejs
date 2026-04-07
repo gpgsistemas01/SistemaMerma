@@ -54,11 +54,11 @@
         <tr>
             <th>Folio</th>
             <th>Solicitud</th>
-            <% if (user.department === 'Almacén') { %>
+            <% if (user.department === 'Almacén' || user.department === 'Sistemas') { %>
                 <th>Área</th>
             <% } %>
             <th>Proyecto</th>
-            <th>Autorización</th>
+            <th>Aprobación</th>
             <th>Entrega</th>
             <th>Estado</th>
             <th>Acciones</th>

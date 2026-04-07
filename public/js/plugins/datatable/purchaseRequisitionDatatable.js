@@ -46,6 +46,19 @@ export const createPurchaseRequisitionDatatable = () => {
         },
         {
             data: null,
+            title: 'Aprobación',
+            render: (data, type, row) => {
+
+                if (!row.approverId || !row.authDate) return '<small>Sin autorizar</small>';
+
+                const approver = `${ row.approver.name } ${ row.approver.lastName }`;
+                const authDate = new Date(row.authDate).toLocaleString();
+
+                return `<div>${ approver }<br><small>${ authDate }</small></div>`;
+            }
+        },
+        {
+            data: null,
             title: 'Entrega',
             render: (data, type, row) => {
 
