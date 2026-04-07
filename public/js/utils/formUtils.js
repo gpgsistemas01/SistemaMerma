@@ -50,6 +50,5 @@ export const setFormReadOnly = ({
         }
     });
 
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.style.display = isReadOnly ? 'none' : 'block';
+    form.querySelector('#submitBtn').classList.toggle('d-none', isReadOnly);
 };

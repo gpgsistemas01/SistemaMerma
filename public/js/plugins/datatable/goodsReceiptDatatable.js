@@ -71,7 +71,9 @@ const openGoodsReceiptModal = async ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
-    document.querySelector('.add-product-container').classList.toggle('d-none', mode === 'view');
+    const isView = mode === 'view';
+    document.querySelector('.add-product-container').classList.toggle('d-none', isView);
+    document.querySelector('.approve-container').classList.toggle('d-none', !isView);
 
     setFormReadOnly({ form, isReadOnly: false });
 
