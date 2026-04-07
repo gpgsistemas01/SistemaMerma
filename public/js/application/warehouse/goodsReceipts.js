@@ -1,5 +1,10 @@
-import { getSuccessMessage } from "../../constants/apiMessages.js";
-import { editGoodsReceiptRequest, registerGoodsReceiptRequest } from "../../services/warehouse/goodsReceiptService.js";
+import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
+import {
+    cancelGoodsReceiptRequest,
+    confirmGoodsReceiptRequest,
+    editGoodsReceiptRequest,
+    registerGoodsReceiptRequest
+} from "../../services/warehouse/goodsReceiptService.js";
 
 export const registerGoodsReceipt = async (formData) => {
 
@@ -74,3 +79,43 @@ export const editGoodsReceipt = async (formData, id) => {
         } else throw err;
     }
 }
+
+export const confirmGoodsReceipt = async (id) => {
+
+    try {
+
+        const response = await confirmGoodsReceiptRequest(id);
+        const { code } = response.data;
+
+        return {
+            message: getSuccessMessage(code)
+        };
+    } catch (err) {
+
+        if (err.response?.status === 404) {
+            err.message = getErrorMessage(err.response.data.code);
+        }
+
+        throw err;
+    }
+};
+
+export const cancelGoodsReceipt = async (id) => {
+
+    try {
+
+        const response = await cancelGoodsReceiptRequest(id);
+        const { code } = response.data;
+
+        return {
+            message: getSuccessMessage(code)
+        };
+    } catch (err) {
+
+        if (err.response?.status === 404) {
+            err.message = getErrorMessage(err.response.data.code);
+        }
+
+        throw err;
+    }
+};
