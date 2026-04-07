@@ -1,4 +1,5 @@
 import { openPurchaseRequisitionModal } from "../../pages/warehouse/purchaseRequisitionsPage.js";
+import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purchaseRequisitionService.js";
 import { createDataTable } from "./baseDatatable.js";
 
 export let details = [];
@@ -83,7 +84,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                url: '/api/warehouse/purchase-requisitions/',
+                url: PURCHASE_REQUISITIONS_API_ROUTE,
                 data: (d) => {
                     d.department = context.department || '';
                 }
