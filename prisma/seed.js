@@ -316,6 +316,13 @@ async function main() {
         await prisma.purchaseRequisition.upsert({
             where: { referenceNumber: 'REQ-0001' },
             update: {
+                requestDate: new Date('2026-04-03T00:00:00.000Z'),
+                observations: 'Requisición inicial de materiales',
+                statusId: estatusAbierta.id,
+                departmentId: '00000000-0000-0000-0000-000000000012',
+                approverId: perfilAprobador.id,
+                requesterId: perfilSolicitante.id,
+                projectId: proyectoDemo.id,
                 details: {
                     deleteMany: {},
                     create: [
@@ -352,6 +359,50 @@ async function main() {
                         { productId: productos[1].id, quantity: 1, description: 'Requisición de prueba 2' },
                         ...(productos[2]
                             ? [{ productId: productos[2].id, quantity: 3, description: 'Requisición de prueba 3' }]
+                            : []),
+                    ]
+                }
+            }
+        });
+
+        await prisma.goodsIssue.upsert({
+            where: { referenceNumber: 'SAL-0001' },
+            update: {
+                requestDate: new Date('2026-04-04T00:00:00.000Z'),
+                observations: 'Salida inicial de materiales',
+                statusId: estatusAbierta.id,
+                departmentId: '00000000-0000-0000-0000-000000000012',
+                approverId: perfilAprobador.id,
+                requesterId: perfilSolicitante.id,
+                warehouseStaffId: perfilAlmacenista.id,
+                projectId: proyectoDemo.id,
+                details: {
+                    deleteMany: {},
+                    create: [
+                        { productId: productos[0].id, quantity: 1, description: 'Salida de prueba 1' },
+                        { productId: productos[1].id, quantity: 2, description: 'Salida de prueba 2' },
+                        ...(productos[2]
+                            ? [{ productId: productos[2].id, quantity: 1, description: 'Salida de prueba 3' }]
+                            : []),
+                    ]
+                }
+            },
+            create: {
+                referenceNumber: 'SAL-0001',
+                requestDate: new Date('2026-04-04T00:00:00.000Z'),
+                observations: 'Salida inicial de materiales',
+                statusId: estatusAbierta.id,
+                departmentId: '00000000-0000-0000-0000-000000000012',
+                approverId: perfilAprobador.id,
+                requesterId: perfilSolicitante.id,
+                warehouseStaffId: perfilAlmacenista.id,
+                projectId: proyectoDemo.id,
+                details: {
+                    create: [
+                        { productId: productos[0].id, quantity: 1, description: 'Salida de prueba 1' },
+                        { productId: productos[1].id, quantity: 2, description: 'Salida de prueba 2' },
+                        ...(productos[2]
+                            ? [{ productId: productos[2].id, quantity: 1, description: 'Salida de prueba 3' }]
                             : []),
                     ]
                 }
