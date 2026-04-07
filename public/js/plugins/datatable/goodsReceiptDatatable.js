@@ -1,5 +1,6 @@
 import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.js";
 import { createDataTable, refreshProductTable } from "./baseDatatable.js";
+import { GOODS_RECEIPTS_API_ROUTE } from "../../services/warehouse/goodsReceiptService.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -9,7 +10,7 @@ export const createGoodsReceiptDatatable = () => {
     
     const table = createDataTable({
         options: {
-            ajax: '/api/warehouse/goods-receipts/',
+            ajax: GOODS_RECEIPTS_API_ROUTE,
             columns: [
                 { data: 'referenceNumber', title: 'Folio' },
                 { 
