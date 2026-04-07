@@ -1,4 +1,9 @@
-import { GoodsIssueNotFound, GoodsIssueProjectNotFound, GoodsIssueRequesterProfileNotFound } from "../../errors/warehouse/goodsIssueError.js";
+import {
+    GoodsIssueNotFound,
+    GoodsIssueProjectNotFound,
+    GoodsIssueRequesterProfileNotFound,
+    GoodsIssueUpdateDatabaseError
+} from "../../errors/warehouse/goodsIssueError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllGoodsIssues = async ({
@@ -209,6 +214,15 @@ export const updateGoodsIssue = async ({
 
     await validateGoodsIssueRelations({ projectId, requesterId });
 
+    const goodsIssueExists = await prisma.goodsIssue.findUnique({
+        where: { id },
+        select: {
+            id: true
+        }
+    });
+
+    if (!goodsIssueExists) throw new GoodsIssueNotFound();
+
     try {
 
         const result = await prisma.$transaction(async (tx) => {
@@ -284,6 +298,6 @@ export const updateGoodsIssue = async ({
 
         if (err.code === 'P2025') throw new GoodsIssueNotFound();
 
-        throw err;
+        throw new GoodsIssueUpdateDatabaseError();
     }
 };

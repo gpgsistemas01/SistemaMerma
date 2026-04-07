@@ -1,4 +1,4 @@
-import { SupplierNotFound } from "../../errors/warehouse/supplierError.js";
+import { SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllSuppliers = async ({
@@ -52,6 +52,17 @@ export const createSupplier = async (supplierDto) => {
 
 export const updateSupplier = async (supplierDto, id) => {
 
+    const supplierExists = await prisma.supplier.findUnique({
+        where: {
+            id
+        },
+        select: {
+            id: true
+        }
+    });
+
+    if (!supplierExists) throw new SupplierNotFound();
+
     try {
 
         const supplier = await prisma.supplier.update({
@@ -69,8 +80,8 @@ export const updateSupplier = async (supplierDto, id) => {
 
     } catch (err) {
 
-        if (err.code === 'P2025') throw SupplierNotFound();
+        if (err.code === 'P2025') throw new SupplierNotFound();
 
-        throw err;
+        throw new SupplierUpdateDatabaseError();
     }
 }

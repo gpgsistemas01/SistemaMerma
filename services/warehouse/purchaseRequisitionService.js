@@ -1,7 +1,9 @@
 import {
     ProjectNotFound,
     PurchaseRequisitionNotFound,
+    PurchaseRequisitionStatusUpdateDatabaseError,
     PurchaseRequisitionStatusNotFound,
+    PurchaseRequisitionUpdateDatabaseError,
     RequesterProfileNotFound
 } from "../../errors/warehouse/purchaseRequisitionError.js";
 import { prisma } from "../../lib/prisma.js";
@@ -225,6 +227,15 @@ export const updatePurchaseRequisition = async ({
 
     const { requester } = await validatePurchaseRequisitionRelations({ projectId, userId });
 
+    const purchaseRequisitionExists = await prisma.purchaseRequisition.findUnique({
+        where: { id },
+        select: {
+            id: true
+        }
+    });
+
+    if (!purchaseRequisitionExists) throw new PurchaseRequisitionNotFound();
+
     try {
 
         const result = await prisma.$transaction(async (prisma) => {
@@ -276,7 +287,7 @@ export const updatePurchaseRequisition = async ({
 
         if (err.code === 'P2025') throw new PurchaseRequisitionNotFound();
 
-        throw err;
+        throw new PurchaseRequisitionUpdateDatabaseError();
     }
 };
 
@@ -318,7 +329,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName }) => {
         });
     } catch (err) {
         if (err.code === 'P2025') throw new PurchaseRequisitionStatusNotFound();
-        throw err;
+        throw new PurchaseRequisitionStatusUpdateDatabaseError();
     }
 };
 
