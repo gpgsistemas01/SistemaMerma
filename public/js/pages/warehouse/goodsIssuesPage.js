@@ -1,6 +1,7 @@
 import { useForm } from "../../application/form.js";
 import { cancelGoodsIssue, confirmGoodsIssue, editGoodsIssue, registerGoodsIssue } from "../../application/warehouse/goodsIssues.js";
 import { validateGoodsIssueValidators } from "../../core/validations/validators.js";
+import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueSelect2 } from "../../plugins/select2/goodsIssueSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
@@ -123,13 +124,13 @@ const addProduct = () => {
 
     details.push({ productId, name: productName, quantity, description });
 
-    refreshTable();
+    refreshProductTable(details);
 
     $('#productInput').empty().trigger('change');
     document.getElementById('quantityInput').value = '';
     document.getElementById('descriptionInput').value = '';
 };
 
-document.getElementById('addProductBtn').addEventListener('click', addProduct);
+on('click', '#addProductBtn', () => addProduct);
 on('click', '#cancelBtn', async () => await handleAction(cancelGoodsIssue));
 on('click', '#confirmBtn', async () => await handleAction(confirmGoodsIssue));

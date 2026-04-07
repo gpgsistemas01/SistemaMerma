@@ -1,5 +1,5 @@
 import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
-import { createDataTable } from "./baseDatatable.js";
+import { createDataTable, refreshProductTable } from "./baseDatatable.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -83,7 +83,12 @@ export const createGoodsIssueDatatable = (context) => {
 
     const table = createDataTable({
         options: {
-            ajax: '/api/warehouse/goods-issues/',
+            ajax: {
+                url: '/api/warehouse/goods-issues/',
+                data: (d) => {
+                    d.department = context.department || '';
+                }
+            },
             columns,
             buttons: [
                 {
@@ -153,13 +158,5 @@ $(selectorProductTable).on('click', '.delete-btn', function () {
 
     details.splice(index, 1);
 
-    refreshTable();
+    refreshProductTable(details);
 });
-
-const refreshTable = () => {
-
-    const table = $(selectorProductTable).DataTable();
-    table.clear();
-    table.rows.add(details);
-    table.draw();
-};
