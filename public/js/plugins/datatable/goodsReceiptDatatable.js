@@ -1,6 +1,6 @@
 import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.js";
+import { createDataTable, refreshProductTable } from "./baseDatatable.js";
 import { GOODS_RECEIPTS_API_ROUTE } from "../../services/warehouse/goodsReceiptService.js";
-import { createDataTable } from "./baseDatatable.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -103,13 +103,5 @@ $(selectorProductTable).on('click', '.delete-btn', function () {
 
     details.splice(index, 1);
 
-    refreshTable();
+    refreshProductTable(details);
 });
-
-const refreshTable = () => {
-
-    const table = $(selectorProductTable).DataTable();
-    table.clear();
-    table.rows.add(details);
-    table.draw();
-}

@@ -13,8 +13,16 @@ export const createDataTable = ({ selector = '#table', options = {} }) => {
     });
 }
 
-export const reloadDataTable = () => {
+export const reloadMainTable = () => {
 
     const table = $('#table').DataTable();
     table.ajax.reload(null, false);
+}
+
+export const refreshProductTable = (details) => {
+
+    const table = $('#productTable').DataTable();
+    table.clear();
+    table.rows.add(details);
+    table.draw();
 }
