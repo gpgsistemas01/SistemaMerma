@@ -70,11 +70,13 @@ const buttons = {
                 <div class="col-12">
                     <%- include('./button', { button: buttons.backButton }) %>
 
-                    <div class="approve-container">
-                        <%- include('./button', { button: buttons.cancelButton }) %>
+                    <% if (form.canApprove) { %>
+                        <div class="approve-container">
+                            <%- include('./button', { button: buttons.cancelButton }) %>
 
-                        <%- include('./button', { button: buttons.confirmButton }) %>
-                    </div>
+                            <%- include('./button', { button: buttons.confirmButton }) %>
+                        </div>
+                    <% } %>
                     
                     <%- include('./submit') %>
                 </div>

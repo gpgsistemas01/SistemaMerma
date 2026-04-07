@@ -1,16 +1,14 @@
-import { formatDateLongWithTime } from "../../utils/formatters.js";
-import { setFormReadOnly } from "../../utils/formUtils.js";
-import { initGoodsIssueSelect2 } from "../select2/goodsIssueSelect.js";
+import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
 import { createDataTable } from "./baseDatatable.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
 const selectorTable = '#table';
-const context = window.GOODS_ISSUE_CONTEXT || {};
-const isWarehouseDepartment = context.department === 'Almacén';
-const isSystemDepartment = context.department === 'Sistemas';
 
-export const createGoodsIssueDatatable = () => {
+export const createGoodsIssueDatatable = (context) => {
+
+    const isWarehouseDepartment = context.department === 'Almacén';
+    const isSystemDepartment = context.department === 'Sistemas';
 
     const columns = [
         { data: 'referenceNumber', title: 'Folio' },
@@ -113,61 +111,7 @@ export const createGoodsIssueDatatable = () => {
     });
 };
 
-const openGoodsIssueModal = async ({ mode, data = null }) => {
-
-    const form = document.getElementById('form');
-
-    form.dataset.mode = mode;
-    form.dataset.id = data?.id || '';
-
-    document.querySelector('.add-product-container').classList.toggle('d-none', mode === 'view');
-
-    setFormReadOnly({ form, isReadOnly: false });
-    document.querySelector('.add-product-container').style.display = '';
-
-    if (mode === 'create') {
-
-        form.reset();
-        document.getElementById('modalTitle').textContent = 'Registrar salida';
-        document.getElementById('submitBtn').textContent = 'Guardar';
-        details.length = 0;
-
-        await initGoodsIssueSelect2({ context });
-    }
-
-    if (mode === 'edit' || mode === 'view') {
-
-        document.getElementById('observationsInput').value = data.observations || '';
-        document.getElementById('requestDateInput').value = formatDateLongWithTime(data.requestDate);
-        details = data.details.map(detail => ({
-            id: detail.id,
-            name: detail.product.name,
-            productId: detail.product.id,
-            quantity: detail.quantity,
-            description: detail.description
-        }));
-
-        await initGoodsIssueSelect2({ data, context });
-
-        if (mode === 'edit') {
-            document.getElementById('modalTitle').textContent = 'Editar salida';
-            document.getElementById('submitBtn').textContent = 'Actualizar';
-        }
-
-        if (mode === 'view') {
-            document.getElementById('modalTitle').textContent = 'Ver salida';
-            setFormReadOnly({ form, isReadOnly: true });
-        }
-    }
-
-    initDetailsTable(mode);
-
-    const modalElement = document.getElementById('modal');
-    const modal = mdb.Modal.getOrCreateInstance(modalElement);
-    modal.show();
-};
-
-export const initDetailsTable = (mode) => {
+export const initDetailsGoodsIssueTable = (mode) => {
 
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
@@ -219,36 +163,3 @@ const refreshTable = () => {
     table.rows.add(details);
     table.draw();
 };
-
-const addProduct = () => {
-
-    const productId = document.getElementById('productInput').value;
-    const productName = document.getElementById('productInput').selectedOptions?.[0]?.text || '';
-    const quantity = document.getElementById('quantityInput').value;
-    const description = document.getElementById('descriptionInput').value;
-
-    if (!productId || !quantity) {
-        alert('Por favor, complete los campos de producto y cantidad.');
-        return;
-    }
-
-    if (isNaN(quantity) || parseFloat(quantity) < 1) {
-        alert('La cantidad debe ser un número mayor a cero.');
-        return;
-    }
-
-    if (description && description.trim().length > 50) {
-        alert('La descripción debe tener como máximo 50 caracteres.');
-        return;
-    }
-
-    details.push({ productId, name: productName, quantity, description });
-
-    refreshTable();
-
-    $('#productInput').empty().trigger('change');
-    document.getElementById('quantityInput').value = '';
-    document.getElementById('descriptionInput').value = '';
-};
-
-document.getElementById('addProductBtn').addEventListener('click', addProduct);

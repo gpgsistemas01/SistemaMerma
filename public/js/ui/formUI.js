@@ -79,3 +79,29 @@ export const toggleTableErrors = (form, errors) => {
     const value = errors[key];
     setTableError(form, key, value);
 }
+
+export const setFormReadOnly = ({
+    form,
+    isReadOnly
+}) => {
+    
+    const elements = form.querySelectorAll('input, select, textarea');
+
+    elements.forEach(el => {
+        if (isReadOnly) {
+            el.setAttribute('disabled', 'disabled');
+        } else {
+            el.removeAttribute('disabled');
+        }
+    });
+
+    form.querySelector('#submitBtn').classList.toggle('d-none', isReadOnly);
+};
+
+export const toggleButtons = ({ mode, status = 'Cerrada' }) => {
+
+    const isView = mode === 'view';
+    const canApprove = !(isView && status === 'Abierta');
+    document.querySelector('.add-product-container').classList.toggle('d-none', isView);
+    document.querySelector('.approve-container').classList.toggle('d-none', canApprove);
+}

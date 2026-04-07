@@ -1,5 +1,4 @@
 import { getErrorMessage, getSuccessMessage } from "../constants/apiMessages.js";
-import { showModal } from "../ui/modalUI.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 
 export const handleFlashMessage = (flash) => {
@@ -20,23 +19,6 @@ export const handleFlashMessage = (flash) => {
 
         case 'error':
             notifications.showError(message || getErrorMessage(code));
-            break;
-            
-        default:
-            break;
-    }
-}
-
-export const handleModalWithFlashMessage = (flash) => {
-
-    if (!flash) return;
-
-    const { code } = flash;
-
-    switch (code) {
-
-        case 'GOOGLE_LOGIN_ERROR':
-            showModal('loginModal');
             break;
             
         default:
