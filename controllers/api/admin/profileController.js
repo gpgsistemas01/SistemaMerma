@@ -15,6 +15,7 @@ export const getAllProfiles = async (req, res) => {
     const currentUser = await getLoggedUser(req.userId);
     const canViewAllProfiles = ['Almacén', 'Sistemas'].includes(currentUser?.department);
 
+    if (canViewAllProfiles) department = '';
     if (!department && !canViewAllProfiles) department = currentUser?.department || '';
 
     const result = await findAllProfiles({

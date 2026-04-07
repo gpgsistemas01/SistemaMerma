@@ -10,6 +10,7 @@ export const findAllProfiles = async ({
 }) => {
 
     const where = {
+        isActive: true,
         ...(search && {
             name: {
                 contains: search,

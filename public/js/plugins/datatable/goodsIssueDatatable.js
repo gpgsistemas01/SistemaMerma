@@ -6,69 +6,87 @@ import { createDataTable } from "./baseDatatable.js";
 export let details = [];
 const selectorProductTable = '#productTable';
 const selectorTable = '#table';
+const context = window.GOODS_ISSUE_CONTEXT || {};
+const isWarehouseDepartment = context.department === 'Almacén';
+const isSystemDepartment = context.department === 'Sistemas';
 
 export const createGoodsIssueDatatable = () => {
 
+    const columns = [
+        { data: 'referenceNumber', title: 'Folio' },
+        {
+            data: null,
+            title: 'Solicitud',
+            render: (data, type, row) => {
+
+                const name = `${ row.requester.name } ${ row.requester.lastName }`;
+                const date = new Date(row.requestDate).toLocaleString();
+
+                return `<div>${ name }<br><small>${ date }</small></div>`;
+            }
+        }
+    ];
+
+    if (isWarehouseDepartment || isSystemDepartment) {
+        columns.push({
+            data: 'department.name',
+            title: 'Área'
+        });
+    }
+
+    columns.push(
+        {
+            data: null,
+            title: 'Proyecto',
+            render: (data, type, row) => {
+
+                const projectDate = new Date(row.project.date).toLocaleDateString();
+                return `<div>${ row.project.referenceNumber } - ${ row.project.name }<br><small>${ row.project.client } | ${ projectDate }</small></div>`;
+            }
+        },
+        {
+            data: null,
+            title: 'Aprobación',
+            render: (data, type, row) => {
+
+                if (!row.approverId || !row.authDate) return '<small>Sin Autorizar</small>';
+
+                const approver = `${ row.approver.name } ${ row.approver.lastName }`;
+                const authDate = new Date(row.authDate).toLocaleString();
+
+                return `<div>${ approver }<br><small>${ authDate }</small></div>`;
+            }
+        },
+        {
+            data: null,
+            title: 'Entrega',
+            render: (data, type, row) => {
+
+                if (!row.deliveredBy || !row.deliveryDate) return '<small>Sin entrega</small>';
+
+                const deliveredBy = `${ row.deliveredBy.name } ${ row.deliveredBy.lastName }`;
+                const deliveryDate = new Date(row.deliveryDate).toLocaleString();
+
+                return `<div>${ deliveredBy }<br><small>${ deliveryDate }</small></div>`;
+            }
+        },
+        { data: 'status.name', title: 'Estado' },
+        {
+            data: 'id',
+            title: 'Acciones',
+            render: () => {
+                return `
+                    <button class="btn-edit">✏️</button>
+                    <button class="btn-view">👁️</button>
+                `;
+            }
+        }
+    );
+
     const table = createDataTable({
         options: {
-            ajax: '/api/warehouse/goods-issues',
-            columns: [
-                { data: 'referenceNumber', title: 'Folio' },
-                { data: 'department.name', title: 'Área' },
-                {
-                    data: null,
-                    title: 'Solicitud',
-                    render: (data, type, row) => {
-
-                        const name = `${ row.requester.name } ${ row.requester.lastName }`;
-                        const date = new Date(row.requestDate).toLocaleString();
-
-                        return `<div>${ name }<br><small>${ date }</small></div>`;
-                    }
-                },
-                {
-                    data: null,
-                    title: 'Autorización',
-                    render: (data, type, row) => {
-
-                        if (!row.approver || !row.authDate) return '-';
-
-                        const name = `${ row.approver.name } ${ row.approver.lastName }`;
-                        const date = new Date(row.authDate).toLocaleString();
-
-                        return `<div>${ name }<br><small>${ date }</small></div>`;
-                    }
-                },
-                {
-                    data: null,
-                    title: 'Entrega',
-                    render: (data, type, row) => {
-
-                        if (!row.warehouseStaff || !row.deliveryDate) return '-';
-
-                        const name = `${ row.warehouseStaff.name } ${ row.warehouseStaff.lastName }`;
-                        const date = new Date(row.deliveryDate).toLocaleString();
-
-                        return `<div>${ name }<br><small>${ date }</small></div>`;
-                    }
-                },
-                {
-                    data: null,
-                    title: 'Proyecto',
-                    render: (data, type, row) => `${ row.project.referenceNumber } - ${ row.project.name }`
-                },
-                { data: 'status.name', title: 'Estado' },
-                {
-                    data: 'id',
-                    title: 'Acciones',
-                    render: () => {
-                        return `
-                            <button class="btn-edit">✏️</button>
-                            <button class="btn-view">👁️</button>
-                        `;
-                    }
-                }
-            ],
+            ajax: '/api/warehouse/goods-issues/',
+            columns,
             buttons: [
                 {
                     text: 'Nueva salida',
@@ -102,6 +120,8 @@ const openGoodsIssueModal = async ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
+    document.querySelector('.add-product-container').classList.toggle('d-none', mode === 'view');
+
     setFormReadOnly({ form, isReadOnly: false });
     document.querySelector('.add-product-container').style.display = '';
 
@@ -112,7 +132,7 @@ const openGoodsIssueModal = async ({ mode, data = null }) => {
         document.getElementById('submitBtn').textContent = 'Guardar';
         details.length = 0;
 
-        await initGoodsIssueSelect2();
+        await initGoodsIssueSelect2({ context });
     }
 
     if (mode === 'edit' || mode === 'view') {
@@ -127,7 +147,7 @@ const openGoodsIssueModal = async ({ mode, data = null }) => {
             description: detail.description
         }));
 
-        await initGoodsIssueSelect2(data);
+        await initGoodsIssueSelect2({ data, context });
 
         if (mode === 'edit') {
             document.getElementById('modalTitle').textContent = 'Editar salida';
@@ -136,7 +156,6 @@ const openGoodsIssueModal = async ({ mode, data = null }) => {
 
         if (mode === 'view') {
             document.getElementById('modalTitle').textContent = 'Ver salida';
-            document.querySelector('.add-product-container').style.display = 'none';
             setFormReadOnly({ form, isReadOnly: true });
         }
     }

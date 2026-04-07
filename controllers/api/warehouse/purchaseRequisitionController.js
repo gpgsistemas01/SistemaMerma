@@ -2,28 +2,6 @@ import { createPurchaseRequisitionDtoForRegister } from "../../../dtos/purchaseR
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { createPurchaseRequisition, findAllPurchaseRequisitions, updatePurchaseRequisition } from "../../../services/warehouse/purchaseRequisitionService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
-import { prisma } from "../../../lib/prisma.js";
-import { RequesterProfileNotFound } from "../../../errors/warehouse/purchaseRequisitionError.js";
-
-const getRequesterIdByUser = async (userId) => {
-
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-            profiles: {
-                where: { isActive: true },
-                take: 1,
-                select: { id: true }
-            }
-        }
-    });
-
-    const requesterId = user?.profiles?.[0]?.id;
-
-    if (!requesterId) throw new RequesterProfileNotFound();
-
-    return requesterId;
-};
 
 export const getAllPurchaseRequisitions = async (req, res) => {
 
@@ -55,11 +33,10 @@ export const registerPurchaseRequisition = async (req, res) => {
 
     const purchaseRequisitionDto = createPurchaseRequisitionDtoForRegister(req.body);
     const sanitizedPurchaseRequisitionDto = sanitizeEmptyStrings(purchaseRequisitionDto);
-    const requesterId = await getRequesterIdByUser(req.userId);
 
     const purchaseRequisition = await createPurchaseRequisition({
-        ...sanitizedPurchaseRequisitionDto,
-        requesterId
+        purchaseRequisitionDto: sanitizedPurchaseRequisitionDto,
+        userId: req.userId
     });
 
     return res.status(200).json({
@@ -72,12 +49,12 @@ export const editPurchaseRequisition = async (req, res) => {
 
     const purchaseRequisitionDto = createPurchaseRequisitionDtoForRegister(req.body);
     const sanitizedPurchaseRequisitionDto = sanitizeEmptyStrings(purchaseRequisitionDto);
-    const requesterId = await getRequesterIdByUser(req.userId);
 
     const purchaseRequisition = await updatePurchaseRequisition({
-        ...sanitizedPurchaseRequisitionDto,
-        requesterId
-    }, req.params.id);
+        purchaseRequisitionDto: sanitizedPurchaseRequisitionDto, 
+        id: req.params.id, 
+        userId: req.userId
+    });
 
     return res.status(200).json({
         purchaseRequisition,

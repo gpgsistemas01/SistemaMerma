@@ -10,15 +10,27 @@
     }
 }; 
 
-button = {
-    id: 'backBtn',
-    class: 'btn btn-link',
-    attrs: {
-        'data-mdb-modal-init': '',
-        'data-mdb-target': '#modal',
-        'data-mdb-dismiss': 'modal'
+const buttons = {
+    backButton: {
+        id: 'backBtn',
+        class: 'btn btn-link',
+        attrs: {
+            'data-mdb-modal-init': '',
+            'data-mdb-target': '#modal',
+            'data-mdb-dismiss': 'modal'
+        },
+        content: 'Regresar'
     },
-    content: 'Regresar'
+    cancelButton: {
+        id: 'cancelBtn',
+        class: 'btn btn-secondary',
+        content: 'Cancelar'
+    },
+    confirmButton: {
+        id: 'confirmBtn',
+        class: 'btn btn-primary',
+        content: 'Confirmar'
+    }
 }; %>
 
 <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="<%= header.title.id %>">
@@ -56,7 +68,13 @@ button = {
                 <% } %>
 
                 <div class="col-12">
-                    <%- include('./button', { button }) %>
+                    <%- include('./button', { button: buttons.backButton }) %>
+
+                    <div class="approve-container">
+                        <%- include('./button', { button: buttons.cancelButton }) %>
+
+                        <%- include('./button', { button: buttons.confirmButton }) %>
+                    </div>
                     
                     <%- include('./submit') %>
                 </div>

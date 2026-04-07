@@ -64,6 +64,24 @@ async function main() {
         },
     });
 
+    const soporte = await prisma.user.findUnique({
+        where: { name: 'Soporte01' }
+        });
+
+        await prisma.user.update({
+            where: { id: soporte.id },
+            data: {
+                profiles: {
+                    create: [
+                        {
+                            name: 'Administrador',
+                            lastName: 'Sistema'
+                        }
+                    ]
+                }
+            }
+        });
+
     const departamentos = await prisma.department.findMany({
         select: { id: true, name: true },
         orderBy: { id: 'asc' }
@@ -111,7 +129,7 @@ async function main() {
         if (!isVentas && !isDiseno) {
             usersSeed.push({
                 name: `${safeName}_${numero}_auxiliar`,
-                password: '12345',
+                password: 'A%54321',
                 departmentId: departamento.id,
                 roleId: roleByName['Auxiliar'],
                 profileName: 'Auxiliar',
@@ -268,7 +286,7 @@ async function main() {
         productos.length >= 2
     ) {
         await prisma.goodsReceipt.upsert({
-            where: { referenceNumber: 'REC-0001' },
+            where: { referenceNumber: 'REC-2026-0001' },
             update: {
                 details: {
                     deleteMany: {},
@@ -320,11 +338,21 @@ async function main() {
                 referenceNumber: 'REQ-0001',
                 requestDate: new Date('2026-04-03T00:00:00.000Z'),
                 observations: 'Requisición inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                approverId: perfilAprobador.id,
-                requesterId: perfilSolicitante.id,
-                projectId: proyectoDemo.id,
+                status: {
+                    connect: { id: "00000000-0000-0000-0000-000000000030" }
+                },
+                department: {
+                    connect: { id: "00000000-0000-0000-0000-000000000012" }
+                },
+                approver: {
+                    connect: { id: perfilAprobador.id }
+                },
+                requester: {
+                    connect: { id: perfilSolicitante.id }
+                },
+                project: {
+                    connect: { id: proyectoDemo.id }
+                },
                 details: {
                     create: [
                         { productId: productos[0].id, quantity: 2, description: 'Requisición de prueba 1' },

@@ -1,6 +1,9 @@
 import { initbaseSelect2 } from "./baseSelect.js";
 
-export const initGoodsIssueSelect2 = async (data = null) => {
+export const initGoodsIssueSelect2 = async ({
+    data = null,
+    context
+}) => {
 
     const requesterSelector = '#requesterInput';
     const projectSelector = '#projectInput';
@@ -8,8 +11,14 @@ export const initGoodsIssueSelect2 = async (data = null) => {
 
     initbaseSelect2({
         selector: requesterSelector,
-        url: '/api/admin/profiles',
+        url: '/api/admin/profiles/',
         placeholder: 'Buscar solicitante...',
+        data: (params) => {
+            return {
+                search: params.term,
+                department: context.department
+            };
+        },
         processResults: (data) => {
 
             const list = data.data || data;

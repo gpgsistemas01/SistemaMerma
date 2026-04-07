@@ -3,6 +3,11 @@ export const initbaseSelect2 = ({
     url, 
     placeholder,
     processResults,
+    data = (params) => {
+        return {
+            search: params.term
+        };
+    }
 }) => {
 
     if ($(selector).hasClass("select2-hidden-accessible")) $(selector).select2('destroy');
@@ -16,11 +21,7 @@ export const initbaseSelect2 = ({
             url: url, 
             dataType: 'json', 
             delay: 250, 
-            data: function (params) { 
-                return { 
-                    search: params.term 
-                }; 
-            }, 
+            data, 
             processResults: processResults 
         } 
     });

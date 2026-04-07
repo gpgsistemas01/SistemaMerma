@@ -44,7 +44,13 @@ export const editGoodsIssue = async (req, res) => {
     const goodsIssueDto = createGoodsIssueDtoForRegister(req.body);
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
 
-    const goodsIssue = await updateGoodsIssue(sanitizedGoodsIssueDto, req.params.id);
+    const canEditDepartment = ['Almacén', 'Sistemas'].includes(req.user.department);
+
+    const goodsIssue = await updateGoodsIssue({
+        goodsIssueDto: sanitizedGoodsIssueDto, 
+        id: req.params.id,
+        canEditDepartment
+    });
 
     return res.status(200).json({
         goodsIssue,

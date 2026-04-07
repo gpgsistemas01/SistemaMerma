@@ -59,11 +59,13 @@
     <thead>
         <tr>
             <th>Folio</th>
-            <th>Área</th>
             <th>Solicitud</th>
-            <th>Autorización</th>
-            <th>Entrega</th>
+            <% if (user.department === 'Almacén') { %>
+                <th>Área</th>
+            <% } %>
             <th>Proyecto</th>
+            <th>Aprobación</th>
+            <th>Entrega</th>
             <th>Estado</th>
             <th>Acciones</th>
         </tr>
@@ -73,6 +75,10 @@
 </table>
 
 <%- include('../../../shared/modal', { form }) %>
+
+<script>
+    window.GOODS_ISSUE_CONTEXT = <%- JSON.stringify(user) %>;
+</script>
 
 <script type="module" src="/js/pages/warehouse/goodsIssuesPage.js"></script>
 

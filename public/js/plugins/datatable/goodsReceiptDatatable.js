@@ -11,7 +11,7 @@ export const createGoodsReceiptDatatable = () => {
     
     const table = createDataTable({
         options: {
-            ajax: '/api/warehouse/goods-receipts',
+            ajax: '/api/warehouse/goods-receipts/',
             columns: [
                 { data: 'referenceNumber', title: 'Folio' },
                 { 
@@ -71,6 +71,10 @@ const openGoodsReceiptModal = async ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
+    const isView = mode === 'view';
+    document.querySelector('.add-product-container').classList.toggle('d-none', isView);
+    document.querySelector('.approve-container').classList.toggle('d-none', !isView);
+
     setFormReadOnly({ form, isReadOnly: false });
 
     if (mode === 'create') {
@@ -106,7 +110,6 @@ const openGoodsReceiptModal = async ({ mode, data = null }) => {
         if (mode === 'view') {
 
             document.getElementById('modalTitle').textContent = 'Ver recepción';
-            document.querySelector('.add-product-container').style.display = mode === 'view' ? 'none' : '';
 
             setFormReadOnly({ form, isReadOnly: true });
         }

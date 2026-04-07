@@ -7,7 +7,7 @@ export const createSupplierDatatable = () => {
     
     const table = createDataTable({
             options: {
-            ajax: '/api/warehouse/suppliers',
+            ajax: '/api/warehouse/suppliers/',
             columns: [
                 { data: 'name', title: 'Nombre' },
                 { data: 'numberphone', title: 'Telefóno' },

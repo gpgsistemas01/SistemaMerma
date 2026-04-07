@@ -8,7 +8,7 @@ export const initPurchaseRequisitionSelect2 = async (data = null) => {
 
     initbaseSelect2({
         selector: projectSelector,
-        url: '/api/warehouse/projects/',
+        url: '/api/admin/projects/',
         placeholder: 'Buscar proyecto...',
         processResults: (data) => {
 
