@@ -20,3 +20,10 @@ export class RequesterProfileNotFound extends AppError {
         super('Perfil solicitante no encontrado', 'REQUESTER_PROFILE_NOT_FOUND', 404);
     }
 }
+
+export class PurchaseRequisitionStatusNotFound extends AppError {
+
+    constructor() {
+        super('Estado de requisición no encontrado', 'PURCHASE_REQUISITION_STATUS_NOT_FOUND', 404);
+    }
+}

@@ -1,4 +1,9 @@
-import { ProjectNotFound, PurchaseRequisitionNotFound, RequesterProfileNotFound } from "../../errors/warehouse/purchaseRequisitionError.js";
+import {
+    ProjectNotFound,
+    PurchaseRequisitionNotFound,
+    PurchaseRequisitionStatusNotFound,
+    RequesterProfileNotFound
+} from "../../errors/warehouse/purchaseRequisitionError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllPurchaseRequisitions = async ({
@@ -274,3 +279,51 @@ export const updatePurchaseRequisition = async ({
         throw err;
     }
 };
+
+const updatePurchaseRequisitionStatus = async ({ id, statusName }) => {
+
+    const purchaseRequisition = await prisma.purchaseRequisition.findUnique({
+        where: { id },
+        include: {
+            status: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    });
+
+    if (!purchaseRequisition) throw new PurchaseRequisitionNotFound();
+    if (purchaseRequisition.status?.name !== 'Abierta') throw new PurchaseRequisitionStatusNotFound();
+
+    try {
+        return await prisma.purchaseRequisition.update({
+            where: { id },
+            data: {
+                status: {
+                    connect: {
+                        name: statusName
+                    }
+                }
+            },
+            select: {
+                id: true,
+                status: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        if (err.code === 'P2025') throw new PurchaseRequisitionStatusNotFound();
+        throw err;
+    }
+};
+
+export const confirmPurchaseRequisition = async ({ id }) =>
+    await updatePurchaseRequisitionStatus({ id, statusName: 'Confirmada' });
+
+export const cancelPurchaseRequisition = async ({ id }) =>
+    await updatePurchaseRequisitionStatus({ id, statusName: 'Cancelada' });
