@@ -1,5 +1,5 @@
 import express from 'express';
-import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
+import { authorizeUserApi, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
 import { editSupplier, getAllSuppliers, registerSupplier } from '../../../controllers/api/warehouse/supplierController.js';
 import { supplierValidation } from '../../../validators/forms/supplierValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
@@ -9,7 +9,7 @@ const router = express.Router();
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserWeb({
+    authorizeUserApi({
         roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
         departments: ['Almacén', 'Sistemas']
     }),
@@ -21,7 +21,7 @@ router.post(
     verifyCookiesAuthTokenRequired,
     supplierValidation,
     validate,
-    authorizeUserWeb({
+    authorizeUserApi({
         roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
         departments: ['Almacén', 'Sistemas']
     }),
@@ -33,7 +33,7 @@ router.put(
     verifyCookiesAuthTokenRequired,
     supplierValidation,
     validate,
-    authorizeUserWeb({
+    authorizeUserApi({
         roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
         departments: ['Almacén', 'Sistemas']
     }),

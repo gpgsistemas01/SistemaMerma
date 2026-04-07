@@ -141,7 +141,9 @@ const successMessages = {
     CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
     UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!',
     CREATED_PURCHASE_REQUISITION: '¡Requisición de compra creada exitosamente!',
-    UPDATED_PURCHASE_REQUISITION: '¡Requisición de compra actualizada exitosamente!'
+    UPDATED_PURCHASE_REQUISITION: '¡Requisición de compra actualizada exitosamente!',
+    CONFIRMED_PURCHASE_REQUISITION: '¡Requisición de compra confirmada exitosamente!',
+    CANCELED_PURCHASE_REQUISITION: '¡Requisición de compra cancelada exitosamente!'
 };
 
 export const getErrorMessage = (code) => errorMessages[code] ?? null;

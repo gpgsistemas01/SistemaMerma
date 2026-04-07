@@ -1,5 +1,5 @@
 import express from 'express';
-import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
+import { authorizeUserApi, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
 import { getAllProjects } from '../../../controllers/api/warehouse/projectController.js';
 
 const router = express.Router();
@@ -12,7 +12,7 @@ const projectPermissions = {
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserWeb(projectPermissions),
+    authorizeUserApi(projectPermissions),
     getAllProjects
 );
 
