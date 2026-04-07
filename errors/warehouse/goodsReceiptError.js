@@ -20,3 +20,10 @@ export class ProfileNotFound extends AppError {
         super('Perfil no encontrado', 'PROFILE_NOT_FOUND', 404);
     }
 }
+
+export class GoodsReceiptUpdateDatabaseError extends AppError {
+
+    constructor() {
+        super('Error de base de datos al editar el recibo de mercancía', 'GOODS_RECEIPT_UPDATE_DB_ERROR', 500);
+    }
+}

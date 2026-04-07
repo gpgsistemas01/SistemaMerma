@@ -20,3 +20,10 @@ export class GoodsIssueRequesterProfileNotFound extends AppError {
         super('Perfil solicitante no encontrado', 'REQUESTER_PROFILE_NOT_FOUND', 404);
     }
 }
+
+export class GoodsIssueUpdateDatabaseError extends AppError {
+
+    constructor() {
+        super('Error de base de datos al editar la salida de almacén', 'GOODS_ISSUE_UPDATE_DB_ERROR', 500);
+    }
+}
