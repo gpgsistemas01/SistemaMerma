@@ -188,9 +188,7 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
                         }
                     },
                 },
-                where: {
-                    id: id
-                }
+                where: { id }
             });
 
             const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);

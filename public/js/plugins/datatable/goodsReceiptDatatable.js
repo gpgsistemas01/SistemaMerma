@@ -11,7 +11,7 @@ export const createGoodsReceiptDatatable = () => {
     
     const table = createDataTable({
         options: {
-            ajax: '/api/warehouse/goods-receipts',
+            ajax: '/api/warehouse/goods-receipts/',
             columns: [
                 { data: 'referenceNumber', title: 'Folio' },
                 { 

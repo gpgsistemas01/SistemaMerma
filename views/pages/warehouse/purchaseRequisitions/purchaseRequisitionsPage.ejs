@@ -54,10 +54,11 @@
         <tr>
             <th>Folio</th>
             <th>Solicitud</th>
-            <% if (department === 'Almacén') { %>
+            <% if (user.department === 'Almacén') { %>
                 <th>Área</th>
             <% } %>
             <th>Proyecto</th>
+            <th>Autorización</th>
             <th>Entrega</th>
             <th>Estado</th>
             <th>Acciones</th>
@@ -70,7 +71,7 @@
 <%- include('../../../shared/modal', { form }) %>
 
 <script>
-    window.PURCHASE_REQUISITION_CONTEXT = <%- JSON.stringify(department) %>;
+    window.PURCHASE_REQUISITION_CONTEXT = <%- JSON.stringify(user) %>;
 </script>
 
 <script type="module" src="/js/pages/warehouse/purchaseRequisitionsPage.js"></script>

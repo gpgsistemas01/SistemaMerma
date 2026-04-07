@@ -8,7 +8,7 @@ export const createProductDatatable = () => {
     
     const table = createDataTable({
         options: {
-            ajax: '/api/warehouse/products',
+            ajax: '/api/warehouse/products/',
             columns: [
                 { data: 'name', title: 'Nombre' },
                 { 

@@ -185,7 +185,7 @@ model DetailPurchaseRequisitionProduct {
 model GoodsIssue {
   id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   referenceNumber  String   @unique @db.VarChar(50)
-  authDate         DateTime?
+  approvedDate         DateTime?
   requestDate      DateTime
   deliveryDate     DateTime?
   observations     String?  @db.VarChar(50)

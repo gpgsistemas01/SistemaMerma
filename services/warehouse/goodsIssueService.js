@@ -11,7 +11,10 @@ export const findAllGoodsIssues = async ({
     userRole = ''
 }) => {
 
-    const canViewAll = userRole === 'Coordinador' && userDepartment === 'Almacén';
+    const isAdmin = userRole === 'Administrador del sistema';
+    const isWarehouseCoordinator = userRole === 'Coordinador' && userDepartment === 'Almacén';
+
+    const canViewAll = isAdmin || isWarehouseCoordinator;
 
     const where = {
         ...(search && {
@@ -20,10 +23,14 @@ export const findAllGoodsIssues = async ({
                 mode: 'insensitive'
             }
         }),
-        ...(!canViewAll && userDepartment && {
-            department: {
-                name: userDepartment
-            }
+        ...(!canViewAll && {
+            OR: [
+                {
+                    department: {
+                        name: userDepartment
+                    }
+                }
+            ]
         })
     };
 
@@ -192,7 +199,11 @@ export const createGoodsIssue = async (goodsIssueDto) => {
     return result.goodsIssue;
 };
 
-export const updateGoodsIssue = async (goodsIssueDto, id) => {
+export const updateGoodsIssue = async ({
+    goodsIssueDto, 
+    id,
+    canEditDepartment
+}) => {
 
     const { requesterId, projectId, details, ...goodsIssueData } = goodsIssueDto;
 
@@ -202,23 +213,46 @@ export const updateGoodsIssue = async (goodsIssueDto, id) => {
 
         const result = await prisma.$transaction(async (tx) => {
 
-            const goodsIssue = await tx.goodsIssue.update({
-                data: {
-                    ...goodsIssueData,
-                    project: {
-                        connect: {
-                            id: projectId
-                        }
-                    },
-                    requester: {
-                        connect: {
+            const user = await tx.user.findFirst({
+                where: {
+                    profiles: {
+                        some: {
                             id: requesterId
                         }
                     }
                 },
-                where: {
-                    id
+                select: {
+                    departmentId: true
                 }
+            });
+
+            if (!user) throw new GoodsIssueRequesterProfileNotFound();
+
+            const updatedData = {
+                ...goodsIssueData,
+                project: {
+                    connect: {
+                        id: projectId
+                    }
+                },
+                requester: {
+                    connect: {
+                        id: requesterId
+                    }
+                }
+            };
+
+            if (canEditDepartment) {
+                updatedData.department = {
+                    connect: {
+                        id: user.departmentId
+                    }
+                };
+            }
+
+            const goodsIssue = await tx.goodsIssue.update({
+                data: updatedData,
+                where: { id }
             });
 
             const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);

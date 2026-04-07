@@ -132,7 +132,7 @@ const validatePurchaseRequisitionRelations = async ({ projectId, userId }) => {
             }
         })
     ]);
-console.log(user)
+
     const requester = user?.profiles[0];
     const departmentId = user?.departmentId;
 
@@ -238,9 +238,7 @@ export const updatePurchaseRequisition = async ({
                         }
                     }
                 },
-                where: {
-                    id
-                }
+                where: { id }
             });
 
             const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);

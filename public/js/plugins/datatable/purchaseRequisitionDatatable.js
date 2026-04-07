@@ -8,6 +8,7 @@ const selectorProductTable = '#productTable';
 const selectorTable = '#table';
 const context = window.PURCHASE_REQUISITION_CONTEXT || {};
 const isWarehouseDepartment = context.department === 'Almacén';
+const isSystemDepartment = context.department === 'Sistemas';
 
 export const createPurchaseRequisitionDatatable = () => {
 
@@ -26,7 +27,7 @@ export const createPurchaseRequisitionDatatable = () => {
         }
     ];
 
-    if (isWarehouseDepartment) {
+    if (isWarehouseDepartment || isSystemDepartment) {
         columns.push({
             data: 'department.name',
             title: 'Área'
@@ -72,7 +73,7 @@ export const createPurchaseRequisitionDatatable = () => {
     const table = createDataTable({
         options: {
             ajax: {
-                url: '/api/warehouse/purchase-requisitions',
+                url: '/api/warehouse/purchase-requisitions/',
                 data: (d) => {
                     d.department = context.department || '';
                 }
