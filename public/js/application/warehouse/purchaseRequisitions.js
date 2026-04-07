@@ -1,5 +1,10 @@
 import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
-import { cancelPurchaseRequisitionRequest, confirmPurchaseRequisitionRequest, editPurchaseRequisitionRequest, registerPurchaseRequisitionRequest } from "../../services/warehouse/purchaseRequisitionService.js";
+import {
+    cancelPurchaseRequisitionRequest,
+    confirmPurchaseRequisitionRequest,
+    editPurchaseRequisitionRequest,
+    registerPurchaseRequisitionRequest
+} from "../../services/warehouse/purchaseRequisitionService.js";
 
 export const registerPurchaseRequisition = async (formData) => {
 
@@ -59,78 +64,42 @@ export const editPurchaseRequisition = async (formData, id) => {
     }
 };
 
-export const cancelPurchaseRequisition = async (id) => {
-
-    try {
-    
-        const response = await cancelPurchaseRequisitionRequest(id);
-
-        const { data } = response;
-        const { code } = data;
-        let message = getSuccessMessage(code);
-
-        return {
-            message
-        };
-
-    } catch (err) {
-
-        if (err.response) {
-
-            let message;
-            const { data, status } = err.response;
-
-            switch (status) {
-
-                case 404:
-                    message = getErrorMessage(data.code);
-                    err.message = message;
-                    throw err;
-                default:
-                    throw err;
-            }
-
-        } else {
-
-            throw err;
-        }
-    }
-}
-
 export const confirmPurchaseRequisition = async (id) => {
 
     try {
-    
-        const response = await confirmPurchaseRequisitionRequest(id);
 
-        const { data } = response;
-        const { code } = data;
-        let message = getSuccessMessage(code);
+        const response = await confirmPurchaseRequisitionRequest(id);
+        const { code } = response.data;
 
         return {
-            message
+            message: getSuccessMessage(code)
         };
-
     } catch (err) {
 
-        if (err.response) {
-
-            let message;
-            const { data, status } = err.response;
-
-            switch (status) {
-
-                case 404:
-                    message = getErrorMessage(data.code);
-                    err.message = message;
-                    throw err;
-                default:
-                    throw err;
-            }
-
-        } else {
-
-            throw err;
+        if (err.response?.status === 404) {
+            err.message = getErrorMessage(err.response.data.code);
         }
+
+        throw err;
     }
-}
+};
+
+export const cancelPurchaseRequisition = async (id) => {
+
+    try {
+
+        const response = await cancelPurchaseRequisitionRequest(id);
+        const { code } = response.data;
+
+        return {
+            message: getSuccessMessage(code)
+        };
+    } catch (err) {
+
+        if (err.response?.status === 404) {
+            err.message = getErrorMessage(err.response.data.code);
+        }
+
+        throw err;
+    }
+};

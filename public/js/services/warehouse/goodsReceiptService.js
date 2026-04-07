@@ -14,12 +14,12 @@ export const editGoodsReceiptRequest = (data, id) => apiRequest({
     data
 });
 
-export const cancelGoodsReceiptRequest = (id) => apiRequest({
-    method: 'patch',
-    url: `${ route }/goods-receipts/cancel/${ id }`
-});
-
 export const confirmGoodsReceiptRequest = (id) => apiRequest({
     method: 'patch',
-    url: `${ route }/goods-receipts/confirm/${ id }`
+    url: `${ route }/goods-receipts/${ id }/confirm`
+});
+
+export const cancelGoodsReceiptRequest = (id) => apiRequest({
+    method: 'patch',
+    url: `${ route }/goods-receipts/${ id }/cancel`
 });

@@ -125,6 +125,9 @@ export const errorMessages = {
     PROJECT_NOT_FOUND: 'Proyecto no encontrado.',
     REQUESTER_PROFILE_NOT_FOUND: 'Perfil solicitante no encontrado.',
     PURCHASE_REQUISITION_NOT_FOUND: 'Requisición de compra no encontrada.',
+    PURCHASE_REQUISITION_STATUS_NOT_FOUND: 'Estado de requisición no encontrado.',
+    GOODS_RECEIPT_NOT_FOUND: 'Recibo de mercancía no encontrado.',
+    GOODS_RECEIPT_STATUS_NOT_FOUND: 'Estado de recepción de compra no encontrado.'
 };
 
 const successMessages = {
@@ -138,6 +141,8 @@ const successMessages = {
     UPDATED_SUPPLIER: '¡Proveedor actuallizada exitosamente!',
     CREATED_GOODS_RECEIPT: '¡Entrada de mercancía creada exitosamente!',
     UPDATED_GOODS_RECEIPT: '¡Entrada de mercancía actualizada exitosamente!',
+    CONFIRMED_GOODS_RECEIPT: '¡Entrada de mercancía confirmada exitosamente!',
+    CANCELED_GOODS_RECEIPT: '¡Entrada de mercancía cancelada exitosamente!',
     CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
     UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!',
     CREATED_PURCHASE_REQUISITION: '¡Requisición de compra creada exitosamente!',

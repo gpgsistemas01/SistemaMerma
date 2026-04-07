@@ -1,7 +1,13 @@
 import express from 'express';
 import { authorizeUserApi, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
-import { editGoodsReceipt, getAllGoodsReceipts, registerGoodsReceipt } from '../../../controllers/api/warehouse/goodsReceiptController.js';
+import {
+    cancelGoodsReceiptStatus,
+    confirmGoodsReceiptStatus,
+    editGoodsReceipt,
+    getAllGoodsReceipts,
+    registerGoodsReceipt
+} from '../../../controllers/api/warehouse/goodsReceiptController.js';
 import { goodsReceiptValidation } from '../../../validators/forms/goodsReceiptValidations.js';
 
 const router = express.Router();
@@ -33,6 +39,20 @@ router.put(
     validate,
     authorizeUserApi(goodsReceiptPermissions),
     editGoodsReceipt
+);
+
+router.patch(
+    '/:id/confirm',
+    verifyCookiesAuthTokenRequired,
+    authorizeUserApi(goodsReceiptPermissions),
+    confirmGoodsReceiptStatus
+);
+
+router.patch(
+    '/:id/cancel',
+    verifyCookiesAuthTokenRequired,
+    authorizeUserApi(goodsReceiptPermissions),
+    cancelGoodsReceiptStatus
 );
 
 export default router;
