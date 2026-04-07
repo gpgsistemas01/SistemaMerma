@@ -1,9 +1,9 @@
 import { findAllProfiles } from "../../../services/admin/profileService.js";
-import { getLoggedUser } from "../../../services/userService.js";
 
 export const getAllProfiles = async (req, res) => {
 
     let { department } = req.query;
+    const { user } = req;
     const start = parseInt(req.query.start) || 0;
     const length = parseInt(req.query.length) || 10;
     const search = req.query.search?.value || req.query.search || '';
@@ -12,11 +12,10 @@ export const getAllProfiles = async (req, res) => {
     const orderColumnIndex = req.query.order?.[0]?.column || 0;
     const orderDir = req.query.order?.[0]?.dir || 'asc';
 
-    const currentUser = await getLoggedUser(req.userId);
-    const canViewAllProfiles = ['Almacén', 'Sistemas'].includes(currentUser?.department);
+    const canViewAllProfiles = ['Almacén', 'Sistemas'].includes(user?.department);
 
     if (canViewAllProfiles) department = '';
-    if (!department && !canViewAllProfiles) department = currentUser?.department || '';
+    if (!department && !canViewAllProfiles) department = user?.department || '';
 
     const result = await findAllProfiles({
         department,
