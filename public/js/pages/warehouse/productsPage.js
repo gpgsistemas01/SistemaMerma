@@ -3,7 +3,7 @@ import { useForm } from "../../application/form.js";
 import { editProduct, registerProduct } from "../../application/warehouse/products.js";
 import { productValidators } from "../../core/validations/validators.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
-import { setFormReadOnly, toggleInputSelectErrors } from "../../ui/formUI.js";
+import { setFormReadOnly, toggleButtons, toggleInputSelectErrors } from "../../ui/formUI.js";
 import { initProductSelect2 } from "../../plugins/select2/productSelect.js";
 
 createProductDatatable();

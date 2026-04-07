@@ -4,6 +4,7 @@ import { validateGoodsReceiptValidators } from "../../core/validations/validator
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { initGoodsReceiptSelect2 } from "../../plugins/select2/goodsReceiptSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
+import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
 
@@ -50,8 +51,7 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
-    toggleButtons(mode);
-
+    toggleButtons({ mode, status: data?.status?.name });
     setFormReadOnly({ form, isReadOnly: false });
 
     details.length = 0;
@@ -69,7 +69,7 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
 
         document.getElementById('observationsInput').value = data.observations || '';
         document.getElementById('receptionDateInput').value = formatDateLongWithTime(data.receptionDate);
-        details.push(...data.details.map(detail => ({
+        details.push(...data?.details.map(detail => ({
             id: detail.id,
             name: detail.product.name,
             productId: detail.product.id,

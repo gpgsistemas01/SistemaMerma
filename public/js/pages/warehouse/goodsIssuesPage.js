@@ -4,6 +4,7 @@ import { validateGoodsIssueValidators } from "../../core/validations/validators.
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueSelect2 } from "../../plugins/select2/goodsIssueSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
+import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
 
@@ -52,8 +53,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
-    toggleButtons(mode);
-
+    toggleButtons({ mode, status: data?.status?.name });
     setFormReadOnly({ form, isReadOnly: false });
 
     details.length = 0;
@@ -71,7 +71,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
 
         document.getElementById('observationsInput').value = data.observations || '';
         document.getElementById('requestDateInput').value = formatDateLongWithTime(data.requestDate);
-        details.push(...data.details.map(detail => ({
+        details.push(...data?.details.map(detail => ({
             id: detail.id,
             name: detail.product.name,
             productId: detail.product.id,

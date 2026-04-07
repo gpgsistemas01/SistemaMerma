@@ -3,7 +3,7 @@ import { useForm } from "../../application/form.js";
 import { editSupplier, registerSupplier } from "../../application/warehouse/suppliers.js";
 import { supplierValidators } from "../../core/validations/validators.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
-import { setFormReadOnly } from "../../ui/formUI.js";
+import { setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
 
 createSupplierDatatable();
 
