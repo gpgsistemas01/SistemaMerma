@@ -286,7 +286,7 @@ async function main() {
         productos.length >= 2
     ) {
         await prisma.goodsReceipt.upsert({
-            where: { referenceNumber: 'REC-2026-0001' },
+            where: { referenceNumber: 'REC-2026-000001' },
             update: {
                 details: {
                     deleteMany: {},
@@ -297,7 +297,7 @@ async function main() {
                 }
             },
             create: {
-                referenceNumber: 'REC-0001',
+                referenceNumber: 'REC-2026-000001',
                 supplierId: proveedor.id,
                 receptionDate: new Date('2026-04-02T00:00:00.000Z'),
                 observations: 'Recepción inicial de materiales',
@@ -314,7 +314,7 @@ async function main() {
         });
 
         await prisma.purchaseRequisition.upsert({
-            where: { referenceNumber: 'REQ-0001' },
+            where: { referenceNumber: 'REQ-2026-000001' },
             update: {
                 requestDate: new Date('2026-04-03T00:00:00.000Z'),
                 observations: 'Requisición inicial de materiales',
@@ -335,7 +335,7 @@ async function main() {
                 }
             },
             create: {
-                referenceNumber: 'REQ-0001',
+                referenceNumber: 'REQ-2026-000001',
                 requestDate: new Date('2026-04-03T00:00:00.000Z'),
                 observations: 'Requisición inicial de materiales',
                 status: {
@@ -366,7 +366,7 @@ async function main() {
         });
 
         await prisma.goodsIssue.upsert({
-            where: { referenceNumber: 'SAL-0001' },
+            where: { referenceNumber: 'SAL-2026-000001' },
             update: {
                 requestDate: new Date('2026-04-04T00:00:00.000Z'),
                 observations: 'Salida inicial de materiales',
@@ -388,7 +388,7 @@ async function main() {
                 }
             },
             create: {
-                referenceNumber: 'SAL-0001',
+                referenceNumber: 'SAL-2026-0001',
                 requestDate: new Date('2026-04-04T00:00:00.000Z'),
                 observations: 'Salida inicial de materiales',
                 statusId: estatusAbierta.id,

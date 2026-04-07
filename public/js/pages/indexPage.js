@@ -1,8 +1,7 @@
 import { notifications } from "../plugins/swal/swalComponent.js";
-import { handleFlashMessage, handleModalWithFlashMessage } from "../handlers/flashMessageHandler.js";
+import { handleFlashMessage } from "../handlers/flashMessageHandler.js";
 
 handleFlashMessage(window.FLASH_MESSAGE || null);
-handleModalWithFlashMessage(window.FLASH_MESSAGE || null);
 
 const successMessage = localStorage.getItem('showSuccessToast');
 

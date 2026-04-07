@@ -13,3 +13,23 @@ export const editGoodsIssueRequest = (data, id) => apiRequest({
     url: `${ route }/goods-issues/${ id }`,
     data
 });
+
+export const cancelGoodsIssueRequest = (id) => apiRequest({
+    method: 'patch',
+    url: `${ route }/goods-issues/cancel/${ id }`
+});
+
+export const confirmGoodsIssueRequest = (id) => apiRequest({
+    method: 'patch',
+    url: `${ route }/goods-issues/confirm/${ id }`
+});
+
+export const rejectGoodsIssueRequest = (id) => apiRequest({
+    method: 'patch',
+    url: `${ route }/goods-issues/reject/${ id }`
+});
+
+export const approveGoodsIssueRequest = (id) => apiRequest({
+    method: 'patch',
+    url: `${ route }/goods-issues/approve/${ id }`
+});

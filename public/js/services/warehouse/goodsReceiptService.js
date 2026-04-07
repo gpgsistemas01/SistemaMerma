@@ -13,3 +13,13 @@ export const editGoodsReceiptRequest = (data, id) => apiRequest({
     url: `${ route }/goods-receipts/${ id }`,
     data
 });
+
+export const cancelGoodsReceiptRequest = (id) => apiRequest({
+    method: 'patch',
+    url: `${ route }/goods-receipts/cancel/${ id }`
+});
+
+export const confirmGoodsReceiptRequest = (id) => apiRequest({
+    method: 'patch',
+    url: `${ route }/goods-receipts/confirm/${ id }`
+});

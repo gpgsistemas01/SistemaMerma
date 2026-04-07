@@ -1,6 +1,4 @@
-import { formatDateLongWithTime } from "../../utils/formatters.js";
-import { setFormReadOnly } from "../../utils/formUtils.js";
-import { initGoodsReceiptSelect2 } from "../select2/goodsReceiptSelect.js";
+import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.js";
 import { createDataTable } from "./baseDatatable.js";
 
 export let details = [];
@@ -64,65 +62,7 @@ export const createGoodsReceiptDatatable = () => {
     });
 }
 
-const openGoodsReceiptModal = async ({ mode, data = null }) => {
-
-    const form = document.getElementById('form');
-
-    form.dataset.mode = mode;
-    form.dataset.id = data?.id || '';
-
-    const isView = mode === 'view';
-    document.querySelector('.add-product-container').classList.toggle('d-none', isView);
-    document.querySelector('.approve-container').classList.toggle('d-none', !isView);
-
-    setFormReadOnly({ form, isReadOnly: false });
-
-    if (mode === 'create') {
-        
-        form.reset();
-        document.getElementById('modalTitle').textContent = 'Registrar recepción';
-        document.getElementById('submitBtn').textContent = 'Guardar';
-        details.length = 0;
-
-        await initGoodsReceiptSelect2();
-    }
-
-    if (mode === 'edit' || mode === 'view') {
-
-        document.getElementById('observationsInput').value = data.observations || '';
-        document.getElementById('receptionDateInput').value = formatDateLongWithTime(data.receptionDate);
-        details = data.details.map(detail => ({
-            id: detail.id,
-            name: detail.product.name,
-            productId: detail.product.id,
-            quantity: detail.quantity,
-            description: detail.description
-        }));
-
-        await initGoodsReceiptSelect2(data);
-
-        if (mode === 'edit') {
-
-            document.getElementById('modalTitle').textContent = 'Editar recepción';
-            document.getElementById('submitBtn').textContent = 'Actualizar';
-        }
-
-        if (mode === 'view') {
-
-            document.getElementById('modalTitle').textContent = 'Ver recepción';
-
-            setFormReadOnly({ form, isReadOnly: true });
-        }
-    }
-
-    initDetailsTable(mode)
-
-    const modalElement = document.getElementById('modal');
-    const modal = mdb.Modal.getOrCreateInstance(modalElement);
-    modal.show();
-}
-
-export const initDetailsTable = (mode) => {
+export const initDetailsGoodsReceiptTable = (mode) => {
 
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
@@ -172,37 +112,3 @@ const refreshTable = () => {
     table.rows.add(details);
     table.draw();
 }
-
-const addProduct = () => {
-
-    const productId = document.getElementById('productInput').value;
-    const productName = document.getElementById('productInput').selectedOptions?.[0]?.text || '';
-    const quantity = document.getElementById('quantityInput').value;
-    const description = document.getElementById('descriptionInput').value;
-
-    if (!productId || !quantity) {
-        alert('Por favor, complete los campos de producto y cantidad.');
-        return;
-    }
-
-    if (isNaN(quantity) || parseFloat(quantity) < 1) {
-        alert('La cantidad debe ser un número mayor a cero.');
-        return;
-    }
-
-    if (description && description.trim().length > 50) {
-        alert('La descripción debe tener como máximo 50 caracteres.');
-        return;
-    }
-
-    const product = { productId: productId, name: productName, quantity, description };
-    details.push(product);
-
-    refreshTable();
-
-    $('#productInput').empty().trigger('change');
-    document.getElementById('quantityInput').value = '';
-    document.getElementById('descriptionInput').value = '';
-}
-
-document.getElementById('addProductBtn').addEventListener('click', addProduct);

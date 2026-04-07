@@ -1,18 +1,12 @@
-export const closeModal = (idModal, form) => {
-    
-    const modalHtml = document.getElementById(idModal);
-    const modal = mdb.Modal.getInstance(modalHtml);
+import { cleanForm } from "../utils/formUtils.js";
 
-    modalHtml.addEventListener('hidden.mdb.modal', () => {
-        form.reset();
+export const closeModal = (form) => {
+    
+    const modalElement = document.getElementById('modal');
+    const modal = mdb.Modal.getOrCreateInstance(modalElement);
+
+    modalElement.addEventListener('hidden.mdb.modal', () => {
+        cleanForm(form);
     });
     modal.hide();
-}
-
-export const showModal = (idModal) => {
-
-    const modalHtml = document.getElementById(idModal);
-    const modal = new mdb.Modal(modalHtml);
-
-    modal.show();
 }

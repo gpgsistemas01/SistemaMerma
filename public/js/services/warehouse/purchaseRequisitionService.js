@@ -13,3 +13,13 @@ export const editPurchaseRequisitionRequest = (data, id) => apiRequest({
     url: `${ route }/purchase-requisitions/${ id }`,
     data
 });
+
+export const cancelPurchaseRequisitionRequest = (id) => apiRequest({
+    method: 'patch',
+    url: `${ route }/purchase-requisitions/cancel/${ id }`
+});
+
+export const confirmPurchaseRequisitionRequest = (id) => apiRequest({
+    method: 'patch',
+    url: `${ route }/purchase-requisitions/confirm/${ id }`
+});

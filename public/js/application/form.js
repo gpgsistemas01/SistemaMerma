@@ -1,8 +1,8 @@
 import { getErrorMessage } from "../constants/apiMessages.js";
-import { mapServerErrors } from "../core/forms/mappers/formMapper.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
-import { toggleErrorMessages } from "../ui/forms/formMessagesUI.js";
+import { toggleErrorMessages } from "../ui/formUI.js";
 import { on } from "../utils/domUtils.js";
+import { mapServerErrors } from "../utils/formUtils.js";
 
 export const useForm = async ({ 
     normalizeData = () => {},
