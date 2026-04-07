@@ -86,6 +86,7 @@ model Product {
   detailsGoodsReceipts DetailGoodsReceiptProduct[]
   detailsPurchaseRequisitions DetailPurchaseRequisitionProduct[]
   detailsGoodsIssues DetailGoodsIssueProduct[]
+  detailsMovement DetailMovement[]
 }
 
 model UoM {
@@ -134,6 +135,7 @@ model GoodsReceipt {
   supplier     Supplier   @relation(fields: [supplierId], references: [id])
   status       Status     @relation(fields: [statusId], references: [id])
   details        DetailGoodsReceiptProduct[]
+  movements InventoryMovement[]
 }
 
 model DetailGoodsReceiptProduct {
@@ -144,6 +146,8 @@ model DetailGoodsReceiptProduct {
   description    String?      @db.VarChar(50)
   goodsReceipt   GoodsReceipt @relation(fields: [goodsReceiptId], references: [id])
   product        Product      @relation(fields: [productId], references: [id])
+  detailMovementId String @unique @db.Uuid
+  detailMovement DetailMovement @relation(fields: [detailMovementId], references: [id])
 }
 
 model PurchaseRequisition { 
@@ -205,6 +209,7 @@ model GoodsIssue {
   project          Project    @relation(fields: [projectId], references: [id])
 
   details          DetailGoodsIssueProduct[]
+  movement InventoryMovement[]
 }
 
 model DetailGoodsIssueProduct {
@@ -216,4 +221,43 @@ model DetailGoodsIssueProduct {
 
   goodsIssue    GoodsIssue @relation(fields: [goodsIssueId], references: [id])
   product       Product    @relation(fields: [productId], references: [id])
+  detailMovementId String  @unique @db.Uuid
+  detailMovement DetailMovement @relation(fields: [detailMovementId], references: [id])
+}
+
+model Reason {
+  id String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @db.VarChar(50)
+  movements InventoryMovement[]
+}
+
+model InventoryMovement {
+  id String @id @default(uuid())
+
+  goodsReceiptId String? @db.Uuid
+  goodsIssueId   String? @db.Uuid
+  reasonId String @db.Uuid
+
+  goodsReceipt GoodsReceipt? @relation(fields: [goodsReceiptId], references: [id])
+  goodsIssue   GoodsIssue?   @relation(fields: [goodsIssueId], references: [id])
+  reason Reason @relation(fields: [reasonId], references: [id])
+
+  date DateTime
+
+  details DetailMovement[]
+}
+
+model DetailMovement {
+  id String @id @default(uuid())
+
+  quantity Decimal @db.Decimal(10, 2)
+
+  movementId String @db.Uuid
+  movement InventoryMovement @relation(fields: [movementId], references: [id])
+
+  productId String @db.Uuid
+  product Product @relation(fields: [productId], references: [id])
+
+  detailGoodsIssueProduct DetailGoodsIssueProduct?
+  detailGoodsReceiptProduct DetailGoodsReceiptProduct?
 }
