@@ -1,6 +1,12 @@
 import { createGoodsReceiptDtoForRegister } from "../../../dtos/goodsReceiptDto.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { createGoodsReceipt, findAllGoodsReceipts, updateGoodsReceipt } from "../../../services/warehouse/goodsReceiptService.js";
+import {
+    cancelGoodsReceipt,
+    confirmGoodsReceipt,
+    createGoodsReceipt,
+    findAllGoodsReceipts,
+    updateGoodsReceipt
+} from "../../../services/warehouse/goodsReceiptService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllGoodsReceipts = async (req, res) => {
@@ -49,3 +55,23 @@ export const editGoodsReceipt = async (req, res) => {
         code: successCodeMessages.UPDATED_GOODS_RECEIPT
     });
 }
+
+export const confirmGoodsReceiptStatus = async (req, res) => {
+
+    const goodsReceipt = await confirmGoodsReceipt({ id: req.params.id });
+
+    return res.status(200).json({
+        goodsReceipt,
+        code: successCodeMessages.CONFIRMED_GOODS_RECEIPT
+    });
+};
+
+export const cancelGoodsReceiptStatus = async (req, res) => {
+
+    const goodsReceipt = await cancelGoodsReceipt({ id: req.params.id });
+
+    return res.status(200).json({
+        goodsReceipt,
+        code: successCodeMessages.CANCELED_GOODS_RECEIPT
+    });
+};
