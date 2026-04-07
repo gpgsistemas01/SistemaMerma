@@ -4,8 +4,31 @@ import { authorizeUserApi, verifyCookiesAuthTokenRequired } from "../../../middl
 
 const router = express.Router();
 const profilePermissions = {
-    roles: ['Administrador del sistema'],
-    departments: ['Sistemas']
+    roles: [
+        'Administrador del sistema',
+        'Coordinador',
+        'Auxiliar',
+        'Operador',
+        'Instalador',
+        'Diseñador',
+        'Almacenista',
+        'Vendedor',
+        'Repartidor',
+    ],
+    departments: [
+        'Sistemas',
+        'Ventas',
+        'Diseño',
+        'Impresión',
+        'Router',
+        'Taller 3d',
+        'Herrería',
+        'Acabados',
+        'PT',
+        'Tráfico',
+        'Instalaciones',
+        'Almacén',
+    ]
 };
 
 router.get(
