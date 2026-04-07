@@ -1,4 +1,9 @@
-import { ProfileNotFound, GoodsReceiptNotFound, SupplierNotFound } from "../../errors/warehouse/goodsReceiptError.js";
+import {
+    ProfileNotFound,
+    GoodsReceiptNotFound,
+    GoodsReceiptUpdateDatabaseError,
+    SupplierNotFound
+} from "../../errors/warehouse/goodsReceiptError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllGoodsReceipts = async ({
@@ -170,6 +175,15 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
     await validateGoodsReceiptRelations({ receivedById, supplierId });
 
+    const goodsReceiptExists = await prisma.goodsReceipt.findUnique({
+        where: { id },
+        select: {
+            id: true
+        }
+    });
+
+    if (!goodsReceiptExists) throw new GoodsReceiptNotFound();
+
     try {
 
         const result = await prisma.$transaction(async (prisma) => {
@@ -219,8 +233,8 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
     } catch (err) {
 
-        if (err.code === 'P2025') throw GoodsReceiptNotFound();
+        if (err.code === 'P2025') throw new GoodsReceiptNotFound();
 
-        throw err;
+        throw new GoodsReceiptUpdateDatabaseError();
     }
 }
