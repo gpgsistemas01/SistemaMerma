@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../constants/apiMessages.js";
-import { reloadDataTable } from "../plugins/datatable/baseDatatable.js";
+import { reloadMainTable } from "../plugins/datatable/baseDatatable.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { closeModal } from "../ui/modalUI.js";
 
@@ -19,7 +19,7 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
     notifications.showSuccess(response.message);
     closeModal(form);
 
-    reloadDataTable();
+    reloadMainTable();
 }
 
 export const handleAction = async (action) => {

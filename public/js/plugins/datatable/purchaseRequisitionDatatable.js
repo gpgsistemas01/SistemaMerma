@@ -1,5 +1,6 @@
 import { openPurchaseRequisitionModal } from "../../pages/warehouse/purchaseRequisitionsPage.js";
-import { createDataTable } from "./baseDatatable.js";
+import { createDataTable, refreshProductTable } from "./baseDatatable.js";
+import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purchaseRequisitionService.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -83,7 +84,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                url: '/api/warehouse/purchase-requisitions/',
+                url: PURCHASE_REQUISITIONS_API_ROUTE,
                 data: (d) => {
                     d.department = context.department || '';
                 }
@@ -157,13 +158,5 @@ $(selectorProductTable).on('click', '.delete-btn', function() {
 
     details.splice(index, 1);
 
-    refreshTable();
+    refreshProductTable(details);
 });
-
-const refreshTable = () => {
-
-    const table = $(selectorProductTable).DataTable();
-    table.clear();
-    table.rows.add(details);
-    table.draw();
-};
