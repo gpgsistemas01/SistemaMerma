@@ -1,6 +1,12 @@
 import { createPurchaseRequisitionDtoForRegister } from "../../../dtos/purchaseRequisitionDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { createPurchaseRequisition, findAllPurchaseRequisitions, updatePurchaseRequisition } from "../../../services/warehouse/purchaseRequisitionService.js";
+import {
+    cancelPurchaseRequisition,
+    confirmPurchaseRequisition,
+    createPurchaseRequisition,
+    findAllPurchaseRequisitions,
+    updatePurchaseRequisition
+} from "../../../services/warehouse/purchaseRequisitionService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllPurchaseRequisitions = async (req, res) => {
@@ -59,5 +65,25 @@ export const editPurchaseRequisition = async (req, res) => {
     return res.status(200).json({
         purchaseRequisition,
         code: successCodeMessages.UPDATED_PURCHASE_REQUISITION
+    });
+};
+
+export const confirmPurchaseRequisitionStatus = async (req, res) => {
+
+    const purchaseRequisition = await confirmPurchaseRequisition({ id: req.params.id });
+
+    return res.status(200).json({
+        purchaseRequisition,
+        code: successCodeMessages.CONFIRMED_PURCHASE_REQUISITION
+    });
+};
+
+export const cancelPurchaseRequisitionStatus = async (req, res) => {
+
+    const purchaseRequisition = await cancelPurchaseRequisition({ id: req.params.id });
+
+    return res.status(200).json({
+        purchaseRequisition,
+        code: successCodeMessages.CANCELED_PURCHASE_REQUISITION
     });
 };
