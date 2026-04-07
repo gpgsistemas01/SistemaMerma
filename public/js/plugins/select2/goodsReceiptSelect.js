@@ -24,8 +24,14 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
 
     initbaseSelect2({
         selector: receivedBySelector,
-        url: '/api/admin/profiles?department=Almacén',
+        url: '/api/admin/profiles/',
         placeholder: 'Buscar persona que recibe...',
+        data: (params) => {
+            return {
+                search: params.term,
+                department: 'Almacén'
+            };
+        },
         processResults: (data) => {
             
             const list = data.data || data;

@@ -1,8 +1,8 @@
 import { getErrorMessage } from "../constants/apiMessages.js";
-import { mapServerErrors } from "../core/forms/mappers/formMapper.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
-import { toggleErrorMessages } from "../ui/forms/formMessagesUI.js";
+import { toggleErrorMessages } from "../ui/formUI.js";
 import { on } from "../utils/domUtils.js";
+import { mapServerErrors } from "../utils/formUtils.js";
 
 export const useForm = async ({ 
     normalizeData = () => {},
@@ -43,20 +43,21 @@ export const useForm = async ({
                 const message = getErrorMessage(code);
 
                 switch (status) {
-                    case 400:
+                    case 400: {
                         const serverErrors = mapServerErrors(errors);
                         normalizeServerErrors(form, serverErrors);
                         toggleErrorMessages(form, serverErrors);
-                        break;
+                        return;
+                    }
 
                     case 401:
+                        localStorage.setItem('showErrorToast', message);
                         window.location.replace('/');
-                        notifications.showError(message);
-                        break;
+                        return;
                     
                     case 404:
                         notifications.showError(err.message);
-                        break;
+                        return;
                     
                     default:
                         throw err;

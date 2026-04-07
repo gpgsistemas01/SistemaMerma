@@ -1,4 +1,11 @@
-import { ProfileNotFound, GoodsReceiptNotFound, SupplierNotFound } from "../../errors/warehouse/goodsReceiptError.js";
+import {
+    ProfileNotFound,
+    GoodsReceiptNotFound,
+    GoodsReceiptUpdateDatabaseError,
+    SupplierNotFound,
+    GoodsReceiptStatusNotFound,
+    GoodsReceiptStatusUpdateDatabaseError
+} from "../../errors/warehouse/goodsReceiptError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllGoodsReceipts = async ({
@@ -71,14 +78,14 @@ export const findAllGoodsReceipts = async ({
     };
 };
 
-const validateGoodsReceiptRelations = async (goodsReceiptDto) => {
+const validateGoodsReceiptRelations = async ({ receivedById, supplierId }) => {
 
     const [supplier, receivedBy] = await Promise.all([
         prisma.supplier.findUnique({
-            where: { id: goodsReceiptDto.supplierId }
+            where: { id: supplierId }
         }),
         prisma.profile.findUnique({
-            where: { id: goodsReceiptDto.receivedById }
+            where: { id: receivedById }
         })
     ]);
 
@@ -88,13 +95,13 @@ const validateGoodsReceiptRelations = async (goodsReceiptDto) => {
 
 export const createGoodsReceipt = async (goodsReceiptDto) => {
 
-    await validateGoodsReceiptRelations(goodsReceiptDto);
-
     const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
 
-    const result = await prisma.$transaction(async (prisma) => {
+    await validateGoodsReceiptRelations({ receivedById, supplierId });
 
-        const user = await prisma.user.findFirst({
+    const result = await prisma.$transaction(async (tx) => {
+
+        const user = await tx.user.findFirst({
             where: {
                 profiles: {
                     some: {
@@ -109,7 +116,7 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
 
         const type = 'REC';
 
-        const counter = await prisma.referenceNumberCounter.update({
+        const counter = await tx.referenceNumberCounter.update({
             where: { prefix: type },
             data: { 
                 counter: { 
@@ -121,7 +128,7 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
         const year = new Date().getFullYear();
         const referenceNumber = `${type}-${year}-${counter.counter.toString().padStart(6, '0')}`;
 
-        const goodsReceipt = await prisma.goodsReceipt.create({
+        const goodsReceipt = await tx.goodsReceipt.create({
             data: {
                 ...goodsReceiptData,
                 status: {
@@ -166,9 +173,18 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
 
 export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
-    await validateGoodsReceiptRelations(goodsReceiptDto);
-
     const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
+
+    await validateGoodsReceiptRelations({ receivedById, supplierId });
+
+    const goodsReceiptExists = await prisma.goodsReceipt.findUnique({
+        where: { id },
+        select: {
+            id: true
+        }
+    });
+
+    if (!goodsReceiptExists) throw new GoodsReceiptNotFound();
 
     try {
 
@@ -188,9 +204,7 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
                         }
                     },
                 },
-                where: {
-                    id: id
-                }
+                where: { id }
             });
 
             const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);
@@ -221,8 +235,56 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
     } catch (err) {
 
-        if (err.code === 'P2025') throw GoodsReceiptNotFound();
+        if (err.code === 'P2025') throw new GoodsReceiptNotFound();
 
-        throw err;
+        throw new GoodsReceiptUpdateDatabaseError();
     }
 }
+
+const updateGoodsReceiptStatus = async ({ id, statusName }) => {
+
+    const goodsReceipt = await prisma.goodsReceipt.findUnique({
+        where: { id },
+        include: {
+            status: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    });
+
+    if (!goodsReceipt) throw new GoodsReceiptNotFound();
+    if (goodsReceipt.status?.name !== 'Abierta') throw new GoodsReceiptStatusNotFound();
+
+    try {
+        return await prisma.goodsReceipt.update({
+            where: { id },
+            data: {
+                status: {
+                    connect: {
+                        name: statusName
+                    }
+                }
+            },
+            select: {
+                id: true,
+                status: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        if (err.code === 'P2025') throw new GoodsReceiptStatusNotFound();
+        throw new GoodsReceiptStatusUpdateDatabaseError();
+    }
+};
+
+export const confirmGoodsReceipt = async ({ id }) =>
+    await updateGoodsReceiptStatus({ id, statusName: 'Confirmada' });
+
+export const cancelGoodsReceipt = async ({ id }) =>
+    await updateGoodsReceiptStatus({ id, statusName: 'Cancelada' });

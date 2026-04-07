@@ -1,27 +1,45 @@
+import { getErrorMessage } from "../constants/apiMessages.js";
 import { reloadDataTable } from "../plugins/datatable/baseDatatable.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
+import { closeModal } from "../ui/modalUI.js";
 
-export const handleSuccess = async ({ form, formData, create, update }) => {
+export const handleSubmit = async ({ form, formData, create, update }) => {
     
     const id = form.dataset.id;
     const mode = form.dataset.mode;
     let response;
 
     if (mode === 'create') response = await create(formData);
-    else response = await update(formData, id);
+    else {
+
+        if (!id) notifications.showError('No hay registro seleccionado.');
+        response = await update(formData, id);
+    }
 
     notifications.showSuccess(response.message);
-
-    form.reset();
-    form.dataset.mode = '';
-    form.dataset.id = '';
-
-    const modalElement = document.getElementById('modal');
-    const modal = mdb.Modal.getOrCreateInstance(modalElement);
-
-    modal.hide();
+    closeModal(form);
 
     reloadDataTable();
+}
+
+export const handleAction = async (action) => {
+
+    const form = document.getElementById('form');
+    const id = form.dataset.id;
+
+    if (!id) notifications.showError('No hay registro seleccionado.');
+
+    const response = await action(id);
+
+    notifications.showSuccess(response.message);
+    closeModal(form);
+}
+
+export const cleanForm = (form) => {
+
+    form.reset();
+    form.dataset.id = '';
+    form.dataset.mode = '';
 }
 
 export const validateFields = (validators, formData) => {
@@ -35,21 +53,14 @@ export const validateFields = (validators, formData) => {
     return errors;
 }
 
-export const setFormReadOnly = ({
-    form,
-    isReadOnly
-}) => {
-    
-    const elements = form.querySelectorAll('input, select, textarea');
+export const mapServerErrors = (serverErrors) => {
 
-    elements.forEach(el => {
-        if (isReadOnly) {
-            el.setAttribute('disabled', 'disabled');
-        } else {
-            el.removeAttribute('disabled');
-        }
-    });
+    const errors = {};
 
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.style.display = isReadOnly ? 'none' : 'block';
-};
+    for (const field in serverErrors) {
+
+        errors[field] = getErrorMessage(serverErrors[field]);
+    }
+
+    return errors;
+}

@@ -1,4 +1,4 @@
-import { CategoryNotFound, ProductNotFound, UomNotFound } from "../../errors/warehouse/productError.js";
+import { CategoryNotFound, ProductNotFound, ProductUpdateDatabaseError, UomNotFound } from "../../errors/warehouse/productError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllProducts = async ({
@@ -91,6 +91,17 @@ export const updateProduct = async (productDto, id) => {
 
     await validateProductRelations(productDto);
 
+    const productExists = await prisma.product.findUnique({
+        where: {
+            id
+        },
+        select: {
+            id: true
+        }
+    });
+
+    if (!productExists) throw new ProductNotFound();
+
     const { uomId, categoryId, ...productData } = productDto;
 
     try {
@@ -118,8 +129,8 @@ export const updateProduct = async (productDto, id) => {
 
     } catch (err) {
 
-        if (err.code === 'P2025') throw ProductNotFound();
+        if (err.code === 'P2025') throw new ProductNotFound();
 
-        throw err;
+        throw new ProductUpdateDatabaseError();
     }
 }

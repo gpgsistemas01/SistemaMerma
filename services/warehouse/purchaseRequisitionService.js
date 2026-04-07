@@ -1,22 +1,39 @@
-import { ProjectNotFound, PurchaseRequisitionNotFound, RequesterProfileNotFound } from "../../errors/warehouse/purchaseRequisitionError.js";
+import {
+    ProjectNotFound,
+    PurchaseRequisitionNotFound,
+    PurchaseRequisitionStatusUpdateDatabaseError,
+    PurchaseRequisitionStatusNotFound,
+    PurchaseRequisitionUpdateDatabaseError,
+    RequesterProfileNotFound
+} from "../../errors/warehouse/purchaseRequisitionError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllPurchaseRequisitions = async ({
+    currentDepartment = '',
     skip = 0,
     take = 10,
     search = '',
     orderBy = 'requestDate',
-    orderDir = 'asc'
+    orderDir = 'asc',
+    userDepartment = '',
+    userRole = ''
 }) => {
 
-    const where = search
-        ? {
+    const canViewAll = userRole === 'Coordinador' && userDepartment === 'Almacén';
+
+    const where = {
+        ...(search && {
             referenceNumber: {
                 contains: search,
                 mode: 'insensitive'
             }
-        }
-        : {};
+        }),
+        ...(!canViewAll && userDepartment && {
+            department: {
+                name: userDepartment
+            }
+        })
+    };
 
     const purchaseRequisitions = await prisma.purchaseRequisition.findMany({
         skip,
@@ -26,6 +43,19 @@ export const findAllPurchaseRequisitions = async ({
             [orderBy]: orderDir
         },
         include: {
+            department: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            },
+            approver: {
+                select: {
+                    id: true,
+                    name: true,
+                    lastName: true
+                }
+            },
             requester: {
                 select: {
                     id: true,
@@ -37,7 +67,21 @@ export const findAllPurchaseRequisitions = async ({
                 select: {
                     id: true,
                     referenceNumber: true,
+                    name: true,
+                    client: true,
+                    date: true
+                }
+            },
+            department: {
+                select: {
                     name: true
+                }
+            },
+            deliveredBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    lastName: true
                 }
             },
             status: {
@@ -62,7 +106,15 @@ export const findAllPurchaseRequisitions = async ({
         }
     });
 
-    const total = await prisma.purchaseRequisition.count();
+    const total = await prisma.purchaseRequisition.count({
+        where: currentDepartment && currentDepartment !== 'Almacén'
+            ? {
+                department: {
+                    name: currentDepartment
+                }
+            }
+            : {}
+    });
     const filtered = await prisma.purchaseRequisition.count({ where });
 
     return {
@@ -72,47 +124,45 @@ export const findAllPurchaseRequisitions = async ({
     };
 };
 
-const validatePurchaseRequisitionRelations = async (purchaseRequisitionDto) => {
+const validatePurchaseRequisitionRelations = async ({ projectId, userId }) => {
 
-    const [project, requester] = await Promise.all([
-        prisma.project.findUnique({
-            where: { id: purchaseRequisitionDto.projectId }
+    const [project, user] = await Promise.all([
+        prisma.project.findFirst({
+            where: { id: projectId }
         }),
-        prisma.profile.findUnique({
-            where: { id: purchaseRequisitionDto.requesterId }
+        prisma.user.findUnique({
+            where: { 
+                id: userId
+            },
+            include: {
+                profiles: true
+            }
         })
     ]);
 
+    const requester = user?.profiles[0];
+    const departmentId = user?.departmentId;
+
     if (!project) throw new ProjectNotFound();
     if (!requester) throw new RequesterProfileNotFound();
+
+    return { project, requester, departmentId };
 };
 
-export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
+export const createPurchaseRequisition = async ({
+    purchaseRequisitionDto,
+    userId
+}) => {
 
-    await validatePurchaseRequisitionRelations(purchaseRequisitionDto);
+    const { projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
 
-    const { requesterId, projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
+    const { requester, departmentId } = await validatePurchaseRequisitionRelations({ projectId, userId });
 
-    const result = await prisma.$transaction(async (prisma) => {
-
-        const user = await prisma.user.findFirst({
-            where: {
-                profiles: {
-                    some: {
-                        id: requesterId
-                    }
-                }
-            },
-            select: {
-                departmentId: true
-            }
-        });
-
-        if (!user) throw new RequesterProfileNotFound();
+    const result = await prisma.$transaction(async (tx) => {
 
         const type = 'REQ';
 
-        const counter = await prisma.referenceNumberCounter.update({
+        const counter = await tx.referenceNumberCounter.update({
             where: { prefix: type },
             data: {
                 counter: {
@@ -124,7 +174,7 @@ export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
         const year = new Date().getFullYear();
         const referenceNumber = `${type}-${year}-${counter.counter.toString().padStart(6, '0')}`;
 
-        const purchaseRequisition = await prisma.purchaseRequisition.create({
+        const purchaseRequisition = await tx.purchaseRequisition.create({
             data: {
                 ...purchaseRequisitionData,
                 status: {
@@ -139,12 +189,12 @@ export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
                 },
                 requester: {
                     connect: {
-                        id: requesterId
+                        id: requester.id
                     }
                 },
                 department: {
                     connect: {
-                        id: user.departmentId
+                        id: departmentId
                     }
                 },
                 referenceNumber,
@@ -167,11 +217,24 @@ export const createPurchaseRequisition = async (purchaseRequisitionDto) => {
     return result.purchaseRequisition;
 };
 
-export const updatePurchaseRequisition = async (purchaseRequisitionDto, id) => {
+export const updatePurchaseRequisition = async ({
+    purchaseRequisitionDto, 
+    id,
+    userId
+}) => {
 
-    await validatePurchaseRequisitionRelations(purchaseRequisitionDto);
+    const { projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
 
-    const { requesterId, projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
+    const { requester } = await validatePurchaseRequisitionRelations({ projectId, userId });
+
+    const purchaseRequisitionExists = await prisma.purchaseRequisition.findUnique({
+        where: { id },
+        select: {
+            id: true
+        }
+    });
+
+    if (!purchaseRequisitionExists) throw new PurchaseRequisitionNotFound();
 
     try {
 
@@ -187,13 +250,11 @@ export const updatePurchaseRequisition = async (purchaseRequisitionDto, id) => {
                     },
                     requester: {
                         connect: {
-                            id: requesterId
+                            id: requester.id
                         }
                     }
                 },
-                where: {
-                    id
-                }
+                where: { id }
             });
 
             const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);
@@ -221,10 +282,59 @@ export const updatePurchaseRequisition = async (purchaseRequisitionDto, id) => {
         });
 
         return result;
+
     } catch (err) {
 
         if (err.code === 'P2025') throw new PurchaseRequisitionNotFound();
 
-        throw err;
+        throw new PurchaseRequisitionUpdateDatabaseError();
     }
 };
+
+const updatePurchaseRequisitionStatus = async ({ id, statusName }) => {
+
+    const purchaseRequisition = await prisma.purchaseRequisition.findUnique({
+        where: { id },
+        include: {
+            status: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    });
+
+    if (!purchaseRequisition) throw new PurchaseRequisitionNotFound();
+    if (purchaseRequisition.status?.name !== 'Abierta') throw new PurchaseRequisitionStatusNotFound();
+
+    try {
+        return await prisma.purchaseRequisition.update({
+            where: { id },
+            data: {
+                status: {
+                    connect: {
+                        name: statusName
+                    }
+                }
+            },
+            select: {
+                id: true,
+                status: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        if (err.code === 'P2025') throw new PurchaseRequisitionStatusNotFound();
+        throw new PurchaseRequisitionStatusUpdateDatabaseError();
+    }
+};
+
+export const confirmPurchaseRequisition = async ({ id }) =>
+    await updatePurchaseRequisitionStatus({ id, statusName: 'Confirmada' });
+
+export const cancelPurchaseRequisition = async ({ id }) =>
+    await updatePurchaseRequisitionStatus({ id, statusName: 'Cancelada' });

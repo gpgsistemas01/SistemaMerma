@@ -20,3 +20,24 @@ export class ProfileNotFound extends AppError {
         super('Perfil no encontrado', 'PROFILE_NOT_FOUND', 404);
     }
 }
+
+export class GoodsReceiptUpdateDatabaseError extends AppError {
+
+    constructor() {
+        super('Error de base de datos al editar el recibo de mercancía', 'GOODS_RECEIPT_UPDATE_DB_ERROR', 500);
+    }
+}
+
+export class GoodsReceiptStatusNotFound extends AppError {
+
+    constructor() {
+        super('Estado de recepción de compra no encontrado', 'GOODS_RECEIPT_STATUS_NOT_FOUND', 404);
+    }
+}
+
+export class GoodsReceiptStatusUpdateDatabaseError extends AppError {
+
+    constructor() {
+        super('Error de base de datos al editar el estado de la recepción de compra', 'GOODS_RECEIPT_STATUS_UPDATE_DB_ERROR', 500);
+    }
+}
