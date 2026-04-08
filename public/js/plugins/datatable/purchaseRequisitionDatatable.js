@@ -47,12 +47,12 @@ export const createPurchaseRequisitionDatatable = (context) => {
             title: 'Aprobación',
             render: (data, type, row) => {
 
-                if (!row.approverId || !row.authDate) return '<small>Sin autorizar</small>';
+                if (!row.approverId || !row.approveDate) return '<small>Sin autorizar</small>';
 
                 const approver = `${ row.approver.name } ${ row.approver.lastName }`;
-                const authDate = new Date(row.authDate).toLocaleString();
+                const approveDate = new Date(row.approveDate).toLocaleString();
 
-                return `<div>${ approver }<br><small>${ authDate }</small></div>`;
+                return `<div>${ approver }<br><small>${ approveDate }</small></div>`;
             }
         },
         {

@@ -41,3 +41,10 @@ export class PurchaseRequisitionStatusUpdateDatabaseError extends AppError {
         super('Error de base de datos al editar el estado de la requisición', 'PURCHASE_REQUISITION_STATUS_UPDATE_DB_ERROR', 500);
     }
 }
+
+export class PurchaseRequisitionApproverProfileNotFound extends AppError {
+
+    constructor() {
+        super('Perfil aprobador activo no encontrado para el usuario', 'PURCHASE_REQUISITION_APPROVER_PROFILE_NOT_FOUND', 404);
+    }
+}

@@ -4,7 +4,8 @@ import {
     PurchaseRequisitionStatusUpdateDatabaseError,
     PurchaseRequisitionStatusNotFound,
     PurchaseRequisitionUpdateDatabaseError,
-    RequesterProfileNotFound
+    RequesterProfileNotFound,
+    PurchaseRequisitionApproverProfileNotFound
 } from "../../errors/warehouse/purchaseRequisitionError.js";
 import { prisma } from "../../lib/prisma.js";
 
@@ -291,7 +292,7 @@ export const updatePurchaseRequisition = async ({
     }
 };
 
-const updatePurchaseRequisitionStatus = async ({ id, statusName }) => {
+const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
 
     const purchaseRequisition = await prisma.purchaseRequisition.findUnique({
         where: { id },
@@ -308,15 +309,44 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName }) => {
     if (purchaseRequisition.status?.name !== 'Abierta') throw new PurchaseRequisitionStatusNotFound();
 
     try {
+
+        const data = {
+            status: {
+                connect: {
+                    name: statusName
+                }
+            }
+        };
+
+        if (statusName === 'Confirmada') {
+            const approver = await prisma.profile.findFirst({
+                where: {
+                    isActive: true,
+                    users: {
+                        some: {
+                            id: userId,
+                            isActive: true
+                        }
+                    }
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (!approver) throw new PurchaseRequisitionApproverProfileNotFound();
+
+            data.approver = {
+                connect: {
+                    id: approver.id
+                }
+            };
+            data.approveDate = new Date();
+        }
+
         return await prisma.purchaseRequisition.update({
             where: { id },
-            data: {
-                status: {
-                    connect: {
-                        name: statusName
-                    }
-                }
-            },
+            data,
             select: {
                 id: true,
                 status: {
@@ -333,8 +363,8 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName }) => {
     }
 };
 
-export const confirmPurchaseRequisition = async ({ id }) =>
-    await updatePurchaseRequisitionStatus({ id, statusName: 'Confirmada' });
+export const confirmPurchaseRequisition = async ({ id, userId }) =>
+    await updatePurchaseRequisitionStatus({ id, statusName: 'Confirmada', userId });
 
-export const cancelPurchaseRequisition = async ({ id }) =>
-    await updatePurchaseRequisitionStatus({ id, statusName: 'Cancelada' });
+export const cancelPurchaseRequisition = async ({ id, userId }) =>
+    await updatePurchaseRequisitionStatus({ id, statusName: 'Cancelada', userId });
