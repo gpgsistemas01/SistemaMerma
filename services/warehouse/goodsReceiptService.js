@@ -354,10 +354,13 @@ const updateGoodsReceiptStatus = async ({ id, statusName }) => {
             });
         });
     } catch (err) {
-        if (err instanceof ProfileNotFound || err instanceof GoodsReceiptNotFound) {
+        if (
+            err instanceof ProfileNotFound ||
+            err instanceof GoodsReceiptNotFound ||
+            err instanceof GoodsReceiptReceptionDateRequired
+        ) {
             throw new GoodsReceiptStatusUpdateDatabaseError();
         }
-        if (err instanceof GoodsReceiptReceptionDateRequired) throw err;
         if (err.code === 'P2025') throw new GoodsReceiptStatusNotFound();
         throw new GoodsReceiptStatusUpdateDatabaseError();
     }

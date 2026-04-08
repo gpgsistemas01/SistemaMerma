@@ -38,7 +38,7 @@ export class GoodsReceiptStatusNotFound extends AppError {
 export class GoodsReceiptReceptionDateRequired extends AppError {
 
     constructor() {
-        super('La fecha de recepción es obligatoria para actualizar el estado.', 'GOODS_RECEIPT_RECEPTION_DATE_REQUIRED', 400);
+        super('La fecha de recepción es obligatoria para actualizar el estado.', 'GOODS_RECEIPT_RECEPTION_DATE_REQUIRED', 500);
     }
 }
 
