@@ -24,6 +24,11 @@
         href: '/salidas-almacen',
         isActive: currentRoute === '/salidas-almacen'
     },
+    {
+        content: 'Consumo de producto',
+        href: '/consumos-producto',
+        isActive: currentRoute === '/consumos-producto'
+    },
 ].map(item => ({
     ...item,
     class: `nav-link ${ item.isActive ? 'active' : ''}`

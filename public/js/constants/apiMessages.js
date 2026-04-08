@@ -31,6 +31,9 @@ export const errorMessages = {
 
     REQUESTER_ID_INVALID_UUID: 'El solicitante no es válido.',
 
+    MACHINE_ID_REQUIRED: 'La máquina es requerida.',
+    MACHINE_ID_INVALID_UUID: 'La máquina no es válida.',
+
     REQUEST_DATE_REQUIRED: 'La fecha de solicitud es requerida.',
 
     REQUEST_DATE_INVALID_FORMAT: 'La fecha de solicitud no es válida.',
@@ -141,6 +144,10 @@ export const errorMessages = {
     GOODS_ISSUE_STATUS_UPDATE_DB_ERROR: 'Error de base de datos al editar el estado de la salida de almacén.',
     GOODS_ISSUE_APPROVAL_FORBIDDEN: 'No tienes permisos para aprobar o rechazar salidas de otra área.',
     GOODS_ISSUE_APPROVER_PROFILE_NOT_FOUND: 'Perfil aprobador activo no encontrado para el usuario.',
+    PRODUCT_CONSUMPTION_NOT_FOUND: 'Consumo de producto no encontrado.',
+    MACHINE_NOT_FOUND: 'Máquina no encontrada.',
+    PRODUCT_CONSUMPTION_GOODS_ISSUE_NOT_FOUND: 'Salida de almacén no encontrada en el detalle.',
+    PRODUCT_CONSUMPTION_UPDATE_DB_ERROR: 'Error de base de datos al editar el consumo de producto.',
     PRODUCT_NOT_FOUND: 'Producto no encontrado.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
     UOM_NOT_FOUND: 'Unidad de medida no encontrada.',
@@ -170,7 +177,9 @@ const successMessages = {
     CREATED_PURCHASE_REQUISITION: '¡Requisición de compra creada exitosamente!',
     UPDATED_PURCHASE_REQUISITION: '¡Requisición de compra actualizada exitosamente!',
     CONFIRMED_PURCHASE_REQUISITION: '¡Requisición de compra confirmada exitosamente!',
-    CANCELED_PURCHASE_REQUISITION: '¡Requisición de compra cancelada exitosamente!'
+    CANCELED_PURCHASE_REQUISITION: '¡Requisición de compra cancelada exitosamente!',
+    CREATED_PRODUCT_CONSUMPTION: '¡Consumo de producto creado exitosamente!',
+    UPDATED_PRODUCT_CONSUMPTION: '¡Consumo de producto actualizado exitosamente!'
 };
 
 export const getErrorMessage = (code) => errorMessages[code] ?? null;

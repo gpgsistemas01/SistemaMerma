@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validateNumberphone, validatePassword, validateNumber, validateUsername, validateTextOptional, validateDimension, validateDateOptional, validateDetailsArray, validateDate, validateText } from "./fieldValidations.js";
+import { validateName, validateNumberphone, validatePassword, validateNumber, validateUsername, validateTextOptional, validateDimension, validateDateOptional, validateDetailsArray, validateDate, validateConsumptionDetailsArray } from "./fieldValidations.js";
 
 export const supplierValidators = {
     name: validateName,
@@ -48,4 +48,12 @@ export const validatePurchaseRequisitionValidators = {
     observations: (value) => validateTextOptional(value, 'Las observaciones'),
     requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
     details: validateDetailsArray
+};
+
+export const validateProductConsumptionValidators = {
+    requesterId: (value) => isEmptyOrNull(value, 'El encargado'),
+    projectId: (value) => isEmptyOrNull(value, 'El proyecto'),
+    machineId: (value) => isEmptyOrNull(value, 'La máquina'),
+    requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
+    details: validateConsumptionDetailsArray
 };

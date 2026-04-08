@@ -57,6 +57,12 @@ const buttons = {
                             <%- include('./select', { input: form.table.select }) %>
                         </div>
 
+                        <% if (form.table.extraSelect) { %>
+                            <div class="col-3">
+                                <%- include('./select', { input: form.table.extraSelect }) %>
+                            </div>
+                        <% } %>
+
                         <%- include('./outlineInputList', { inputs: form.table.inputs }) %>
 
                         <div class="col-2">

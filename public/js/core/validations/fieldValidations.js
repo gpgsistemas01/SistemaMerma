@@ -178,3 +178,22 @@ export const validateDetailsArray = (details) => {
 
     return null;
 };
+
+export const validateConsumptionDetailsArray = (details) => {
+
+    if (!Array.isArray(details) || details.length === 0) {
+        return 'La lista de detalles debe contener al menos un producto.';
+    }
+
+    for (const detail of details) {
+        if (!detail.productId || !detail.goodsIssueId || !detail.consumedSquareMeters) {
+            return 'Cada detalle debe contener producto, salida de almacén y m² consumidos.';
+        }
+
+        if (isNaN(detail.consumedSquareMeters) || parseFloat(detail.consumedSquareMeters) < 1) {
+            return 'Los m² consumidos deben ser un número mayor a cero.';
+        }
+    }
+
+    return null;
+};

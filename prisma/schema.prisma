@@ -14,6 +14,7 @@ model Department {
   goodsReceipts        GoodsReceipt[]
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
+  productConsumptions  ProductConsumption[]
 }
 
 model Role {
@@ -48,6 +49,7 @@ model Profile {
   requesterGoodsIssues          GoodsIssue[]          @relation("RequesterGoodsIssueRelation")
   warehouseStaffGoodsIssues     GoodsIssue[]          @relation("WarehouseStaffGoodsIssueRelation")
   deliveredPurchaseRequisitions PurchaseRequisition[] @relation("DeliveredByRelation")
+  productConsumptions           ProductConsumption[]
 }
 
 model Category {
@@ -62,6 +64,7 @@ model Status {
   goodsReceipts        GoodsReceipt[]
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
+  productConsumptions  ProductConsumption[]
 }
 
 model Product {
@@ -88,6 +91,7 @@ model Product {
   detailsPurchaseRequisitions DetailPurchaseRequisitionProduct[]
   detailsGoodsIssues          DetailGoodsIssueProduct[]
   detailsMovement             DetailMovement[]
+  detailsProductConsumptions  DetailProductConsumption[]
 }
 
 model UoM {
@@ -113,6 +117,13 @@ model Project {
   date                 DateTime
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
+  productConsumptions  ProductConsumption[]
+}
+
+model Machine {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String               @unique @db.VarChar(50)
+  productConsumptions ProductConsumption[]
 }
 
 model ReferenceNumberCounter {
@@ -189,6 +200,26 @@ model DetailPurchaseRequisitionProduct {
   product             Product             @relation(fields: [productId], references: [id])
 }
 
+model ProductConsumption {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber String   @unique @db.VarChar(50)
+  requestDate     DateTime
+
+  statusId     String @db.Uuid
+  departmentId String @db.Uuid
+  projectId    String @db.Uuid
+  requesterId  String @db.Uuid
+  machineId    String @db.Uuid
+
+  status     Status     @relation(fields: [statusId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+  project    Project    @relation(fields: [projectId], references: [id])
+  requester  Profile    @relation(fields: [requesterId], references: [id])
+  machine    Machine    @relation(fields: [machineId], references: [id])
+
+  details DetailProductConsumption[]
+}
+
 model GoodsIssue {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   referenceNumber String    @unique @db.VarChar(50)
@@ -213,6 +244,7 @@ model GoodsIssue {
 
   details  DetailGoodsIssueProduct[]
   movement InventoryMovement[]
+  detailsProductConsumptions DetailProductConsumption[]
 }
 
 model DetailGoodsIssueProduct {
@@ -226,6 +258,18 @@ model DetailGoodsIssueProduct {
   product          Product        @relation(fields: [productId], references: [id])
   detailMovementId String         @unique @db.Uuid
   detailMovement   DetailMovement @relation(fields: [detailMovementId], references: [id])
+}
+
+model DetailProductConsumption {
+  id                  String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productConsumptionId String @db.Uuid
+  productId           String  @db.Uuid
+  goodsIssueId        String  @db.Uuid
+  consumedSquareMeters Decimal @db.Decimal(10, 2)
+
+  productConsumption ProductConsumption @relation(fields: [productConsumptionId], references: [id])
+  product            Product            @relation(fields: [productId], references: [id])
+  goodsIssue         GoodsIssue         @relation(fields: [goodsIssueId], references: [id])
 }
 
 model Reason {

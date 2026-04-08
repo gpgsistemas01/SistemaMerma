@@ -187,6 +187,15 @@ async function main() {
             { prefix: 'REC' },
             { prefix: 'SAL'},
             { prefix: 'REQ' },
+            { prefix: 'CON' },
+        ],
+        skipDuplicates: true
+    });
+
+    await prisma.machine.createMany({
+        data: [
+            { name: 'Mimaki CJV300' },
+            { name: 'HP Latex 800W' }
         ],
         skipDuplicates: true
     });
