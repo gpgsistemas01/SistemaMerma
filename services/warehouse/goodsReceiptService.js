@@ -5,7 +5,8 @@ import {
     SupplierNotFound,
     GoodsReceiptStatusNotFound,
     GoodsReceiptReceptionDateRequired,
-    GoodsReceiptStatusUpdateDatabaseError
+    GoodsReceiptStatusUpdateDatabaseError,
+    GoodsReceiptApproverProfileNotFound
 } from "../../errors/warehouse/goodsReceiptError.js";
 import { prisma } from "../../lib/prisma.js";
 
@@ -35,6 +36,13 @@ export const findAllGoodsReceipts = async ({
         },
         include: {
             receivedBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    lastName: true
+                }
+            },
+            approver: {
                 select: {
                     id: true,
                     name: true,
@@ -119,10 +127,10 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
 
         const counter = await tx.referenceNumberCounter.update({
             where: { prefix: type },
-            data: { 
-                counter: { 
-                    increment: 1 
-                } 
+            data: {
+                counter: {
+                    increment: 1
+                }
             }
         });
 
@@ -149,7 +157,7 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
                 },
                 department: {
                     connect: {
-                        id:  user.departmentId,
+                        id: user.departmentId,
                     }
                 },
                 referenceNumber,
@@ -210,7 +218,7 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
             const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);
             const deleteFilter = { goodsReceiptId: id };
-            
+
             if (incomingDetailsIds.length) deleteFilter.id = { notIn: incomingDetailsIds };
 
             await prisma.detailGoodsReceiptProduct.deleteMany({
@@ -220,7 +228,7 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
             const detailsGoodsReceipt = await Promise.all(details.map(async detail => {
 
                 return await prisma.detailGoodsReceiptProduct.create({
-                    data: { 
+                    data: {
                         ...detail,
                         goodsReceiptId: id
                     }
@@ -242,7 +250,7 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
     }
 }
 
-const updateGoodsReceiptStatus = async ({ id, statusName }) => {
+const updateGoodsReceiptStatus = async ({ id, statusName, userId }) => {
 
     try {
         const goodsReceipt = await prisma.goodsReceipt.findUnique({
@@ -333,15 +341,43 @@ const updateGoodsReceiptStatus = async ({ id, statusName }) => {
                 );
             }
 
+            const data = {
+                status: {
+                    connect: {
+                        name: statusName
+                    }
+                }
+            };
+
+            if (statusName === 'Confirmada') {
+                const approver = await tx.profile.findFirst({
+                    where: {
+                        isActive: true,
+                        users: {
+                            some: {
+                                id: userId,
+                                isActive: true
+                            }
+                        }
+                    },
+                    select: {
+                        id: true
+                    }
+                });
+
+                if (!approver) throw new GoodsReceiptApproverProfileNotFound();
+
+                data.approver = {
+                    connect: {
+                        id: approver.id
+                    }
+                };
+                data.approveDate = new Date();
+            }
+
             return await tx.goodsReceipt.update({
                 where: { id },
-                data: {
-                    status: {
-                        connect: {
-                            name: statusName
-                        }
-                    }
-                },
+                data,
                 select: {
                     id: true,
                     status: {
@@ -357,7 +393,8 @@ const updateGoodsReceiptStatus = async ({ id, statusName }) => {
         if (
             err instanceof ProfileNotFound ||
             err instanceof GoodsReceiptNotFound ||
-            err instanceof GoodsReceiptReceptionDateRequired
+            err instanceof GoodsReceiptReceptionDateRequired ||
+            err instanceof GoodsReceiptApproverProfileNotFound
         ) {
             throw new GoodsReceiptStatusUpdateDatabaseError();
         }
@@ -366,8 +403,8 @@ const updateGoodsReceiptStatus = async ({ id, statusName }) => {
     }
 };
 
-export const confirmGoodsReceipt = async ({ id }) =>
-    await updateGoodsReceiptStatus({ id, statusName: 'Confirmada' });
+export const confirmGoodsReceipt = async ({ id, userId }) =>
+    await updateGoodsReceiptStatus({ id, statusName: 'Confirmada', userId });
 
-export const cancelGoodsReceipt = async ({ id }) =>
-    await updateGoodsReceiptStatus({ id, statusName: 'Cancelada' });
+export const cancelGoodsReceipt = async ({ id, userId }) =>
+    await updateGoodsReceiptStatus({ id, statusName: 'Cancelada', userId });

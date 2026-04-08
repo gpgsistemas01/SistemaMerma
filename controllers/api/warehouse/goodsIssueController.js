@@ -69,7 +69,8 @@ export const approveGoodsIssueStatus = async (req, res) => {
     const goodsIssue = await approveGoodsIssue({
         id: req.params.id,
         userDepartment: req.user.department,
-        userRole: req.user.role
+        userRole: req.user.role,
+        userId: req.userId
     });
 
     return res.status(200).json({
@@ -83,7 +84,8 @@ export const rejectGoodsIssueStatus = async (req, res) => {
     const goodsIssue = await rejectGoodsIssue({
         id: req.params.id,
         userDepartment: req.user.department,
-        userRole: req.user.role
+        userRole: req.user.role,
+        userId: req.userId
     });
 
     return res.status(200).json({

@@ -58,7 +58,7 @@ export const editGoodsReceipt = async (req, res) => {
 
 export const confirmGoodsReceiptStatus = async (req, res) => {
 
-    const goodsReceipt = await confirmGoodsReceipt({ id: req.params.id });
+    const goodsReceipt = await confirmGoodsReceipt({ id: req.params.id, userId: req.userId });
 
     return res.status(200).json({
         goodsReceipt,
@@ -68,7 +68,7 @@ export const confirmGoodsReceiptStatus = async (req, res) => {
 
 export const cancelGoodsReceiptStatus = async (req, res) => {
 
-    const goodsReceipt = await cancelGoodsReceipt({ id: req.params.id });
+    const goodsReceipt = await cancelGoodsReceipt({ id: req.params.id, userId: req.userId });
 
     return res.status(200).json({
         goodsReceipt,

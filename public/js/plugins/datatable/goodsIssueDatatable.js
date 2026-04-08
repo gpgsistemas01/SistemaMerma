@@ -47,12 +47,12 @@ export const createGoodsIssueDatatable = (context) => {
             title: 'Aprobación',
             render: (data, type, row) => {
 
-                if (!row.approverId || !row.authDate) return '<small>Sin Autorizar</small>';
+                if (!row.approverId || !row.approvedDate) return '<small>Sin Autorizar</small>';
 
                 const approver = `${ row.approver.name } ${ row.approver.lastName }`;
-                const authDate = new Date(row.authDate).toLocaleString();
+                const approvedDate = new Date(row.approvedDate).toLocaleString();
 
-                return `<div>${ approver }<br><small>${ authDate }</small></div>`;
+                return `<div>${ approver }<br><small>${ approvedDate }</small></div>`;
             }
         },
         {

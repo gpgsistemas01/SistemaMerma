@@ -25,6 +25,19 @@ export const createGoodsReceiptDatatable = () => {
                     }
                 },
                 { data: 'supplier.name', title: 'Proveedor' },
+                {
+                    data: null,
+                    title: 'Aprobación',
+                    render: (data, type, row) => {
+
+                        if (!row.approverId || !row.approveDate) return '<small>Sin aprobar</small>';
+
+                        const approver = `${ row.approver.name } ${ row.approver.lastName }`;
+                        const approveDate = new Date(row.approveDate).toLocaleString();
+
+                        return `<div>${ approver }<br><small>${ approveDate }</small></div>`;
+                    }
+                },
                 { data: 'status.name', title: 'Estado' },
                 {
                     data: 'id',
