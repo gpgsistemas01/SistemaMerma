@@ -127,7 +127,8 @@ export const errorMessages = {
     PURCHASE_REQUISITION_NOT_FOUND: 'Requisición de compra no encontrada.',
     PURCHASE_REQUISITION_STATUS_NOT_FOUND: 'Estado de requisición no encontrado.',
     GOODS_RECEIPT_NOT_FOUND: 'Recibo de mercancía no encontrado.',
-    GOODS_RECEIPT_STATUS_NOT_FOUND: 'Estado de recepción de compra no encontrado.'
+    GOODS_RECEIPT_STATUS_NOT_FOUND: 'Estado de recepción de compra no encontrado.',
+    GOODS_RECEIPT_RECEPTION_DATE_REQUIRED: 'La fecha de recepción es obligatoria para actualizar el estado.'
 };
 
 const successMessages = {
