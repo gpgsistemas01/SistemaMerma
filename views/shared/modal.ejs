@@ -11,6 +11,11 @@
 }; 
 
 const buttons = {
+    addProductButton: {
+        id: 'addProductBtn',
+        class: 'btn btn-primary w-100',
+        content: 'Agregar'
+    },
     backButton: {
         id: 'backBtn',
         class: 'btn btn-link',
@@ -60,7 +65,7 @@ const buttons = {
                         <%- include('./outlineInputList', { inputs: form.table.inputs }) %>
 
                         <div class="col-2">
-                            <%- include('./button', { button: form.table.button }) %>
+                            <%- include('./button', { button: buttons.addProductButton }) %>
                         </div>
                     </div>
 

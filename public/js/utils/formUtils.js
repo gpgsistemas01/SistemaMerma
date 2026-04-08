@@ -18,21 +18,28 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
 
     notifications.showSuccess(response.message);
     closeModal(form);
-
     reloadMainTable();
 }
 
 export const handleAction = async (action) => {
 
-    const form = document.getElementById('form');
-    const id = form.dataset.id;
+    try {
 
-    if (!id) notifications.showError('No hay registro seleccionado.');
+        const form = document.getElementById('form');
+        const id = form.dataset.id;
 
-    const response = await action(id);
+        if (!id) notifications.showError('No hay registro seleccionado.');
 
-    notifications.showSuccess(response.message);
-    closeModal(form);
+        const response = await action(id);
+
+        notifications.showSuccess(response.message);
+        closeModal(form);
+        reloadMainTable();
+
+    } catch (err) {
+
+        notifications.showError(err.message);
+    }
 }
 
 export const cleanForm = (form) => {

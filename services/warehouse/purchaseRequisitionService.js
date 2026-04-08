@@ -8,6 +8,9 @@ import {
 } from "../../errors/warehouse/purchaseRequisitionError.js";
 import { prisma } from "../../lib/prisma.js";
 
+const allowedDepartments = ['Almcén', 'Sistemas'];
+const allowedUsers = ['Coordinador', 'Administrador del sistema'];
+
 export const findAllPurchaseRequisitions = async ({
     currentDepartment = '',
     skip = 0,
@@ -19,7 +22,7 @@ export const findAllPurchaseRequisitions = async ({
     userRole = ''
 }) => {
 
-    const canViewAll = userRole === 'Coordinador' && userDepartment === 'Almacén';
+    const canViewAll = allowedUsers.includes(userRole) && allowedDepartments.includes(userDepartment);
 
     const where = {
         ...(search && {
@@ -43,12 +46,7 @@ export const findAllPurchaseRequisitions = async ({
             [orderBy]: orderDir
         },
         include: {
-            department: {
-                select: {
-                    id: true,
-                    name: true
-                }
-            },
+            department: true,
             approver: {
                 select: {
                     id: true,
@@ -70,11 +68,6 @@ export const findAllPurchaseRequisitions = async ({
                     name: true,
                     client: true,
                     date: true
-                }
-            },
-            department: {
-                select: {
-                    name: true
                 }
             },
             deliveredBy: {
@@ -107,7 +100,7 @@ export const findAllPurchaseRequisitions = async ({
     });
 
     const total = await prisma.purchaseRequisition.count({
-        where: currentDepartment && currentDepartment !== 'Almacén'
+        where: currentDepartment && !allowedDepartments.includes(currentDepartment)
             ? {
                 department: {
                     name: currentDepartment

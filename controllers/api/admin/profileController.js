@@ -1,5 +1,7 @@
 import { findAllProfiles } from "../../../services/admin/profileService.js";
 
+const allowedDepartments = ['Almacén', 'Sistemas'];
+
 export const getAllProfiles = async (req, res) => {
 
     let { department } = req.query;
@@ -12,7 +14,7 @@ export const getAllProfiles = async (req, res) => {
     const orderColumnIndex = req.query.order?.[0]?.column || 0;
     const orderDir = req.query.order?.[0]?.dir || 'asc';
 
-    const canViewAllProfiles = ['Almacén', 'Sistemas'].includes(user?.department);
+    const canViewAllProfiles = allowedDepartments.includes(user?.department);
 
     if (canViewAllProfiles) department = '';
     if (!department && !canViewAllProfiles) department = user?.department || '';

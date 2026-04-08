@@ -133,6 +133,6 @@ const addProduct = () => {
     document.getElementById('descriptionInput').value = '';
 }
 
-on('click', '#addProductBtn', () => addProduct);
+on('click', '#addProductBtn', addProduct);
 on('click', '#cancelBtn', async () => await handleAction(cancelGoodsReceipt));
 on('click', '#confirmBtn', async () => await handleAction(confirmGoodsReceipt));

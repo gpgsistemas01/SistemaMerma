@@ -227,12 +227,12 @@ model DetailGoodsIssueProduct {
 
 model Reason {
   id String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @db.VarChar(50)
+  name String @unique @db.VarChar(50)
   movements InventoryMovement[]
 }
 
 model InventoryMovement {
-  id String @id @default(uuid())
+  id String @id  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   goodsReceiptId String? @db.Uuid
   goodsIssueId   String? @db.Uuid
@@ -248,7 +248,7 @@ model InventoryMovement {
 }
 
 model DetailMovement {
-  id String @id @default(uuid())
+  id String @id  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   quantity Decimal @db.Decimal(10, 2)
 

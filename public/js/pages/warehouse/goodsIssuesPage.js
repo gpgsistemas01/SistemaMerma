@@ -131,6 +131,6 @@ const addProduct = () => {
     document.getElementById('descriptionInput').value = '';
 };
 
-on('click', '#addProductBtn', () => addProduct);
+on('click', '#addProductBtn', addProduct);
 on('click', '#cancelBtn', async () => await handleAction(cancelGoodsIssue));
 on('click', '#confirmBtn', async () => await handleAction(confirmGoodsIssue));

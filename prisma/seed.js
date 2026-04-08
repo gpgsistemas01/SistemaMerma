@@ -225,49 +225,6 @@ async function main() {
         });
     }
 
-    const productos = await prisma.product.findMany({
-        where: { name: { in: ['Producto 1', 'Producto 2', 'Producto 3'] } },
-        orderBy: { name: 'asc' }
-    });
-    const proveedor = await prisma.supplier.findFirst({ where: { name: 'Proveedor 1' } });
-    const estatusAbierta = await prisma.status.findFirst({ where: { name: 'Abierta' } });
-    const perfilAlmacenista = await prisma.profile.findFirst({
-        where: {
-            users: {
-                some: {
-                    department: {
-                        name: 'Almacén'
-                    }
-                }
-            }
-        },
-        orderBy: { name: 'asc' }
-    });
-    const perfilAprobador = await prisma.profile.findFirst({
-        where: {
-            users: {
-                some: {
-                    department: { name: 'Almacén' },
-                    role: { name: 'Coordinador' }
-                }
-            }
-        }
-    });
-    const perfilSolicitante = await prisma.profile.findFirst({
-        where: {
-            users: {
-                some: {
-                    department: {
-                        name: {
-                            notIn: ['Ventas', 'Diseño']
-                        }
-                    }
-                }
-            }
-        },
-        orderBy: { name: 'asc' }
-    });
-
     await prisma.project.upsert({
         where: { referenceNumber: 'PROY-001' },
         update: {},
@@ -279,143 +236,14 @@ async function main() {
         }
     });
 
-    const proyectoDemo = await prisma.project.findUnique({
-        where: { referenceNumber: 'PROY-001' }
+    await prisma.reason.createMany({
+        data: [
+            {
+                name: 'Restock'
+            }
+        ],
+        skipDuplicates: true
     });
-
-    if (
-        proveedor &&
-        estatusAbierta &&
-        perfilAlmacenista &&
-        perfilSolicitante &&
-        perfilAprobador &&
-        proyectoDemo &&
-        productos.length >= 2
-    ) {
-        await prisma.goodsReceipt.upsert({
-            where: { referenceNumber: 'REC-2026-000001' },
-            update: {
-                details: {
-                    deleteMany: {},
-                    create: [
-                        { productId: productos[0].id, quantity: 5, description: 'Recepción de prueba 1' },
-                        { productId: productos[1].id, quantity: 8, description: 'Recepción de prueba 2' },
-                    ]
-                }
-            },
-            create: {
-                referenceNumber: 'REC-2026-000001',
-                supplierId: proveedor.id,
-                receptionDate: new Date('2026-04-02T00:00:00.000Z'),
-                observations: 'Recepción inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                receivedById: perfilAlmacenista.id,
-                details: {
-                    create: [
-                        { productId: productos[0].id, quantity: 5, description: 'Recepción de prueba 1' },
-                        { productId: productos[1].id, quantity: 8, description: 'Recepción de prueba 2' },
-                    ]
-                }
-            }
-        });
-
-        await prisma.purchaseRequisition.upsert({
-            where: { referenceNumber: 'REQ-2026-000001' },
-            update: {
-                requestDate: new Date('2026-04-03T00:00:00.000Z'),
-                observations: 'Requisición inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                approverId: perfilAprobador.id,
-                requesterId: perfilSolicitante.id,
-                projectId: proyectoDemo.id,
-                details: {
-                    deleteMany: {},
-                    create: [
-                        { productId: productos[0].id, quantity: 2, description: 'Requisición de prueba 1' },
-                        { productId: productos[1].id, quantity: 1, description: 'Requisición de prueba 2' },
-                        ...(productos[2]
-                            ? [{ productId: productos[2].id, quantity: 3, description: 'Requisición de prueba 3' }]
-                            : []),
-                    ]
-                }
-            },
-            create: {
-                referenceNumber: 'REQ-2026-000001',
-                requestDate: new Date('2026-04-03T00:00:00.000Z'),
-                observations: 'Requisición inicial de materiales',
-                status: {
-                    connect: { id: "00000000-0000-0000-0000-000000000030" }
-                },
-                department: {
-                    connect: { id: "00000000-0000-0000-0000-000000000012" }
-                },
-                approver: {
-                    connect: { id: perfilAprobador.id }
-                },
-                requester: {
-                    connect: { id: perfilSolicitante.id }
-                },
-                project: {
-                    connect: { id: proyectoDemo.id }
-                },
-                details: {
-                    create: [
-                        { productId: productos[0].id, quantity: 2, description: 'Requisición de prueba 1' },
-                        { productId: productos[1].id, quantity: 1, description: 'Requisición de prueba 2' },
-                        ...(productos[2]
-                            ? [{ productId: productos[2].id, quantity: 3, description: 'Requisición de prueba 3' }]
-                            : []),
-                    ]
-                }
-            }
-        });
-
-        await prisma.goodsIssue.upsert({
-            where: { referenceNumber: 'SAL-2026-000001' },
-            update: {
-                requestDate: new Date('2026-04-04T00:00:00.000Z'),
-                observations: 'Salida inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                approverId: perfilAprobador.id,
-                requesterId: perfilSolicitante.id,
-                warehouseStaffId: perfilAlmacenista.id,
-                projectId: proyectoDemo.id,
-                details: {
-                    deleteMany: {},
-                    create: [
-                        { productId: productos[0].id, quantity: 1, description: 'Salida de prueba 1' },
-                        { productId: productos[1].id, quantity: 2, description: 'Salida de prueba 2' },
-                        ...(productos[2]
-                            ? [{ productId: productos[2].id, quantity: 1, description: 'Salida de prueba 3' }]
-                            : []),
-                    ]
-                }
-            },
-            create: {
-                referenceNumber: 'SAL-2026-0001',
-                requestDate: new Date('2026-04-04T00:00:00.000Z'),
-                observations: 'Salida inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                approverId: perfilAprobador.id,
-                requesterId: perfilSolicitante.id,
-                warehouseStaffId: perfilAlmacenista.id,
-                projectId: proyectoDemo.id,
-                details: {
-                    create: [
-                        { productId: productos[0].id, quantity: 1, description: 'Salida de prueba 1' },
-                        { productId: productos[1].id, quantity: 2, description: 'Salida de prueba 2' },
-                        ...(productos[2]
-                            ? [{ productId: productos[2].id, quantity: 1, description: 'Salida de prueba 3' }]
-                            : []),
-                    ]
-                }
-            }
-        });
-    }
 }
 
 main().finally(() => {
