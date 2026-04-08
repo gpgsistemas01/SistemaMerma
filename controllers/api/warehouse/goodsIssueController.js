@@ -1,6 +1,12 @@
 import { createGoodsIssueDtoForRegister } from "../../../dtos/goodsIssueDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { createGoodsIssue, findAllGoodsIssues, updateGoodsIssue } from "../../../services/warehouse/goodsIssueService.js";
+import {
+    approveGoodsIssue,
+    createGoodsIssue,
+    findAllGoodsIssues,
+    rejectGoodsIssue,
+    updateGoodsIssue
+} from "../../../services/warehouse/goodsIssueService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllGoodsIssues = async (req, res) => {
@@ -55,5 +61,33 @@ export const editGoodsIssue = async (req, res) => {
     return res.status(200).json({
         goodsIssue,
         code: successCodeMessages.UPDATED_GOODS_ISSUE
+    });
+};
+
+export const approveGoodsIssueStatus = async (req, res) => {
+
+    const goodsIssue = await approveGoodsIssue({
+        id: req.params.id,
+        userDepartment: req.user.department,
+        userRole: req.user.role
+    });
+
+    return res.status(200).json({
+        goodsIssue,
+        code: successCodeMessages.APPROVED_GOODS_ISSUE
+    });
+};
+
+export const rejectGoodsIssueStatus = async (req, res) => {
+
+    const goodsIssue = await rejectGoodsIssue({
+        id: req.params.id,
+        userDepartment: req.user.department,
+        userRole: req.user.role
+    });
+
+    return res.status(200).json({
+        goodsIssue,
+        code: successCodeMessages.REJECTED_GOODS_ISSUE
     });
 };

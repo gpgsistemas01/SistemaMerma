@@ -126,9 +126,25 @@ export const errorMessages = {
     REQUESTER_PROFILE_NOT_FOUND: 'Perfil solicitante no encontrado.',
     PURCHASE_REQUISITION_NOT_FOUND: 'Requisición de compra no encontrada.',
     PURCHASE_REQUISITION_STATUS_NOT_FOUND: 'Estado de requisición no encontrado.',
+    PURCHASE_REQUISITION_UPDATE_DB_ERROR: 'Error de base de datos al editar la requisición de compra.',
+    PURCHASE_REQUISITION_STATUS_UPDATE_DB_ERROR: 'Error de base de datos al editar el estado de la requisición.',
     GOODS_RECEIPT_NOT_FOUND: 'Recibo de mercancía no encontrado.',
     GOODS_RECEIPT_STATUS_NOT_FOUND: 'Estado de recepción de compra no encontrado.',
-    GOODS_RECEIPT_RECEPTION_DATE_REQUIRED: 'La fecha de recepción es obligatoria para actualizar el estado.'
+    GOODS_RECEIPT_RECEPTION_DATE_REQUIRED: 'La fecha de recepción es obligatoria para actualizar el estado.',
+    GOODS_RECEIPT_UPDATE_DB_ERROR: 'Error de base de datos al editar el recibo de mercancía.',
+    GOODS_RECEIPT_STATUS_UPDATE_DB_ERROR: 'Error de base de datos al editar el estado de la recepción de compra.',
+    GOODS_ISSUE_NOT_FOUND: 'Salida de almacén no encontrada.',
+    GOODS_ISSUE_UPDATE_DB_ERROR: 'Error de base de datos al editar la salida de almacén.',
+    GOODS_ISSUE_STATUS_NOT_FOUND: 'Estado de salida de almacén no encontrado.',
+    GOODS_ISSUE_STATUS_UPDATE_DB_ERROR: 'Error de base de datos al editar el estado de la salida de almacén.',
+    GOODS_ISSUE_APPROVAL_FORBIDDEN: 'No tienes permisos para aprobar o rechazar salidas de otra área.',
+    PRODUCT_NOT_FOUND: 'Producto no encontrado.',
+    PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
+    UOM_NOT_FOUND: 'Unidad de medida no encontrada.',
+    CATEGORY_NOT_FOUND: 'Categoría no encontrada.',
+    PROFILE_NOT_FOUND: 'Perfil no encontrado.',
+    SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
+    SUPPLIER_UPDATE_DB_ERROR: 'Error de base de datos al editar el proveedor.'
 };
 
 const successMessages = {
@@ -146,6 +162,8 @@ const successMessages = {
     CANCELED_GOODS_RECEIPT: '¡Entrada de mercancía cancelada exitosamente!',
     CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
     UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!',
+    APPROVED_GOODS_ISSUE: '¡Salida de almacén aprobada exitosamente!',
+    REJECTED_GOODS_ISSUE: '¡Salida de almacén rechazada exitosamente!',
     CREATED_PURCHASE_REQUISITION: '¡Requisición de compra creada exitosamente!',
     UPDATED_PURCHASE_REQUISITION: '¡Requisición de compra actualizada exitosamente!',
     CONFIRMED_PURCHASE_REQUISITION: '¡Requisición de compra confirmada exitosamente!',

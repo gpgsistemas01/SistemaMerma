@@ -1,7 +1,10 @@
 import {
+    GoodsIssueApprovalForbidden,
     GoodsIssueNotFound,
     GoodsIssueProjectNotFound,
     GoodsIssueRequesterProfileNotFound,
+    GoodsIssueStatusNotFound,
+    GoodsIssueStatusUpdateDatabaseError,
     GoodsIssueUpdateDatabaseError
 } from "../../errors/warehouse/goodsIssueError.js";
 import { prisma } from "../../lib/prisma.js";
@@ -301,3 +304,72 @@ export const updateGoodsIssue = async ({
         throw new GoodsIssueUpdateDatabaseError();
     }
 };
+
+const updateGoodsIssueStatus = async ({
+    id,
+    statusName,
+    userDepartment,
+    userRole
+}) => {
+
+    const goodsIssue = await prisma.goodsIssue.findUnique({
+        where: { id },
+        include: {
+            department: {
+                select: {
+                    name: true
+                }
+            },
+            status: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    });
+
+    if (!goodsIssue) throw new GoodsIssueNotFound();
+    if (goodsIssue.status?.name !== 'Abierta') throw new GoodsIssueStatusNotFound();
+
+    const isSystemAdmin = userRole === 'Administrador del sistema';
+    const isWarehouseDepartment = userDepartment === 'Almacén';
+    const canApproveAnyDepartment = isSystemAdmin || isWarehouseDepartment;
+
+    if (
+        !canApproveAnyDepartment &&
+        goodsIssue.department?.name !== userDepartment
+    ) {
+        throw new GoodsIssueApprovalForbidden();
+    }
+
+    try {
+        return await prisma.goodsIssue.update({
+            where: { id },
+            data: {
+                status: {
+                    connect: {
+                        name: statusName
+                    }
+                }
+            },
+            select: {
+                id: true,
+                status: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        if (err.code === 'P2025') throw new GoodsIssueStatusNotFound();
+        throw new GoodsIssueStatusUpdateDatabaseError();
+    }
+};
+
+export const approveGoodsIssue = async ({ id, userDepartment, userRole }) =>
+    await updateGoodsIssueStatus({ id, statusName: 'Aprobada', userDepartment, userRole });
+
+export const rejectGoodsIssue = async ({ id, userDepartment, userRole }) =>
+    await updateGoodsIssueStatus({ id, statusName: 'Rechazada', userDepartment, userRole });
