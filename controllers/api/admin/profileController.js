@@ -5,6 +5,7 @@ const allowedDepartments = ['Almacén', 'Sistemas'];
 export const getAllProfiles = async (req, res) => {
 
     let { department } = req.query;
+    const strictDepartmentFilter = req.query.strictDepartmentFilter === 'true';
     const { user } = req;
     const start = parseInt(req.query.start) || 0;
     const length = parseInt(req.query.length) || 10;
@@ -16,7 +17,7 @@ export const getAllProfiles = async (req, res) => {
 
     const canViewAllProfiles = allowedDepartments.includes(user?.department);
 
-    if (canViewAllProfiles) department = '';
+    if (canViewAllProfiles && !strictDepartmentFilter) department = '';
     if (!department && !canViewAllProfiles) department = user?.department || '';
 
     const result = await findAllProfiles({

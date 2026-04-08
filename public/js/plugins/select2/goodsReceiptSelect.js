@@ -29,7 +29,8 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
         data: (params) => {
             return {
                 search: params.term,
-                department: 'Almacén'
+                department: 'Almacén',
+                strictDepartmentFilter: true
             };
         },
         processResults: (data) => {
