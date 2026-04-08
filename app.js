@@ -8,6 +8,7 @@ import uomApiRoutes from './routes/api/warehouse/uomApiRoute.js';
 import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.js';
 import purchaseRequisitionApiRoutes from './routes/api/warehouse/purchaseRequisitionApiRoute.js';
 import goodsIssueApiRoutes from './routes/api/warehouse/goodsIssueApiRoute.js';
+import productConsumptionApiRoutes from './routes/api/warehouse/productConsumptionApiRoute.js';
 import profileApiRoutes from './routes/api/admin/profileApiRoute.js';
 import projectApiRoutes from './routes/api/admin/projectApiRoute.js';
 
@@ -20,6 +21,7 @@ import supplierWebRoutes from './routes/web/warehouse/supplierWebRoute.js';
 import purchaseRequisitionWebRoutes from './routes/web/warehouse/purchaseRequisitionWebRoute.js';
 import goodsReceiptWebRoutes from './routes/web/warehouse/goodsReceiptWebRoute.js';
 import goodsIssueWebRoutes from './routes/web/warehouse/goodsIssueWebRoute.js';
+import productConsumptionWebRoutes from './routes/web/warehouse/productConsumptionWebRoute.js';
 
 import { checkTypeContentJson, checkTypeContentFile, checkContentTypePlainText } from './middleware/contentTypeMiddleware.js';
 import cookieParser from 'cookie-parser';
@@ -74,6 +76,7 @@ app.use('/proveedores', supplierWebRoutes);
 app.use('/requisiciones', purchaseRequisitionWebRoutes);
 app.use('/recepciones-compra', goodsReceiptWebRoutes);
 app.use('/salidas-almacen', goodsIssueWebRoutes);
+app.use('/consumos-producto', productConsumptionWebRoutes);
 
 // api routes
 app.use(apiRoute + authRoute, authApiRoutes);
@@ -84,6 +87,7 @@ app.use(apiRoute + warehouse + '/uoms', uomApiRoutes);
 app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);
 app.use(apiRoute + warehouse + '/purchase-requisitions', purchaseRequisitionApiRoutes);
 app.use(apiRoute + warehouse + '/goods-issues', goodsIssueApiRoutes);
+app.use(apiRoute + warehouse + '/product-consumptions', productConsumptionApiRoutes);
 app.use(apiRoute + admin + '/profiles', profileApiRoutes);
 app.use(apiRoute + admin + '/projects', projectApiRoutes);
 

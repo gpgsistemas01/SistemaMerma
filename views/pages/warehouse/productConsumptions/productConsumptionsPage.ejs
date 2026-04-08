@@ -1,0 +1,41 @@
+<% const form = {
+    canApprove: false,
+    selects: [
+        { id: 'projectInput', name: 'projectId' },
+        { id: 'requesterInput', name: 'requesterId' },
+        { id: 'machineInput', name: 'machineId' }
+    ],
+    inputs: [
+        { id: 'requestDateInput', name: 'requestDate', type: 'datetime-local', label: 'Fecha y hora de solicitud:' }
+    ],
+    table: {
+        select: { id: 'productInput', name: 'productId', label: 'Producto' },
+        extraSelect: { id: 'goodsIssueInput', name: 'goodsIssueId', label: 'Salida de almacén (folio)' },
+        inputs: [
+            { id: 'consumedSquareMetersInput', name: 'consumedSquareMeters', type: 'number', label: 'M² consumidos', col: '3' }
+        ],
+        button: { id: 'addProductBtn', class: 'btn btn-primary w-100', content: 'Agregar' }
+    }
+} %>
+
+<table id="table" class="display">
+    <thead>
+        <tr>
+            <th>Folio</th>
+            <th>Proyecto</th>
+            <th>Encargado</th>
+            <th>Máquina</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<%- include('../../../shared/modal', { form }) %>
+
+<script type="module" src="/js/pages/warehouse/productConsumptionsPage.js"></script>
+
+<%- contentFor('title') %>
+Consumo de producto
+<%- contentFor('layoutType') %>
+site
