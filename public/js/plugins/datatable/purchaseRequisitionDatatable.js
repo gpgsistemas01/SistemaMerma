@@ -1,5 +1,5 @@
 import { openPurchaseRequisitionModal } from "../../pages/warehouse/purchaseRequisitionsPage.js";
-import { createDataTable, refreshProductTable } from "./baseDatatable.js";
+import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purchaseRequisitionService.js";
 
 export let details = [];
@@ -59,12 +59,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
         {
             data: 'id',
             title: 'Acciones',
-            render: () => {
-                return `
-                    <button class="btn-edit">✏️</button>
-                    <button class="btn-view">👁️</button>
-                `;
-            }
+            render: () => renderActionButtons(row.status?.name)
         }
     );
 
@@ -80,7 +75,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
             buttons: [
                 {
                     text: 'Nueva requisición',
-                    action: () => {
+                    action: (data, type, row) => {
                         openPurchaseRequisitionModal({ mode: 'create' });
                     }
                 }

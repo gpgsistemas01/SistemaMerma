@@ -26,3 +26,16 @@ export const refreshProductTable = (details) => {
     table.rows.add(details);
     table.draw();
 }
+
+export const renderActionButtons = (statusName) => {
+
+    const actions = [];
+
+    if (statusName === 'Abierta') {
+        actions.push('<button class="btn-edit">✏️</button>');
+    }
+
+    actions.push('<button class="btn-view">👁️</button>');
+
+    return actions.join('');
+}

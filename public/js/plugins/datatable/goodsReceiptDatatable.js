@@ -1,5 +1,5 @@
 import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.js";
-import { createDataTable, refreshProductTable } from "./baseDatatable.js";
+import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { GOODS_RECEIPTS_API_ROUTE } from "../../services/warehouse/goodsReceiptService.js";
 
 export let details = [];
@@ -42,12 +42,7 @@ export const createGoodsReceiptDatatable = () => {
                 {
                     data: 'id',
                     title: 'Acciones',
-                    render: () => {
-                        return `
-                            <button class="btn-edit">✏️</button>
-                            <button class="btn-view">👁️</button>
-                        `;
-                    }
+                    render: (data, type, row) => renderActionButtons(row.status?.name)
                 }
             ],
             buttons: [

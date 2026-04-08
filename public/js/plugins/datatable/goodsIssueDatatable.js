@@ -1,5 +1,5 @@
 import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
-import { createDataTable, refreshProductTable } from "./baseDatatable.js";
+import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -73,12 +73,7 @@ export const createGoodsIssueDatatable = (context) => {
         {
             data: 'id',
             title: 'Acciones',
-            render: () => {
-                return `
-                    <button class="btn-edit">✏️</button>
-                    <button class="btn-view">👁️</button>
-                `;
-            }
+            render: (data, type, row) => renderActionButtons(row.status?.name)
         }
     );
 
