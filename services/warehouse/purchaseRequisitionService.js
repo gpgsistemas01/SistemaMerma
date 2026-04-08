@@ -71,13 +71,6 @@ export const findAllPurchaseRequisitions = async ({
                     date: true
                 }
             },
-            deliveredBy: {
-                select: {
-                    id: true,
-                    name: true,
-                    lastName: true
-                }
-            },
             status: {
                 select: {
                     id: true,
@@ -351,6 +344,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             }
         });
     } catch (err) {
+
         if (err.code === 'P2025') throw new PurchaseRequisitionStatusNotFound();
         throw new PurchaseRequisitionStatusUpdateDatabaseError();
     }

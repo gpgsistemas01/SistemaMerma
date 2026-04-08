@@ -55,19 +55,6 @@ export const createPurchaseRequisitionDatatable = (context) => {
                 return `<div>${ approver }<br><small>${ approveDate }</small></div>`;
             }
         },
-        {
-            data: null,
-            title: 'Entrega',
-            render: (data, type, row) => {
-
-                if (!row.deliveredBy || !row.deliveryDate) return '<small>Sin entrega</small>';
-
-                const deliveredBy = `${ row.deliveredBy.name } ${ row.deliveredBy.lastName }`;
-                const deliveryDate = new Date(row.deliveryDate).toLocaleString();
-
-                return `<div>${ deliveredBy }<br><small>${ deliveryDate }</small></div>`;
-            }
-        },
         { data: 'status.name', title: 'Estado' },
         {
             data: 'id',

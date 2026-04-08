@@ -51,24 +51,7 @@
     }
 } %>
 
-<table id="table" class="display">
-    <thead>
-        <tr>
-            <th>Folio</th>
-            <th>Solicitud</th>
-            <% if (user.department === 'Almacén') { %>
-                <th>Área</th>
-            <% } %>
-            <th>Proyecto</th>
-            <th>Aprobación</th>
-            <th>Entrega</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-
-    <tbody></tbody>
-</table>
+<%- include('../../../shared/mainTable') %>
 
 <%- include('../../../shared/modal', { form }) %>
 

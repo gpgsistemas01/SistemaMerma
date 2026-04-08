@@ -149,8 +149,8 @@ model DetailGoodsReceiptProduct {
   description      String?        @db.VarChar(50)
   goodsReceipt     GoodsReceipt   @relation(fields: [goodsReceiptId], references: [id])
   product          Product        @relation(fields: [productId], references: [id])
-  detailMovementId String         @unique @db.Uuid
-  detailMovement   DetailMovement @relation(fields: [detailMovementId], references: [id])
+  detailMovementId String?         @unique @db.Uuid
+  detailMovement   DetailMovement? @relation(fields: [detailMovementId], references: [id])
 }
 
 model PurchaseRequisition {
@@ -224,8 +224,8 @@ model DetailGoodsIssueProduct {
 
   goodsIssue       GoodsIssue     @relation(fields: [goodsIssueId], references: [id])
   product          Product        @relation(fields: [productId], references: [id])
-  detailMovementId String         @unique @db.Uuid
-  detailMovement   DetailMovement @relation(fields: [detailMovementId], references: [id])
+  detailMovementId String?         @unique @db.Uuid
+  detailMovement   DetailMovement? @relation(fields: [detailMovementId], references: [id])
 }
 
 model Reason {
