@@ -16,20 +16,20 @@ export const editGoodsIssueRequest = (data, id) => apiRequest({
 
 export const cancelGoodsIssueRequest = (id) => apiRequest({
     method: 'patch',
-    url: `${ route }/goods-issues/cancel/${ id }`
+    url: `${ route }//goods-issues/${ id }/cancel`
 });
 
 export const confirmGoodsIssueRequest = (id) => apiRequest({
     method: 'patch',
-    url: `${ route }/goods-issues/confirm/${ id }`
+    url: `${ route }/goods-issues/${ id }/confirm`
 });
 
 export const rejectGoodsIssueRequest = (id) => apiRequest({
     method: 'patch',
-    url: `${ route }/goods-issues/reject/${ id }`
+    url: `${ route }/goods-issues/${ id }/reject`
 });
 
 export const approveGoodsIssueRequest = (id) => apiRequest({
     method: 'patch',
-    url: `${ route }/goods-issues/approve/${ id }`
+    url: `${ route }/goods-issues/${ id }/approve`
 });

@@ -98,10 +98,14 @@ export const setFormReadOnly = ({
     form.querySelector('#submitBtn').classList.toggle('d-none', isReadOnly);
 };
 
-export const toggleButtons = ({ mode, status = 'Cerrada' }) => {
+export const toggleButtons = ({
+    mode,
+    status = 'Cerrada',
+    showActions = true
+}) => {
 
     const isView = mode === 'view';
-    const canApprove = !(isView && status === 'Abierta');
+    const canApprove = !showActions || !(isView && status === 'Abierta');
     document.querySelector('.add-product-container').classList.toggle('d-none', isView);
     document.querySelector('.approve-container').classList.toggle('d-none', canApprove);
 }

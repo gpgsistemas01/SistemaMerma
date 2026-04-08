@@ -14,9 +14,12 @@ export const initGoodsIssueSelect2 = async ({
         url: '/api/admin/profiles/',
         placeholder: 'Buscar solicitante...',
         data: (params) => {
+
+            const canRequestAnyDepartment = context.department === 'Almacén' || context.role === 'Administrador del sistema';
+
             return {
                 search: params.term,
-                department: context.department
+                department: canRequestAnyDepartment ? '' : context.department
             };
         },
         processResults: (data) => {

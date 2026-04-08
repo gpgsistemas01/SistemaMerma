@@ -60,14 +60,15 @@ export const createGoodsIssueDatatable = (context) => {
             title: 'Entrega',
             render: (data, type, row) => {
 
-                if (!row.deliveredBy || !row.deliveryDate) return '<small>Sin entrega</small>';
+                if (!row.warehouseStaff || !row.deliveryDate) return '<small>Sin entrega</small>';
 
-                const deliveredBy = `${ row.deliveredBy.name } ${ row.deliveredBy.lastName }`;
+                const deliveredBy = `${ row.warehouseStaff.name } ${ row.warehouseStaff.lastName }`;
                 const deliveryDate = new Date(row.deliveryDate).toLocaleString();
 
                 return `<div>${ deliveredBy }<br><small>${ deliveryDate }</small></div>`;
             }
         },
+        { data: 'dispatchStatus', title: 'Estado surtido' },
         { data: 'status.name', title: 'Estado' },
         {
             data: 'id',
@@ -116,7 +117,7 @@ export const createGoodsIssueDatatable = (context) => {
     });
 };
 
-export const initDetailsGoodsIssueTable = (mode) => {
+export const initDetailsGoodsIssueTable = (mode, status = 'Abierta') => {
 
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
@@ -125,9 +126,18 @@ export const initDetailsGoodsIssueTable = (mode) => {
 
     const columns = [
         { data: 'name', title: 'Producto' },
-        { data: 'quantity', title: 'Cantidad' },
+        { data: 'quantity', title: 'Cantidad solicitada' },
         { data: 'description', title: 'Descripción' },
     ];
+
+    const showPendingColumns = mode === 'view' && status !== 'Abierta';
+
+    if (showPendingColumns) {
+        columns.push(
+            { data: 'pendingQuantity', title: 'Cantidad pendiente' },
+            { data: 'deliveredQuantity', title: 'Cantidad surtida' }
+        );
+    }
 
     if (mode !== 'view') {
         columns.push({

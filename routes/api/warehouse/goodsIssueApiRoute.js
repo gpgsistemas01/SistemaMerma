@@ -3,6 +3,8 @@ import { authorizeUserApi, verifyCookiesAuthTokenRequired } from '../../../middl
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import {
     approveGoodsIssueStatus,
+    cancelGoodsIssueStatus,
+    confirmGoodsIssueStatus,
     editGoodsIssue,
     getAllGoodsIssues,
     registerGoodsIssue,
@@ -20,6 +22,11 @@ const goodsIssuePermissions = {
 const goodsIssueApprovalPermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['Sistemas', 'Impresión', 'Router', 'Taller 3d', 'Herrería', 'Acabados', 'PT', 'Tráfico', 'Instalaciones', 'Almacén']
+};
+
+const goodsIssueConfirmationPermissions = {
+    roles: ['Coordinador', 'Auxiliar', 'Almacenista', 'Administrador del sistema'],
+    departments: ['Sistemas', 'Almacén']
 };
 
 router.get(
@@ -59,6 +66,20 @@ router.patch(
     verifyCookiesAuthTokenRequired,
     authorizeUserApi(goodsIssueApprovalPermissions),
     rejectGoodsIssueStatus
+);
+
+router.patch(
+    '/:id/confirm',
+    verifyCookiesAuthTokenRequired,
+    authorizeUserApi(goodsIssueConfirmationPermissions),
+    confirmGoodsIssueStatus
+);
+
+router.patch(
+    '/:id/cancel',
+    verifyCookiesAuthTokenRequired,
+    authorizeUserApi(goodsIssueConfirmationPermissions),
+    cancelGoodsIssueStatus
 );
 
 export default router;

@@ -2,6 +2,8 @@ import { createGoodsIssueDtoForRegister } from "../../../dtos/goodsIssueDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     approveGoodsIssue,
+    cancelGoodsIssue,
+    confirmGoodsIssue,
     createGoodsIssue,
     findAllGoodsIssues,
     rejectGoodsIssue,
@@ -37,7 +39,9 @@ export const registerGoodsIssue = async (req, res) => {
     const goodsIssueDto = createGoodsIssueDtoForRegister(req.body);
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
 
-    const goodsIssue = await createGoodsIssue(sanitizedGoodsIssueDto);
+    const goodsIssue = await createGoodsIssue({
+        goodsIssueDto: sanitizedGoodsIssueDto
+    });
 
     return res.status(200).json({
         goodsIssue,
@@ -55,7 +59,9 @@ export const editGoodsIssue = async (req, res) => {
     const goodsIssue = await updateGoodsIssue({
         goodsIssueDto: sanitizedGoodsIssueDto, 
         id: req.params.id,
-        canEditDepartment
+        canEditDepartment,
+        userDepartment: req.user.department,
+        userRole: req.user.role
     });
 
     return res.status(200).json({
@@ -91,5 +97,35 @@ export const rejectGoodsIssueStatus = async (req, res) => {
     return res.status(200).json({
         goodsIssue,
         code: successCodeMessages.REJECTED_GOODS_ISSUE
+    });
+};
+
+export const confirmGoodsIssueStatus = async (req, res) => {
+
+    const goodsIssue = await confirmGoodsIssue({
+        id: req.params.id,
+        userDepartment: req.user.department,
+        userRole: req.user.role,
+        userId: req.userId
+    });
+
+    return res.status(200).json({
+        goodsIssue,
+        code: successCodeMessages.CONFIRMED_GOODS_ISSUE
+    });
+};
+
+export const cancelGoodsIssueStatus = async (req, res) => {
+
+    const goodsIssue = await cancelGoodsIssue({
+        id: req.params.id,
+        userDepartment: req.user.department,
+        userRole: req.user.role,
+        userId: req.userId
+    });
+
+    return res.status(200).json({
+        goodsIssue,
+        code: successCodeMessages.CANCELED_GOODS_ISSUE
     });
 };

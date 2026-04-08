@@ -55,3 +55,24 @@ export class GoodsIssueApproverProfileNotFound extends AppError {
         super('Perfil aprobador activo no encontrado para el usuario', 'GOODS_ISSUE_APPROVER_PROFILE_NOT_FOUND', 404);
     }
 }
+
+export class GoodsIssueConfirmationForbidden extends AppError {
+
+    constructor() {
+        super('No tienes permisos para confirmar o cancelar salidas de almacén', 'GOODS_ISSUE_CONFIRMATION_FORBIDDEN', 403);
+    }
+}
+
+export class GoodsIssueWarehouseStaffProfileNotFound extends AppError {
+
+    constructor() {
+        super('Perfil de almacenista activo no encontrado para el usuario', 'GOODS_ISSUE_WAREHOUSE_STAFF_PROFILE_NOT_FOUND', 404);
+    }
+}
+
+export class GoodsIssueEditForbidden extends AppError {
+
+    constructor() {
+        super('No tienes permisos para editar salidas de otra área', 'GOODS_ISSUE_EDIT_FORBIDDEN', 403);
+    }
+}

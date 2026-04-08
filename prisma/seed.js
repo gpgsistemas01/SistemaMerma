@@ -240,7 +240,10 @@ async function main() {
         data: [
             {
                 name: 'Restock'
-            }
+            },
+            {
+                name: 'Consumo interno'
+            },
         ],
         skipDuplicates: true
     });
