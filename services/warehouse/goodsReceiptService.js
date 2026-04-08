@@ -4,6 +4,7 @@ import {
     GoodsReceiptUpdateDatabaseError,
     SupplierNotFound,
     GoodsReceiptStatusNotFound,
+    GoodsReceiptReceptionDateRequired,
     GoodsReceiptStatusUpdateDatabaseError
 } from "../../errors/warehouse/goodsReceiptError.js";
 import { prisma } from "../../lib/prisma.js";
@@ -265,7 +266,7 @@ const updateGoodsReceiptStatus = async ({ id, statusName }) => {
         });
 
         if (!goodsReceipt) throw new GoodsReceiptNotFound();
-        if (!goodsReceipt.receptionDate) throw new GoodsReceiptStatusUpdateDatabaseError();
+        if (!goodsReceipt.receptionDate) throw new GoodsReceiptReceptionDateRequired();
         if (goodsReceipt.status?.name !== 'Abierta') throw new GoodsReceiptStatusNotFound();
 
         return await prisma.$transaction(async (tx) => {
@@ -356,6 +357,7 @@ const updateGoodsReceiptStatus = async ({ id, statusName }) => {
         if (err instanceof ProfileNotFound || err instanceof GoodsReceiptNotFound) {
             throw new GoodsReceiptStatusUpdateDatabaseError();
         }
+        if (err instanceof GoodsReceiptReceptionDateRequired) throw err;
         if (err.code === 'P2025') throw new GoodsReceiptStatusNotFound();
         throw new GoodsReceiptStatusUpdateDatabaseError();
     }
