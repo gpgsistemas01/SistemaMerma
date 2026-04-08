@@ -47,6 +47,13 @@ async function main() {
         skipDuplicates: true
     });
 
+    await prisma.reason.createMany({
+        data: [
+            { name: 'reestock' }
+        ],
+        skipDuplicates: true
+    });
+
     // const hashedPassword = await bcrypt.hash('A%54321', 10)
 
     await prisma.user.upsert({

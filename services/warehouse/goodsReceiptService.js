@@ -4,6 +4,7 @@ import {
     GoodsReceiptUpdateDatabaseError,
     SupplierNotFound,
     GoodsReceiptStatusNotFound,
+    GoodsReceiptReceptionDateRequired,
     GoodsReceiptStatusUpdateDatabaseError
 } from "../../errors/warehouse/goodsReceiptError.js";
 import { prisma } from "../../lib/prisma.js";
@@ -243,41 +244,123 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
 const updateGoodsReceiptStatus = async ({ id, statusName }) => {
 
-    const goodsReceipt = await prisma.goodsReceipt.findUnique({
-        where: { id },
-        include: {
-            status: {
-                select: {
-                    name: true
-                }
-            }
-        }
-    });
-
-    if (!goodsReceipt) throw new GoodsReceiptNotFound();
-    if (goodsReceipt.status?.name !== 'Abierta') throw new GoodsReceiptStatusNotFound();
-
     try {
-        return await prisma.goodsReceipt.update({
+        const goodsReceipt = await prisma.goodsReceipt.findUnique({
             where: { id },
-            data: {
-                status: {
-                    connect: {
-                        name: statusName
-                    }
-                }
-            },
             select: {
                 id: true,
+                receptionDate: true,
+                receivedById: true,
                 status: {
                     select: {
-                        id: true,
                         name: true
+                    }
+                },
+                details: {
+                    select: {
+                        productId: true,
+                        quantity: true
                     }
                 }
             }
         });
+
+        if (!goodsReceipt) throw new GoodsReceiptNotFound();
+        if (!goodsReceipt.receptionDate) throw new GoodsReceiptReceptionDateRequired();
+        if (goodsReceipt.status?.name !== 'Abierta') throw new GoodsReceiptStatusNotFound();
+
+        return await prisma.$transaction(async (tx) => {
+
+            const receivedByProfile = await tx.profile.findUnique({
+                where: {
+                    id: goodsReceipt.receivedById
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (!receivedByProfile) throw new ProfileNotFound();
+
+            if (statusName === 'Confirmada') {
+
+                const reason = await tx.reason.findFirst({
+                    where: {
+                        name: 'reestock'
+                    },
+                    select: {
+                        id: true
+                    }
+                });
+
+                if (!reason) throw new GoodsReceiptStatusNotFound();
+
+                const movement = await tx.inventoryMovement.create({
+                    data: {
+                        goodsReceiptId: goodsReceipt.id,
+                        reasonId: reason.id,
+                        date: new Date(),
+                        details: {
+                            create: goodsReceipt.details.map((detail) => ({
+                                productId: detail.productId,
+                                quantity: detail.quantity
+                            }))
+                        }
+                    },
+                    include: {
+                        details: {
+                            select: {
+                                productId: true,
+                                quantity: true
+                            }
+                        }
+                    }
+                });
+
+                await Promise.all(
+                    movement.details.map((detail) =>
+                        tx.product.update({
+                            where: {
+                                id: detail.productId
+                            },
+                            data: {
+                                currentStock: {
+                                    increment: detail.quantity
+                                }
+                            }
+                        })
+                    )
+                );
+            }
+
+            return await tx.goodsReceipt.update({
+                where: { id },
+                data: {
+                    status: {
+                        connect: {
+                            name: statusName
+                        }
+                    }
+                },
+                select: {
+                    id: true,
+                    status: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    }
+                }
+            });
+        });
     } catch (err) {
+        if (
+            err instanceof ProfileNotFound ||
+            err instanceof GoodsReceiptNotFound ||
+            err instanceof GoodsReceiptReceptionDateRequired
+        ) {
+            throw new GoodsReceiptStatusUpdateDatabaseError();
+        }
         if (err.code === 'P2025') throw new GoodsReceiptStatusNotFound();
         throw new GoodsReceiptStatusUpdateDatabaseError();
     }
