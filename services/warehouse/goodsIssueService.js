@@ -4,6 +4,7 @@ import {
     GoodsIssueProjectNotFound,
     GoodsIssueRequesterProfileNotFound,
     GoodsIssueStatusNotFound,
+    GoodsIssueApproverProfileNotFound,
     GoodsIssueStatusUpdateDatabaseError,
     GoodsIssueUpdateDatabaseError
 } from "../../errors/warehouse/goodsIssueError.js";
@@ -309,7 +310,8 @@ const updateGoodsIssueStatus = async ({
     id,
     statusName,
     userDepartment,
-    userRole
+    userRole,
+    userId
 }) => {
 
     const goodsIssue = await prisma.goodsIssue.findUnique({
@@ -343,15 +345,44 @@ const updateGoodsIssueStatus = async ({
     }
 
     try {
+
+        const data = {
+            status: {
+                connect: {
+                    name: statusName
+                }
+            }
+        };
+
+        if (statusName === 'Aprobada') {
+            const approver = await prisma.profile.findFirst({
+                where: {
+                    isActive: true,
+                    users: {
+                        some: {
+                            id: userId,
+                            isActive: true
+                        }
+                    }
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (!approver) throw new GoodsIssueApproverProfileNotFound();
+
+            data.approver = {
+                connect: {
+                    id: approver.id
+                }
+            };
+            data.approvedDate = new Date();
+        }
+
         return await prisma.goodsIssue.update({
             where: { id },
-            data: {
-                status: {
-                    connect: {
-                        name: statusName
-                    }
-                }
-            },
+            data,
             select: {
                 id: true,
                 status: {
@@ -368,8 +399,8 @@ const updateGoodsIssueStatus = async ({
     }
 };
 
-export const approveGoodsIssue = async ({ id, userDepartment, userRole }) =>
-    await updateGoodsIssueStatus({ id, statusName: 'Aprobada', userDepartment, userRole });
+export const approveGoodsIssue = async ({ id, userDepartment, userRole, userId }) =>
+    await updateGoodsIssueStatus({ id, statusName: 'Aprobada', userDepartment, userRole, userId });
 
-export const rejectGoodsIssue = async ({ id, userDepartment, userRole }) =>
-    await updateGoodsIssueStatus({ id, statusName: 'Rechazada', userDepartment, userRole });
+export const rejectGoodsIssue = async ({ id, userDepartment, userRole, userId }) =>
+    await updateGoodsIssueStatus({ id, statusName: 'Rechazada', userDepartment, userRole, userId });

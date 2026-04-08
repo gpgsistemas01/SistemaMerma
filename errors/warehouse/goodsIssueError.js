@@ -48,3 +48,10 @@ export class GoodsIssueApprovalForbidden extends AppError {
         super('No tienes permisos para aprobar o rechazar salidas de otra área', 'GOODS_ISSUE_APPROVAL_FORBIDDEN', 403);
     }
 }
+
+export class GoodsIssueApproverProfileNotFound extends AppError {
+
+    constructor() {
+        super('Perfil aprobador activo no encontrado para el usuario', 'GOODS_ISSUE_APPROVER_PROFILE_NOT_FOUND', 404);
+    }
+}

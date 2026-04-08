@@ -70,7 +70,7 @@ export const editPurchaseRequisition = async (req, res) => {
 
 export const confirmPurchaseRequisitionStatus = async (req, res) => {
 
-    const purchaseRequisition = await confirmPurchaseRequisition({ id: req.params.id });
+    const purchaseRequisition = await confirmPurchaseRequisition({ id: req.params.id, userId: req.userId });
 
     return res.status(200).json({
         purchaseRequisition,
@@ -80,7 +80,7 @@ export const confirmPurchaseRequisitionStatus = async (req, res) => {
 
 export const cancelPurchaseRequisitionStatus = async (req, res) => {
 
-    const purchaseRequisition = await cancelPurchaseRequisition({ id: req.params.id });
+    const purchaseRequisition = await cancelPurchaseRequisition({ id: req.params.id, userId: req.userId });
 
     return res.status(200).json({
         purchaseRequisition,
