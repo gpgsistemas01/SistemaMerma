@@ -15,7 +15,7 @@ export const getAllPurchaseRequisitions = async (req, res) => {
 
     const start = parseInt(req.query.start) || 0;
     const length = parseInt(req.query.length) || 10;
-    const search = req.query.search?.value || '';
+    const search =req.query['search[value]'] || '';
 
     const columns = ['requestDate'];
     const orderColumnIndex = req.query.order?.[0]?.column || 0;

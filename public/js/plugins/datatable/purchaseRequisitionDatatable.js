@@ -59,7 +59,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
         {
             data: 'id',
             title: 'Acciones',
-            render: () => renderActionButtons(row.status?.name)
+            render: (data, type, row) => renderActionButtons(row.status?.name)
         }
     );
 
@@ -75,7 +75,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
             buttons: [
                 {
                     text: 'Nueva requisición',
-                    action: (data, type, row) => {
+                    action: () => {
                         openPurchaseRequisitionModal({ mode: 'create' });
                     }
                 }
