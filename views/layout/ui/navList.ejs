@@ -1,30 +1,53 @@
-<% const items = [
-    { 
-        content: 'Productos', 
-        href: '/productos', 
-        isActive: currentRoute === '/productos'
+<%
+const role = user?.role ?? '';
+const department = user?.department ?? '';
+
+const isAdmin = role === 'Administrador del sistema';
+const isSalesOrDesign = ['Ventas', 'Diseño'].includes(department);
+const isWarehouse = department === 'Almacén';
+const isCoordinator = role === 'Coordinador';
+
+const canSeeAll = isAdmin;
+const canSeeOnlyProducts = !canSeeAll && isSalesOrDesign;
+
+const items = [
+    {
+        content: 'Productos',
+        href: '/productos',
+        isActive: currentRoute === '/productos',
+        isVisible: true
     },
     {
         content: 'Proveedores',
         href: '/proveedores',
-        isActive: currentRoute === '/proveedores'
+        isActive: currentRoute === '/proveedores',
+        isActive: currentRoute === '/proveedores',
+        isVisible: canSeeAll
     },
     { 
-        content: 'Requisiciones', 
-        href: '/requisiciones', 
-        isActive: currentRoute === '/requisiciones' 
+        content: 'Requisiciones',
+        href: '/requisiciones',
+        isActive: currentRoute === '/requisiciones',
+        isVisible: canSeeAll || isWarehouse || isCoordinator
     },
     {
         content: 'Recepciones de compra',
         href: '/recepciones-compra',
-        isActive: currentRoute === '/recepciones-compra'
+        isActive: currentRoute === '/recepciones-compra',
+        isVisible: canSeeAll || isWarehouse
     },
     {
         content: 'Salidas de almacén',
         href: '/salidas-almacen',
-        isActive: currentRoute === '/salidas-almacen'
+        isActive: currentRoute === '/salidas-almacen',
+        isVisible: canSeeAll || !canSeeOnlyProducts
     },
-].map(item => ({
+].filter(item => {
+    if (canSeeAll) return true;
+    if (canSeeOnlyProducts) return item.href === '/productos';
+
+    return item.isVisible;
+}).map(item => ({
     ...item,
     class: `nav-link ${ item.isActive ? 'active' : ''}`
 })); %>
@@ -32,7 +55,7 @@
 <ul class="<%= listClass %>">
     <% items.forEach(item => { %>
         <li class="nav-item py-1">
-            <a class="<%= item.class %>" href="<%= item.href %>" 
+            <a class="<%= item.class %>" href="<%= item.href %>"
                 <%= item.isActive ? 'aria-current="page"' : '' %>
             >
                 <%- item.content %>
