@@ -12,6 +12,7 @@ export const createProductDatatable = () => {
                 { data: 'name', title: 'Nombre' },
                 { 
                     data: null,
+                    title: 'Dimensiones (Base x Altura)',
                     render: (data, type, row) => (row.base && row.height) ? `${row.base} x ${row.height}` : 'N/A'
                 },
                 { data: 'unitCost', title: 'Costo Unitario' },
