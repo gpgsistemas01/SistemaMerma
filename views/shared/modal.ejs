@@ -58,8 +58,21 @@ const buttons = {
 
                 <% if (form.table) { %>
                     <div class="row g-2 mb-3 add-product-container">
-                        <div class="col-4">
+                        <div class="col-3">
                             <%- include('./select', { input: form.table.select }) %>
+                        </div>
+
+                        <div class="col-2">
+                            <%- include('./outlineInput', { input: {
+                                id: 'uomDisplayInput',
+                                name: 'uomDisplay',
+                                type: 'text',
+                                label: 'Unidad',
+                                attrs: {
+                                    readonly: '',
+                                    tabindex: '-1'
+                                }
+                            } }) %>
                         </div>
 
                         <%- include('./outlineInputList', { inputs: form.table.inputs }) %>

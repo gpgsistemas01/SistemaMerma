@@ -83,7 +83,12 @@ export const findAllPurchaseRequisitions = async ({
                     product: {
                         select: {
                             id: true,
-                            name: true
+                            name: true,
+                            uom: {
+                                select: {
+                                    name: true
+                                }
+                            }
                         }
                     },
                     description: true,

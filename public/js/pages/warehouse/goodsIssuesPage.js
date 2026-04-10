@@ -78,6 +78,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         form.reset();
         document.getElementById('modalTitle').textContent = 'Registrar salida';
         document.getElementById('submitBtn').textContent = 'Guardar';
+        document.getElementById('uomDisplayInput').value = '';
 
         await initGoodsIssueSelect2({ context });
     }
@@ -99,7 +100,8 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
                     Number(detail.quantity) - Math.min(Number(detail.quantity), deliveredByProduct.get(detail.product.id) || 0),
                     0
                 ),
-                description: detail.description
+                description: detail.description,
+                uom: detail.product.uom?.name || 'N/A'
             }))
             .map((detail) => {
                 const delivered = detail.deliveredQuantity || 0;
@@ -168,7 +170,8 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
 const addProduct = () => {
 
     const productId = document.getElementById('productInput').value;
-    const productName = document.getElementById('productInput').selectedOptions?.[0]?.text || '';
+    const selectedProduct = $('#productInput').select2('data')?.[0];
+    const productName = selectedProduct?.text || '';
     const quantity = document.getElementById('quantityInput').value;
     const description = document.getElementById('descriptionInput').value;
 
@@ -187,13 +190,14 @@ const addProduct = () => {
         return;
     }
 
-    details.push({ productId, name: productName, quantity, description });
+    details.push({ productId, name: productName, quantity, description, uom: selectedProduct?.uom || 'N/A' });
 
     refreshProductTable(details);
 
     $('#productInput').empty().trigger('change');
     document.getElementById('quantityInput').value = '';
     document.getElementById('descriptionInput').value = '';
+    document.getElementById('uomDisplayInput').value = '';
 };
 
 on('click', '#addProductBtn', addProduct);
@@ -204,4 +208,9 @@ on('click', '#cancelBtn', async () => {
 on('click', '#confirmBtn', async () => {
     if (!rightAction) return;
     await handleAction(rightAction);
+});
+on('change', '#productInput', () => {
+    const selectedProduct = $('#productInput').select2('data')?.[0];
+    console.log(selectedProduct)
+    document.getElementById('uomDisplayInput').value = selectedProduct?.uom || '';
 });

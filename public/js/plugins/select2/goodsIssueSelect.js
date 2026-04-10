@@ -63,7 +63,8 @@ export const initGoodsIssueSelect2 = async ({
             return {
                 results: list.map(product => ({
                     id: product.id,
-                    text: product.name
+                    text: product.name,
+                    uom: product.uom?.name || 'N/A'
                 }))
             };
         }

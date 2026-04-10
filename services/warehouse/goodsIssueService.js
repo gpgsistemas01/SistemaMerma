@@ -119,7 +119,12 @@ export const findAllGoodsIssues = async ({
                     product: {
                         select: {
                             id: true,
-                            name: true
+                            name: true,
+                            uom: {
+                                select: {
+                                    name: true
+                                }
+                            }
                         }
                     },
                     description: true,

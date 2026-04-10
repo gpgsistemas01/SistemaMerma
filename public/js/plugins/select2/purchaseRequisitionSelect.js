@@ -48,7 +48,8 @@ export const initPurchaseRequisitionSelect2 = async (data = null) => {
             return {
                 results: list.map(product => ({
                     id: product.id,
-                    text: product.name
+                    text: product.name,
+                    uom: product.uom?.name || 'N/A'
                 }))
             };
         }

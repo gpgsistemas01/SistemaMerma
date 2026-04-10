@@ -64,6 +64,7 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
         form.reset();
         document.getElementById('modalTitle').textContent = 'Registrar requisición';
         document.getElementById('submitBtn').textContent = 'Guardar';
+        document.getElementById('uomDisplayInput').value = '';
 
         await initPurchaseRequisitionSelect2();
     }
@@ -77,7 +78,8 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
             name: detail.product.name,
             productId: detail.product.id,
             quantity: detail.quantity,
-            description: detail.description
+            description: detail.description,
+            uom: detail.product.uom?.name || 'N/A'
         })));
 
         await initPurchaseRequisitionSelect2(data);
@@ -106,7 +108,8 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
 const addProduct = () => {
 
     const productId = document.getElementById('productInput').value;
-    const productName = document.getElementById('productInput').selectedOptions?.[0]?.text || '';
+    const selectedProduct = $('#productInput').select2('data')?.[0];
+    const productName = selectedProduct?.text || '';
     const quantity = document.getElementById('quantityInput').value;
     const description = document.getElementById('descriptionInput').value;
 
@@ -125,7 +128,7 @@ const addProduct = () => {
         return;
     }
 
-    const product = { productId, name: productName, quantity, description };
+    const product = { productId, name: productName, quantity, description, uom: selectedProduct?.uom || 'N/A' };
     details.push(product);
 
     refreshProductTable(details);
@@ -133,8 +136,13 @@ const addProduct = () => {
     $('#productInput').empty().trigger('change');
     document.getElementById('quantityInput').value = '';
     document.getElementById('descriptionInput').value = '';
+    document.getElementById('uomDisplayInput').value = '';
 };
 
 on('click', '#addProductBtn', addProduct);
 on('click', '#cancelBtn', async ()=> await handleAction(cancelPurchaseRequisition));
 on('click', '#confirmBtn', async () => await handleAction(confirmPurchaseRequisition));
+on('change', '#productInput', () => {
+    const selectedProduct = $('#productInput').select2('data')?.[0];
+    document.getElementById('uomDisplayInput').value = selectedProduct?.uom || '';
+});
