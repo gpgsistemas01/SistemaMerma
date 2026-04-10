@@ -247,6 +247,32 @@ async function main() {
         ],
         skipDuplicates: true
     });
+
+    await prisma.machine.createMany({
+        data: [
+            {
+                name: 'Grando',
+                dailyProductionCapacity: 533
+            },
+            {
+                name: 'LX700',
+                dailyProductionCapacity: 84
+            },
+            {
+                name: 'LX365',
+                dailyProductionCapacity: 84
+            },
+            {
+                name: 'Cama plana',
+                dailyProductionCapacity: 55.58
+            },
+            {
+                name: 'Plotter',
+                dailyProductionCapacity: null
+            }
+        ],
+        skipDuplicates: true
+    });
 }
 
 main().finally(() => {

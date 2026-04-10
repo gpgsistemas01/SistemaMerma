@@ -14,6 +14,7 @@ model Department {
   goodsReceipts        GoodsReceipt[]
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
+  indicatorRelations  IndicatorDepartment[]
 }
 
 model Role {
@@ -32,6 +33,7 @@ model User {
   department   Department @relation(fields: [departmentId], references: [id])
   role         Role       @relation(fields: [roleId], references: [id])
   profiles     Profile[]  @relation("ProfileToUser")
+  indicatorLogs indicator_logs[]
 }
 
 model Profile {
@@ -48,6 +50,7 @@ model Profile {
   requesterGoodsIssues          GoodsIssue[]          @relation("RequesterGoodsIssueRelation")
   warehouseStaffGoodsIssues     GoodsIssue[]          @relation("WarehouseStaffGoodsIssueRelation")
   deliveredPurchaseRequisitions PurchaseRequisition[] @relation("DeliveredByRelation")
+  indicatorLogs                  indicator_logs[]
 }
 
 model Category {
@@ -88,6 +91,7 @@ model Product {
   detailsPurchaseRequisitions DetailPurchaseRequisitionProduct[]
   detailsGoodsIssues          DetailGoodsIssueProduct[]
   detailsMovement             DetailMovement[]
+  supplierProducts            SupplierProduct[]
 }
 
 model UoM {
@@ -103,6 +107,17 @@ model Supplier {
   numberphone   String?        @db.VarChar(20)
   isActive      Boolean        @default(true)
   goodsReceipts GoodsReceipt[]
+  products       SupplierProduct[]
+}
+
+model SupplierProduct {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  price     Decimal  @db.Decimal(10, 2)
+  sku       String?  @db.VarChar(50)
+  supplierId String   @db.Uuid
+  productId  String   @db.Uuid
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
 }
 
 model Project {
@@ -260,4 +275,59 @@ model DetailMovement {
 
   detailGoodsIssueProduct   DetailGoodsIssueProduct?
   detailGoodsReceiptProduct DetailGoodsReceiptProduct?
+}
+
+model Machine {
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique @db.VarChar(50)
+  dailyProductionCapacity Decimal? @db.Decimal(10, 2)
+}
+
+model indicator {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique @db.VarChar(50)
+  unit String @db.VarChar(20)
+  logs indicator_logs[]
+  departmentRelations IndicatorDepartment[]
+}
+
+model indicator_logs {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  indicatorId String @db.Uuid
+  profileId String? @db.Uuid
+  userId String? @db.Uuid
+  value Decimal @db.Decimal(10, 2)
+  period DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  indicator indicator @relation(fields: [indicatorId], references: [id])
+  profile Profile? @relation(fields: [profileId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
+
+  @@unique([indicatorId, profileId, period])
+}
+
+model IndicatorDepartment {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  indicatorId String @db.Uuid
+  departmentId String @db.Uuid
+
+  indicator indicator @relation(fields: [indicatorId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@unique([indicatorId, departmentId])
+}
+
+model Shift {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique @db.VarChar(50)
+  hours Decimal @db.Decimal(10, 2)
+}
+
+model Period {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  startDate DateTime
+  endDate DateTime
+  isActive Boolean @default(true)
 }
