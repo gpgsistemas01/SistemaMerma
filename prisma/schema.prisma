@@ -146,7 +146,6 @@ model DetailGoodsReceiptProduct {
   productId        String         @db.Uuid
   goodsReceiptId   String         @db.Uuid
   quantity         Decimal        @db.Decimal(10, 2)
-  description      String?        @db.VarChar(50)
   goodsReceipt     GoodsReceipt   @relation(fields: [goodsReceiptId], references: [id])
   product          Product        @relation(fields: [productId], references: [id])
   detailMovementId String?         @unique @db.Uuid
@@ -183,7 +182,6 @@ model DetailPurchaseRequisitionProduct {
   productId             String  @db.Uuid
   purchaseRequisitionId String  @db.Uuid
   quantity              Decimal @db.Decimal(10, 2)
-  description           String? @db.VarChar(50)
 
   purchaseRequisition PurchaseRequisition @relation(fields: [purchaseRequisitionId], references: [id])
   product             Product             @relation(fields: [productId], references: [id])
@@ -220,7 +218,6 @@ model DetailGoodsIssueProduct {
   productId    String  @db.Uuid
   goodsIssueId String  @db.Uuid
   quantity     Decimal @db.Decimal(10, 2)
-  description  String? @db.VarChar(50)
 
   goodsIssue       GoodsIssue     @relation(fields: [goodsIssueId], references: [id])
   product          Product        @relation(fields: [productId], references: [id])

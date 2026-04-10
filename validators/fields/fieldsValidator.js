@@ -144,11 +144,6 @@ export const validateDetailsArray =
                 const qty = Number(detail.quantity);
 
                 if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
-
-                if (detail.description) {
-
-                    if (typeof detail.description !== 'string' || detail.description.length > 50) throw new Error(errorMap['details'].INVALID_FORMAT_DESCRIPTION);
-                }
             });
 
             return true;

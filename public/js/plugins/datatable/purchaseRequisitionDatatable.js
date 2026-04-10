@@ -109,7 +109,6 @@ export const initDetailsPurchaseRequisitionTable = (mode) => {
         { data: 'name', title: 'Producto' },
         { data: 'quantity', title: 'Cantidad' },
         { data: 'uom', title: 'Unidad' },
-        { data: 'description', title: 'Descripción' },
     ];
 
     if (mode !== 'view') {

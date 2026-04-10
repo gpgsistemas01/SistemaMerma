@@ -1,6 +1,6 @@
 import { useForm } from "../../application/form.js";
 import { cancelGoodsReceipt, confirmGoodsReceipt, editGoodsReceipt, registerGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
-import { validateGoodsReceiptValidators } from "../../core/validations/validators.js";
+import { validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { initGoodsReceiptSelect2 } from "../../plugins/select2/goodsReceiptSelect.js";

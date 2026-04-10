@@ -127,7 +127,6 @@ export const findAllGoodsIssues = async ({
                             }
                         }
                     },
-                    description: true,
                     quantity: true
                 }
             },

@@ -4,7 +4,6 @@ export const createPurchaseRequisitionDtoForRegister = (body = {}) => ({
     observations: body.observations?.trim() || null,
     details: body.details.map(d => ({
         productId: d.productId.trim(),
-        quantity: Number(d.quantity),
-        description: d.description?.trim() || null
+        quantity: Number(d.quantity)
     }))
 });

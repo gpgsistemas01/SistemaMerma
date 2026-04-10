@@ -75,7 +75,6 @@ export const findAllGoodsReceipts = async ({
                             }
                         }
                     },
-                    description: true,
                     quantity: true
                 }
             }

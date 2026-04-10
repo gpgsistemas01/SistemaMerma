@@ -163,17 +163,6 @@ export const validateDetailsArray = (details) => {
         if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
             return 'La cantidad de cada detalle debe ser un número mayor a cero.';
         }
-
-        if (detail.description) {
-
-            if (typeof detail.description !== 'string') {
-                return 'Si hay descripción, entonces debe ser texto.';
-            }
-
-            if (detail.description.length > 50) {
-                return 'Si hay descripción, entonces no debe exceder 50 caracteres.';
-            }
-        }
     }
 
     return null;

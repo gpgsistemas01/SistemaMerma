@@ -1,7 +1,7 @@
 import { login } from "../../application/auth/login.js";
 import { useForm } from "../../application/form.js";
-import { loginValidators } from "../../core/validations/validators.js";
 import { validateFields } from "../../utils/formUtils.js";
+import { loginValidators } from "../../utils/validations/validators.js";
 
 document.getElementById('submitBtn').textContent = 'Ingresar';
 

@@ -123,7 +123,6 @@ export const initDetailsGoodsIssueTable = (mode, status = 'Abierta') => {
         { data: 'name', title: 'Producto' },
         { data: 'quantity', title: 'Cantidad solicitada' },
         { data: 'uom', title: 'Unidad' },
-        { data: 'description', title: 'Descripción' },
     ];
 
     const showPendingColumns = mode === 'view' && status !== 'Abierta';

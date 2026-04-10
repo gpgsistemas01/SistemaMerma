@@ -91,7 +91,6 @@ export const findAllPurchaseRequisitions = async ({
                             }
                         }
                     },
-                    description: true,
                     quantity: true
                 }
             }

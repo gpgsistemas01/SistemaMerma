@@ -1,6 +1,5 @@
 import { useForm } from "../../application/form.js";
 import { cancelPurchaseRequisition, confirmPurchaseRequisition, editPurchaseRequisition, registerPurchaseRequisition } from "../../application/warehouse/purchaseRequisitions.js";
-import { validatePurchaseRequisitionValidators } from "../../core/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createPurchaseRequisitionDatatable, details, initDetailsPurchaseRequisitionTable } from "../../plugins/datatable/purchaseRequisitionDatatable.js";
 import { initPurchaseRequisitionSelect2 } from "../../plugins/select2/purchaseRequisitionSelect.js";
@@ -8,6 +7,7 @@ import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButt
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
+import { validatePurchaseRequisitionValidators } from "../../utils/validations/validators.js";
 
 const context = window.PURCHASE_REQUISITION_CONTEXT || {};
 
