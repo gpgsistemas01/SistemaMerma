@@ -140,7 +140,3 @@ const addProduct = () => {
 on('click', '#addProductBtn', addProduct);
 on('click', '#cancelBtn', async () => await handleAction(cancelGoodsReceipt));
 on('click', '#confirmBtn', async () => await handleAction(confirmGoodsReceipt));
-on('change', '#productInput', () => {
-    const selectedProduct = $('#productInput').select2('data')?.[0];
-    document.getElementById('uomDisplayInput').value = selectedProduct?.uom || '';
-});

@@ -209,8 +209,3 @@ on('click', '#confirmBtn', async () => {
     if (!rightAction) return;
     await handleAction(rightAction);
 });
-on('change', '#productInput', () => {
-    const selectedProduct = $('#productInput').select2('data')?.[0];
-    console.log(selectedProduct)
-    document.getElementById('uomDisplayInput').value = selectedProduct?.uom || '';
-});

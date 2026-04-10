@@ -1,3 +1,4 @@
+import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { initbaseSelect2 } from "./baseSelect.js";
 
 export const initGoodsIssueSelect2 = async ({
@@ -68,6 +69,15 @@ export const initGoodsIssueSelect2 = async ({
                 }))
             };
         }
+    });
+
+    $(productSelector).on('select2:select', (e) => {
+
+        const selectedProduct = e.params.data;
+        const value = selectedProduct?.uom || '';
+
+        const instance = initMdbWrapperInput({ selector: '#uomDisplayInput', value });
+        updateMdbWrapperInput(instance);
     });
 
     if (data) {
