@@ -10,6 +10,19 @@
     }
 }; 
 
+const inputs = {
+    uomDisplayInput: {
+        id: 'uomDisplayInput',
+        name: 'uomDisplay',
+        type: 'text',
+        label: 'Unidad',
+        attrs: {
+            readonly: '',
+            tabindex: '-1'
+        }
+    }
+}
+
 const buttons = {
     addProductButton: {
         id: 'addProductBtn',
@@ -62,20 +75,11 @@ const buttons = {
                             <%- include('./select', { input: form.table.select }) %>
                         </div>
 
-                        <div class="col-2">
-                            <%- include('./outlineInput', { input: {
-                                id: 'uomDisplayInput',
-                                name: 'uomDisplay',
-                                type: 'text',
-                                label: 'Unidad',
-                                attrs: {
-                                    readonly: '',
-                                    tabindex: '-1'
-                                }
-                            } }) %>
-                        </div>
-
                         <%- include('./outlineInputList', { inputs: form.table.inputs }) %>
+
+                        <div class="col-2">
+                            <%- include('./outlineInput', { input: inputs.uomDisplayInput }) %>
+                        </div>
 
                         <div class="col-4">
                             <%- include('./button', { button: buttons.addProductButton }) %>

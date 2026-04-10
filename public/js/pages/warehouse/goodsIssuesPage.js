@@ -173,7 +173,6 @@ const addProduct = () => {
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const productName = selectedProduct?.text || '';
     const quantity = document.getElementById('quantityInput').value;
-    const description = document.getElementById('descriptionInput').value;
 
     if (!productId || !quantity) {
         alert('Por favor, complete los campos de producto y cantidad.');
@@ -185,18 +184,12 @@ const addProduct = () => {
         return;
     }
 
-    if (description && description.trim().length > 50) {
-        alert('La descripción debe tener como máximo 50 caracteres.');
-        return;
-    }
-
-    details.push({ productId, name: productName, quantity, description, uom: selectedProduct?.uom || 'N/A' });
+    details.push({ productId, name: productName, quantity, uom: selectedProduct?.uom || 'N/A' });
 
     refreshProductTable(details);
 
     $('#productInput').empty().trigger('change');
     document.getElementById('quantityInput').value = '';
-    document.getElementById('descriptionInput').value = '';
     document.getElementById('uomDisplayInput').value = '';
 };
 
