@@ -676,6 +676,7 @@ const updateGoodsIssueDeliveryStatus = async ({
                 data,
                 select: {
                     id: true,
+                    referenceNumber: true,
                     status: {
                         select: {
                             id: true,

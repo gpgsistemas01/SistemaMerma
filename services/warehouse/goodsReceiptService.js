@@ -384,6 +384,7 @@ const updateGoodsReceiptStatus = async ({ id, statusName, userId }) => {
                 data,
                 select: {
                     id: true,
+                    referenceNumber: true,
                     status: {
                         select: {
                             id: true,

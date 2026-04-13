@@ -1,6 +1,7 @@
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { handleFlashMessage } from "../handlers/flashMessageHandler.js";
 import { getLatestNotificationsRequest, markAllNotificationsAsReadRequest } from "../services/warehouse/notificationService.js";
+import { formatNotificationDate } from "../utils/formatters.js";
 
 handleFlashMessage(window.FLASH_MESSAGE || null);
 
@@ -35,15 +36,6 @@ const notificationsBellBtn = document.getElementById('notificationsBellBtn');
 const notificationsList = document.getElementById('notificationsList');
 const notificationsUnreadCount = document.getElementById('notificationsUnreadCount');
 const markNotificationsReadBtn = document.getElementById('markNotificationsReadBtn');
-
-const formatNotificationDate = (dateValue) =>
-    new Date(dateValue).toLocaleString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
 
 const updateUnreadCount = (count) => {
 
@@ -103,7 +95,9 @@ if (notificationsBellBtn) {
     if (typeof window.io === 'function') {
         const socket = window.io();
 
-        socket.on('stock:updated', async ({ notification }) => {
+        socket.on('stock:updated', async (data) => {
+
+            const { notification } = data;
             window.dispatchEvent(new CustomEvent('stock:updated', { detail: { notification } }));
 
             if (notification) notifications.showWarning(notification.message);

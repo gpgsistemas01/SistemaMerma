@@ -15,6 +15,7 @@ model Department {
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
   indicatorRelations  IndicatorDepartment[]
+  notifications        Notification[]
 }
 
 model Role {
@@ -34,6 +35,7 @@ model User {
   role         Role       @relation(fields: [roleId], references: [id])
   profiles     Profile[]  @relation("ProfileToUser")
   indicatorLogs indicator_logs[]
+  Notification Notification[]
 }
 
 model Profile {
@@ -127,7 +129,13 @@ model Notification {
   type        String   @default("info") @db.VarChar(20)
   isRead      Boolean  @default(false)
   createdAt   DateTime @default(now())
-  referenceId String?  @db.Uuid
+  entityId    String   @db.Uuid
+  entityType  String   @db.VarChar(50)
+  referenceNumber String?  @db.VarChar(50)
+  userId      String?  @db.Uuid
+  user        User?    @relation(fields: [userId], references: [id])
+  departmentId      String?  @db.Uuid
+  department        Department? @relation(fields: [departmentId], references: [id])
 }
 
 model Project {

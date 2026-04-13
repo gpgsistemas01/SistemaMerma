@@ -107,6 +107,10 @@ app.use((err, req, res, next) => {
 
 io.on('connection', (socket) => {
     console.log(`Socket conectado: ${socket.id}`);
+
+    socket.on('disconnect', () => {
+        console.log(`Socket desconectado: ${socket.id}`);
+    });
 });
 
 const PORT = process.env.PORT || 3000;

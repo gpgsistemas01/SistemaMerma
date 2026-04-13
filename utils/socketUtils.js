@@ -6,13 +6,12 @@ export const initSocket = (io) => {
     return socketInstance;
 };
 
-export const emitStockUpdated = ({ source = 'unknown', referenceId = null, notification = null } = {}) => {
+export const emitStockUpdated = ({ source = 'unknown', notification = null } = {}) => {
 
     if (!socketInstance) return;
 
     socketInstance.emit('stock:updated', {
         source,
-        referenceId,
         notification,
         updatedAt: new Date().toISOString()
     });

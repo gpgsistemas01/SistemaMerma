@@ -112,11 +112,15 @@ export const confirmGoodsIssueStatus = async (req, res) => {
     });
     const notification = await createStockNotification({
         title: 'Stock actualizado',
-        message: `Se confirmó la salida ${goodsIssue.id}. El inventario fue descontado.`,
-        referenceId: goodsIssue.id
+        message: `Se confirmó la salida ${goodsIssue.referenceNumber}. El inventario fue descontado.`,
+        referenceNumber: goodsIssue.referenceNumber,
+        entityId: goodsIssue.id,
+        entityType: 'goods-issue',
+        userId: req.userId,
+        departmentId: req.user.departmentId
     });
 
-    emitStockUpdated({ source: 'goods-issue-confirm', referenceId: goodsIssue.id, notification });
+    emitStockUpdated({ source: 'goods-issue-confirm', notification });
 
     return res.status(200).json({
         goodsIssue,

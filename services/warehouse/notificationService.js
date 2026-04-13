@@ -1,13 +1,26 @@
 import { prisma } from "../../lib/prisma.js";
 
-export const createStockNotification = async ({ title, message, type = 'warning', referenceId = null }) => {
+export const createStockNotification = async ({ 
+    title, 
+    message, 
+    type = 'warning', 
+    referenceNumber = null,
+    entityId = null,
+    entityType = null,
+    userId = null,
+    departmentId = null
+}) => {
 
     return prisma.notification.create({
         data: {
             title,
             message,
             type,
-            referenceId
+            entityId,
+            referenceNumber,
+            entityType,
+            userId,
+            departmentId
         }
     });
 };
