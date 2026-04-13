@@ -1,3 +1,15 @@
+import { cleanForm } from "../../utils/formUtils.js";
+
+export const initMdbModal = (el) => mdb.Modal.getOrCreateInstance(el);
+
+export const hideModal = ({ el, modal, form }) => {
+
+    el.addEventListener('hidden.mdb.modal', () => {
+        cleanForm(form);
+    });
+    modal.hide();
+}
+
 export const initMdbWrapperInput = ({ selector, value }) => {
 
     const inputElement = document.querySelector(selector);

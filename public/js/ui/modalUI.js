@@ -1,12 +1,8 @@
-import { cleanForm } from "../utils/formUtils.js";
+import { hideModal, initMdbModal } from "../plugins/mdb/baseInstance.js";
 
 export const closeModal = (form) => {
     
     const modalElement = document.getElementById('modal');
-    const modal = mdb.Modal.getOrCreateInstance(modalElement);
-
-    modalElement.addEventListener('hidden.mdb.modal', () => {
-        cleanForm(form);
-    });
-    modal.hide();
+    const modal = initMdbModal(modalElement);
+    hideModal({ el: modalElement, modal, form });
 }
