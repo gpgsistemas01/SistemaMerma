@@ -9,6 +9,8 @@ import {
     rejectGoodsIssue,
     updateGoodsIssue
 } from "../../../services/warehouse/goodsIssueService.js";
+import { createStockNotification } from "../../../services/warehouse/notificationService.js";
+import { emitStockUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllGoodsIssues = async (req, res) => {
@@ -108,6 +110,13 @@ export const confirmGoodsIssueStatus = async (req, res) => {
         userRole: req.user.role,
         userId: req.userId
     });
+    const notification = await createStockNotification({
+        title: 'Stock actualizado',
+        message: `Se confirmó la salida ${goodsIssue.id}. El inventario fue descontado.`,
+        referenceId: goodsIssue.id
+    });
+
+    emitStockUpdated({ source: 'goods-issue-confirm', referenceId: goodsIssue.id, notification });
 
     return res.status(200).json({
         goodsIssue,

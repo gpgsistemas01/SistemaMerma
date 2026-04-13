@@ -137,6 +137,15 @@ form .dropdown-item {
   --mdb-highlight-bg-color: var(--mdb-dark);
 }
 
+#notificationsMenu .notification-item {
+  color: var(--mdb-light);
+  white-space: normal;
+}
+
+#notificationsMenu .notification-item small {
+  color: rgba(255, 255, 255, 0.75);
+}
+
 /* navbar styles */
 
 nav .nav-link, .offcanvas .nav-link {

@@ -36,11 +36,21 @@ export const findAllProducts = async ({
         }
     });
 
+    const sortedProducts = products.sort((productA, productB) => {
+
+        const isLowStockA = Number(productA.currentStock) < Number(productA.minStock);
+        const isLowStockB = Number(productB.currentStock) < Number(productB.minStock);
+
+        if (isLowStockA !== isLowStockB) return isLowStockB - isLowStockA;
+
+        return 0;
+    });
+
     const total = await prisma.product.count();
     const filtered = await prisma.product.count({ where });
 
     return {
-        data: products,
+        data: sortedProducts,
         recordsTotal: total,
         recordsFiltered: filtered
     };
