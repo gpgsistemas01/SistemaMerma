@@ -36,6 +36,23 @@ const notificationsBellBtn = document.getElementById('notificationsBellBtn');
 const notificationsList = document.getElementById('notificationsList');
 const notificationsUnreadCount = document.getElementById('notificationsUnreadCount');
 const markNotificationsReadBtn = document.getElementById('markNotificationsReadBtn');
+const appContext = window.APP_CONTEXT || {};
+const loggedUserRole = appContext.role || '';
+const loggedUserDepartment = appContext.department || '';
+const loggedUserDepartmentId = appContext.departmentId || '';
+const isSystemAdmin = loggedUserRole === 'Administrador del sistema';
+const isWarehouse = loggedUserDepartment === 'Almacén';
+
+const shouldDisplayRealtimeNotification = (notification) => {
+
+    if (!notification) return false;
+
+    if (isSystemAdmin || isWarehouse) return true;
+
+    if (['product-low-stock', 'product-stock-restored'].includes(notification.entityType)) return true;
+
+    return notification.departmentId === loggedUserDepartmentId;
+};
 
 const updateUnreadCount = (count) => {
 
@@ -100,7 +117,9 @@ if (notificationsBellBtn) {
             const { notification } = data;
             window.dispatchEvent(new CustomEvent('stock:updated', { detail: { notification } }));
 
-            if (notification) notifications.showWarning(notification.message);
+            if (shouldDisplayRealtimeNotification(notification)) {
+                notifications.showWarning(notification.message);
+            }
 
             await loadNotifications();
         });

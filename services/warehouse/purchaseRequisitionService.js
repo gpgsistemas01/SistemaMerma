@@ -286,7 +286,20 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
 
     const purchaseRequisition = await prisma.purchaseRequisition.findUnique({
         where: { id },
-        include: {
+        select: {
+            id: true,
+            referenceNumber: true,
+            details: {
+                select: {
+                    id: true
+                }
+            },
+            department: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            },
             status: {
                 select: {
                     name: true
@@ -334,7 +347,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             data.approveDate = new Date();
         }
 
-        return await prisma.purchaseRequisition.update({
+        const updatedPurchaseRequisition = await prisma.purchaseRequisition.update({
             where: { id },
             data,
             select: {
@@ -347,6 +360,13 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
                 }
             }
         });
+
+        return {
+            ...updatedPurchaseRequisition,
+            referenceNumber: purchaseRequisition.referenceNumber,
+            department: purchaseRequisition.department,
+            totalRequestedProducts: purchaseRequisition.details.length
+        };
     } catch (err) {
 
         if (err.code === 'P2025') throw new PurchaseRequisitionStatusNotFound();

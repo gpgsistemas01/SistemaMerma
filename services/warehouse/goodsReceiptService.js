@@ -294,6 +294,8 @@ const updateGoodsReceiptStatus = async ({ id, statusName, userId }) => {
 
             if (!receivedByProfile) throw new ProfileNotFound();
 
+            let impactedProductIds = [];
+
             if (statusName === 'Confirmada') {
 
                 const reason = await tx.reason.findFirst({
@@ -343,6 +345,8 @@ const updateGoodsReceiptStatus = async ({ id, statusName, userId }) => {
                         })
                     )
                 );
+
+                impactedProductIds = movement.details.map((detail) => detail.productId);
             }
 
             const data = {
@@ -379,12 +383,18 @@ const updateGoodsReceiptStatus = async ({ id, statusName, userId }) => {
                 data.approveDate = new Date();
             }
 
-            return await tx.goodsReceipt.update({
+            const updatedGoodsReceipt = await tx.goodsReceipt.update({
                 where: { id },
                 data,
                 select: {
                     id: true,
                     referenceNumber: true,
+                    department: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    },
                     status: {
                         select: {
                             id: true,
@@ -393,6 +403,11 @@ const updateGoodsReceiptStatus = async ({ id, statusName, userId }) => {
                     }
                 }
             });
+
+            return {
+                ...updatedGoodsReceipt,
+                impactedProductIds
+            };
         });
     } catch (err) {
         if (

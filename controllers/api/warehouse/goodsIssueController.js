@@ -9,7 +9,7 @@ import {
     rejectGoodsIssue,
     updateGoodsIssue
 } from "../../../services/warehouse/goodsIssueService.js";
-import { createStockNotification } from "../../../services/warehouse/notificationService.js";
+import { createStockNotification, notifyProductStockStatusChanges } from "../../../services/warehouse/notificationService.js";
 import { emitStockUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
@@ -110,17 +110,34 @@ export const confirmGoodsIssueStatus = async (req, res) => {
         userRole: req.user.role,
         userId: req.userId
     });
+
+    const isPartialDispatch = goodsIssue.status?.name === 'Aprobada';
+    const totalProducts = goodsIssue.totalRequestedProducts || 0;
+    const issueMessage = isPartialDispatch
+        ? `Salida folio ${goodsIssue.referenceNumber} aprobada parcialmente para ${goodsIssue.department?.name}, con ${totalProducts} producto(s).`
+        : `Salida folio ${goodsIssue.referenceNumber} aprobada completamente para ${goodsIssue.department?.name}, con ${totalProducts} producto(s).`;
+
     const notification = await createStockNotification({
-        title: 'Stock actualizado',
-        message: `Se confirmó la salida ${goodsIssue.referenceNumber}. El inventario fue descontado.`,
+        title: 'Salida aprobada',
+        message: issueMessage,
+        type: isPartialDispatch ? 'warning' : 'info',
         referenceNumber: goodsIssue.referenceNumber,
         entityId: goodsIssue.id,
         entityType: 'goods-issue',
         userId: req.userId,
-        departmentId: req.user.departmentId
+        departmentId: goodsIssue.department?.id || null
+    });
+
+    const productStockNotifications = await notifyProductStockStatusChanges({
+        productIds: goodsIssue.dispatchedProductIds || [],
+        userId: req.userId
     });
 
     emitStockUpdated({ source: 'goods-issue-confirm', notification });
+
+    for (const productNotification of productStockNotifications) {
+        emitStockUpdated({ source: 'product-stock-status', notification: productNotification });
+    }
 
     return res.status(200).json({
         goodsIssue,

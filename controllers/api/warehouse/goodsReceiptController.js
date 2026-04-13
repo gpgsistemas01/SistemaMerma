@@ -7,7 +7,12 @@ import {
     findAllGoodsReceipts,
     updateGoodsReceipt
 } from "../../../services/warehouse/goodsReceiptService.js";
-import { createStockNotification } from "../../../services/warehouse/notificationService.js";
+import {
+    createNotifications,
+    createStockNotification,
+    findDepartmentsForStockBroadcast,
+    notifyProductStockStatusChanges
+} from "../../../services/warehouse/notificationService.js";
 import { emitStockUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
@@ -61,17 +66,42 @@ export const editGoodsReceipt = async (req, res) => {
 export const confirmGoodsReceiptStatus = async (req, res) => {
 
     const goodsReceipt = await confirmGoodsReceipt({ id: req.params.id, userId: req.userId });
-    const notification = await createStockNotification({
-        title: 'Stock actualizado',
-        message: `Se confirmó la recepción ${goodsReceipt.referenceNumber}. El inventario fue incrementado.`,
+
+    const warehouseNotification = await createStockNotification({
+        title: 'Recepción confirmada',
+        message: `Se confirmó la recepción ${goodsReceipt.referenceNumber}.`,
         referenceNumber: goodsReceipt.referenceNumber,
         entityId: goodsReceipt.id,
-        entityType: 'goods-receipt',
+        entityType: 'goods-receipt-warehouse',
         userId: req.userId,
-        departmentId: req.user.departmentId
+        departmentId: goodsReceipt.department?.id || null
     });
 
-    emitStockUpdated({ source: 'goods-receipt-confirm', notification });
+    const departments = await findDepartmentsForStockBroadcast();
+
+    await createNotifications(
+        departments.map((department) => ({
+            title: 'Recepción de compra',
+            message: `Se restauró o actualizó el stock por la recepción ${goodsReceipt.referenceNumber}.`,
+            type: 'info',
+            referenceNumber: goodsReceipt.referenceNumber,
+            entityId: goodsReceipt.id,
+            entityType: 'goods-receipt-area',
+            userId: req.userId,
+            departmentId: department.id
+        }))
+    );
+
+    const productStockNotifications = await notifyProductStockStatusChanges({
+        productIds: goodsReceipt.impactedProductIds || [],
+        userId: req.userId
+    });
+
+    emitStockUpdated({ source: 'goods-receipt-confirm', notification: warehouseNotification });
+
+    for (const productNotification of productStockNotifications) {
+        emitStockUpdated({ source: 'product-stock-status', notification: productNotification });
+    }
 
     return res.status(200).json({
         goodsReceipt,
