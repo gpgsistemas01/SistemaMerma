@@ -7,6 +7,8 @@ import {
     findAllGoodsReceipts,
     updateGoodsReceipt
 } from "../../../services/warehouse/goodsReceiptService.js";
+import { createStockNotification } from "../../../services/warehouse/notificationService.js";
+import { emitStockUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllGoodsReceipts = async (req, res) => {
@@ -59,6 +61,13 @@ export const editGoodsReceipt = async (req, res) => {
 export const confirmGoodsReceiptStatus = async (req, res) => {
 
     const goodsReceipt = await confirmGoodsReceipt({ id: req.params.id, userId: req.userId });
+    const notification = await createStockNotification({
+        title: 'Stock actualizado',
+        message: `Se confirmó la recepción ${goodsReceipt.id}. El inventario fue incrementado.`,
+        referenceId: goodsReceipt.id
+    });
+
+    emitStockUpdated({ source: 'goods-receipt-confirm', referenceId: goodsReceipt.id, notification });
 
     return res.status(200).json({
         goodsReceipt,

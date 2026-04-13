@@ -120,6 +120,16 @@ model SupplierProduct {
   product    Product  @relation(fields: [productId], references: [id])
 }
 
+model Notification {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String   @db.VarChar(100)
+  message     String   @db.VarChar(255)
+  type        String   @default("info") @db.VarChar(20)
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  referenceId String?  @db.Uuid
+}
+
 model Project {
   id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   referenceNumber      String                @unique @db.VarChar(50)

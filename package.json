@@ -152,6 +152,7 @@
     "side-channel-map": "^1.0.1",
     "side-channel-weakmap": "^1.0.2",
     "simple-update-notifier": "^2.0.0",
+    "socket.io": "^4.8.1",
     "standard-as-callback": "^2.1.0",
     "statuses": "^2.0.2",
     "streamsearch": "^1.1.0",

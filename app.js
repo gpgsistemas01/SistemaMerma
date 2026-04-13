@@ -8,6 +8,7 @@ import uomApiRoutes from './routes/api/warehouse/uomApiRoute.js';
 import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.js';
 import purchaseRequisitionApiRoutes from './routes/api/warehouse/purchaseRequisitionApiRoute.js';
 import goodsIssueApiRoutes from './routes/api/warehouse/goodsIssueApiRoute.js';
+import notificationApiRoutes from './routes/api/warehouse/notificationApiRoute.js';
 import profileApiRoutes from './routes/api/admin/profileApiRoute.js';
 import projectApiRoutes from './routes/api/admin/projectApiRoute.js';
 
@@ -25,11 +26,18 @@ import { checkTypeContentJson, checkTypeContentFile, checkContentTypePlainText }
 import cookieParser from 'cookie-parser';
 
 import express from 'express';
+import http from 'node:http';
 import expressEjsLayouts from 'express-ejs-layouts';
+import { Server } from 'socket.io';
 import { publicDir, viewsDir } from './utils/pathsUtils.js';
 import { errorMap } from './messages/codeMessages.js';
+import { initSocket } from './utils/socketUtils.js';
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+initSocket(io);
+
 const rootRoute = '/';
 const apiRoute = '/api';
 const textRoute = '/text';
@@ -84,6 +92,7 @@ app.use(apiRoute + warehouse + '/uoms', uomApiRoutes);
 app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);
 app.use(apiRoute + warehouse + '/purchase-requisitions', purchaseRequisitionApiRoutes);
 app.use(apiRoute + warehouse + '/goods-issues', goodsIssueApiRoutes);
+app.use(apiRoute + warehouse + '/notifications', notificationApiRoutes);
 app.use(apiRoute + admin + '/profiles', profileApiRoutes);
 app.use(apiRoute + admin + '/projects', projectApiRoutes);
 
@@ -96,9 +105,13 @@ app.use((err, req, res, next) => {
     res.status(500).json({ code: errorMap.message.SERVER_ERROR });
 });
 
+io.on('connection', (socket) => {
+    console.log(`Socket conectado: ${socket.id}`);
+});
+
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 
