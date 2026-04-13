@@ -26,14 +26,17 @@ export const getLoggedUser = async (userId) => {
             id: userId
         },
         select: {
+            id: true,
             name: true,
             role: {
                 select: {
+                    id: true,
                     name: true,
                 }
             },
             department: {
                 select: {
+                    id: true,
                     name: true,
                 }
             },
@@ -41,7 +44,10 @@ export const getLoggedUser = async (userId) => {
     });
 
     return user ? {
+        id: user.id,
+        departmentId: user.department.id,
         department: user.department.name,
+        roleId: user.role.id,
         role: user.role.name,
         name: user.name
     } : null;

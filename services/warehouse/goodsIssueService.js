@@ -555,6 +555,9 @@ const updateGoodsIssueDeliveryStatus = async ({
                 }
             };
 
+            let dispatchedProductIds = [];
+            let totalRequestedProducts = 0;
+
             if (statusName === STATUS_CONFIRMED) {
                 const warehouseStaffId = await getActiveProfileIdByUserId({
                     tx,
@@ -566,6 +569,7 @@ const updateGoodsIssueDeliveryStatus = async ({
                 goodsIssue.details.forEach((detail) => {
                     addQuantityToMap(requestedByProduct, detail.productId, detail.quantity);
                 });
+                totalRequestedProducts = requestedByProduct.size;
 
                 const deliveredByProduct = new Map();
                 goodsIssue.movement.forEach((movement) => {
@@ -652,6 +656,8 @@ const updateGoodsIssueDeliveryStatus = async ({
                     });
                 }
 
+                dispatchedProductIds = detailsToDispatch.map((detail) => detail.productId);
+
                 const isFullyDispatched = Array.from(requestedByProduct.entries()).every(
                     ([productId, requestedQuantity]) =>
                         ((deliveredByProduct.get(productId) || 0) + FLOAT_EPSILON) >= requestedQuantity
@@ -671,12 +677,18 @@ const updateGoodsIssueDeliveryStatus = async ({
                 data.deliveryDate = new Date();
             }
 
-            return await tx.goodsIssue.update({
+            const updatedGoodsIssue = await tx.goodsIssue.update({
                 where: { id },
                 data,
                 select: {
                     id: true,
                     referenceNumber: true,
+                    department: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    },
                     status: {
                         select: {
                             id: true,
@@ -685,6 +697,12 @@ const updateGoodsIssueDeliveryStatus = async ({
                     }
                 }
             });
+
+            return {
+                ...updatedGoodsIssue,
+                dispatchedProductIds,
+                totalRequestedProducts
+            };
         });
     } catch (err) {
         if (err.code === PRISMA_RECORD_NOT_FOUND) throw new GoodsIssueStatusNotFound();
