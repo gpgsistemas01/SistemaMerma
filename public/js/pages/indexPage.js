@@ -47,9 +47,11 @@ const shouldDisplayRealtimeNotification = (notification) => {
 
     if (!notification) return false;
 
+    if (notification.entityType === 'product-stock-restored') return false;
+
     if (isSystemAdmin || isWarehouse) return true;
 
-    if (['product-low-stock', 'product-stock-restored'].includes(notification.entityType)) return true;
+    if (notification.entityType === 'product-low-stock') return true;
 
     return notification.departmentId === loggedUserDepartmentId;
 };

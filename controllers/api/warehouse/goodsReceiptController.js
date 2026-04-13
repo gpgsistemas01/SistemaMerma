@@ -78,7 +78,7 @@ export const confirmGoodsReceiptStatus = async (req, res) => {
 
     const warehouseNotification = await createStockNotification({
         title: 'Recepción confirmada',
-        message: `La recepción ${goodsReceipt.referenceNumber} restauró ${restoredProductsCount} producto(s).`,
+        message: `La recepción ${goodsReceipt.referenceNumber} restauró el stock de ${restoredProductsCount} producto(s).`,
         referenceNumber: goodsReceipt.referenceNumber,
         entityId: goodsReceipt.id,
         entityType: 'goods-receipt-warehouse',
@@ -91,7 +91,7 @@ export const confirmGoodsReceiptStatus = async (req, res) => {
     await createNotifications(
         departments.map((department) => ({
             title: 'Recepción de compra',
-            message: `Se restauró o actualizó el stock por la recepción ${goodsReceipt.referenceNumber}.`,
+            message: `La recepción ${goodsReceipt.referenceNumber} restauró el stock de ${restoredProductsCount} producto(s).`,
             type: 'info',
             referenceNumber: goodsReceipt.referenceNumber,
             entityId: goodsReceipt.id,

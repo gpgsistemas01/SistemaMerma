@@ -4,6 +4,7 @@ const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const DEPARTMENT_WAREHOUSE = 'Almacén';
 const ENTITY_PRODUCT_LOW_STOCK = 'product-low-stock';
 const ENTITY_PRODUCT_STOCK_RESTORED = 'product-stock-restored';
+const ENTITY_GOODS_RECEIPT_AREA = 'goods-receipt-area';
 
 const getNotificationWhereByUser = async (userId) => {
 
@@ -28,17 +29,30 @@ const getNotificationWhereByUser = async (userId) => {
 
     const canViewAllNotifications = user.role?.name === ROLE_SYSTEM_ADMIN || user.department?.name === DEPARTMENT_WAREHOUSE;
 
-    if (canViewAllNotifications) return {};
+    if (canViewAllNotifications) {
+        return {
+            entityType: {
+                notIn: [ENTITY_GOODS_RECEIPT_AREA, ENTITY_PRODUCT_STOCK_RESTORED]
+            }
+        };
+    }
 
     return {
-        OR: [
-            {
-                departmentId: user.department?.id
-            },
+        AND: [
             {
                 entityType: {
-                    in: [ENTITY_PRODUCT_LOW_STOCK, ENTITY_PRODUCT_STOCK_RESTORED]
+                    not: ENTITY_PRODUCT_STOCK_RESTORED
                 }
+            },
+            {
+                OR: [
+                    {
+                        departmentId: user.department?.id
+                    },
+                    {
+                        entityType: ENTITY_PRODUCT_LOW_STOCK
+                    }
+                ]
             }
         ]
     };
