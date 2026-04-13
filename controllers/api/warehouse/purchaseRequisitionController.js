@@ -73,19 +73,19 @@ export const editPurchaseRequisition = async (req, res) => {
 export const confirmPurchaseRequisitionStatus = async (req, res) => {
 
     const purchaseRequisition = await confirmPurchaseRequisition({ id: req.params.id, userId: req.userId });
-    const totalProducts = purchaseRequisition.totalRequestedProducts || 0;
-    const notification = await createStockNotification({
-        title: 'Requisición aprobada',
-        message: `Requisición folio ${purchaseRequisition.referenceNumber} aprobada para ${purchaseRequisition.department?.name}, con ${totalProducts} producto(s).`,
-        type: 'info',
-        referenceNumber: purchaseRequisition.referenceNumber,
-        entityId: purchaseRequisition.id,
-        entityType: 'purchase-requisition',
-        userId: req.userId,
-        departmentId: purchaseRequisition.department?.id || null
-    });
+    // const totalProducts = purchaseRequisition.totalRequestedProducts || 0;
+    // const notification = await createStockNotification({
+    //     title: 'Requisición aprobada',
+    //     message: `Requisición folio ${purchaseRequisition.referenceNumber} aprobada con ${totalProducts} producto(s).`,
+    //     type: 'info',
+    //     referenceNumber: purchaseRequisition.referenceNumber,
+    //     entityId: purchaseRequisition.id,
+    //     entityType: 'purchase-requisition',
+    //     userId: req.userId,
+    //     departmentId: purchaseRequisition.department?.id || null
+    // });
 
-    emitStockUpdated({ source: 'purchase-requisition-confirm', notification });
+    // emitStockUpdated({ source: 'purchase-requisition-confirm', notification });
 
     return res.status(200).json({
         purchaseRequisition,

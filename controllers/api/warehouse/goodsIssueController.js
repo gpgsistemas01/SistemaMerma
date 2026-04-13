@@ -110,12 +110,16 @@ export const confirmGoodsIssueStatus = async (req, res) => {
         userRole: req.user.role,
         userId: req.userId
     });
+    const productStockNotifications = await notifyProductStockStatusChanges({
+        productIds: goodsIssue.dispatchedProductIds || [],
+        userId: req.userId
+    });
 
     const isPartialDispatch = goodsIssue.status?.name === 'Aprobada';
     const totalProducts = goodsIssue.totalRequestedProducts || 0;
     const issueMessage = isPartialDispatch
-        ? `Salida folio ${goodsIssue.referenceNumber} aprobada parcialmente para ${goodsIssue.department?.name}, con ${totalProducts} producto(s).`
-        : `Salida folio ${goodsIssue.referenceNumber} aprobada completamente para ${goodsIssue.department?.name}, con ${totalProducts} producto(s).`;
+        ? `Salida con folio ${goodsIssue.referenceNumber} aprobada parcialmente con ${totalProducts} producto(s).`
+        : `Salida con folio ${goodsIssue.referenceNumber} aprobada completamente con ${totalProducts} producto(s).`;
 
     const notification = await createStockNotification({
         title: 'Salida aprobada',
@@ -126,11 +130,6 @@ export const confirmGoodsIssueStatus = async (req, res) => {
         entityType: 'goods-issue',
         userId: req.userId,
         departmentId: goodsIssue.department?.id || null
-    });
-
-    const productStockNotifications = await notifyProductStockStatusChanges({
-        productIds: goodsIssue.dispatchedProductIds || [],
-        userId: req.userId
     });
 
     emitStockUpdated({ source: 'goods-issue-confirm', notification });

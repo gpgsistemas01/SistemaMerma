@@ -66,10 +66,19 @@ export const editGoodsReceipt = async (req, res) => {
 export const confirmGoodsReceiptStatus = async (req, res) => {
 
     const goodsReceipt = await confirmGoodsReceipt({ id: req.params.id, userId: req.userId });
+    const productStockNotifications = await notifyProductStockStatusChanges({
+        productIds: goodsReceipt.impactedProductIds || [],
+        userId: req.userId
+    });
+    const restoredProductsCount = new Set(
+        productStockNotifications
+            .filter((notification) => notification.entityType === 'product-stock-restored')
+            .map((notification) => notification.entityId)
+    ).size;
 
     const warehouseNotification = await createStockNotification({
         title: 'Recepción confirmada',
-        message: `Se confirmó la recepción ${goodsReceipt.referenceNumber}.`,
+        message: `La recepción ${goodsReceipt.referenceNumber} restauró ${restoredProductsCount} producto(s).`,
         referenceNumber: goodsReceipt.referenceNumber,
         entityId: goodsReceipt.id,
         entityType: 'goods-receipt-warehouse',
@@ -91,11 +100,6 @@ export const confirmGoodsReceiptStatus = async (req, res) => {
             departmentId: department.id
         }))
     );
-
-    const productStockNotifications = await notifyProductStockStatusChanges({
-        productIds: goodsReceipt.impactedProductIds || [],
-        userId: req.userId
-    });
 
     emitStockUpdated({ source: 'goods-receipt-confirm', notification: warehouseNotification });
 
