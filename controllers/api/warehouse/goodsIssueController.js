@@ -9,7 +9,7 @@ import {
     rejectGoodsIssue,
     updateGoodsIssue
 } from "../../../services/warehouse/goodsIssueService.js";
-import { createStockNotification, notifyProductStockStatusChanges } from "../../../services/warehouse/notificationService.js";
+import { createStockNotification, notifyProductStockStatusChanges, resolveDepartmentsForNotification } from "../../../services/warehouse/notificationService.js";
 import { emitStockUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
@@ -113,6 +113,13 @@ export const confirmGoodsIssueStatus = async (req, res) => {
     const productStockNotifications = await notifyProductStockStatusChanges({
         productIds: goodsIssue.dispatchedProductIds || [],
         userId: req.userId
+    });
+
+    const departmentIds = await resolveDepartmentsForNotification({
+        type: 'goods-issue',
+        context: {
+            departmentId: goodsIssue.department?.id
+        }
     });
 
     const isPartialDispatch = goodsIssue.status?.name === 'Aprobada';

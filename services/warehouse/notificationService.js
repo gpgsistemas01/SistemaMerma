@@ -1,10 +1,11 @@
 import { prisma } from "../../lib/prisma.js";
+import { getAllDepartmentIds, getDepartmentWarehouseId } from "../deparmentService.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const DEPARTMENT_WAREHOUSE = 'Almacén';
 const ENTITY_PRODUCT_LOW_STOCK = 'product-low-stock';
 const ENTITY_PRODUCT_STOCK_RESTORED = 'product-stock-restored';
-const ENTITY_GOODS_RECEIPT_AREA = 'goods-receipt-area';
+const ENTITY_GOODS_RECEIPT = 'goods-receipt';
 
 const getNotificationWhereByUser = async (userId) => {
 
@@ -32,7 +33,7 @@ const getNotificationWhereByUser = async (userId) => {
     if (canViewAllNotifications) {
         return {
             entityType: {
-                notIn: [ENTITY_GOODS_RECEIPT_AREA, ENTITY_PRODUCT_STOCK_RESTORED]
+                notIn: [ENTITY_GOODS_RECEIPT, ENTITY_PRODUCT_STOCK_RESTORED]
             }
         };
     }
@@ -94,20 +95,6 @@ export const createNotifications = async (notifications = []) => {
     return notifications;
 };
 
-export const findDepartmentsForStockBroadcast = async () => {
-
-    return prisma.department.findMany({
-        where: {
-            name: {
-                not: DEPARTMENT_WAREHOUSE
-            }
-        },
-        select: {
-            id: true
-        }
-    });
-};
-
 export const notifyProductStockStatusChanges = async ({ productIds = [], userId = null }) => {
 
     if (!productIds.length) return [];
@@ -127,27 +114,34 @@ export const notifyProductStockStatusChanges = async ({ productIds = [], userId 
         }
     });
 
+    const latestNotifications = await prisma.notification.findMany({
+        where: {
+            entityId: {
+                in: uniqueProductIds
+            },
+            entityType: {
+                in: [ENTITY_PRODUCT_LOW_STOCK, ENTITY_PRODUCT_STOCK_RESTORED]
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    });
+
+    const latestNotificationByProduct = new Map();
+
+    for (const notification of latestNotifications) {
+        if (!latestNotificationByProduct.has(notification.entityId)) {
+            latestNotificationByProduct.set(notification.entityId, notification);
+        }
+    }
+
     const notificationsToCreate = [];
 
     for (const product of products) {
-        const latestStateNotification = await prisma.notification.findFirst({
-            where: {
-                entityId: product.id,
-                entityType: {
-                    in: [ENTITY_PRODUCT_LOW_STOCK, ENTITY_PRODUCT_STOCK_RESTORED]
-                }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            },
-            select: {
-                entityType: true
-            }
-        });
+        const latestStateNotification = latestNotificationByProduct.get(product.id);
 
-        const currentStock = Number(product.currentStock);
-        const minStock = Number(product.minStock);
-        const isLowStock = currentStock < minStock;
+        const isLowStock = product.currentStock < product.minStock;
         const lastNotificationType = latestStateNotification?.entityType || null;
 
         if (isLowStock && lastNotificationType !== ENTITY_PRODUCT_LOW_STOCK) {
@@ -178,13 +172,13 @@ export const notifyProductStockStatusChanges = async ({ productIds = [], userId 
     }
 
     if (!notificationsToCreate.length) return [];
-
-    await createNotifications(notificationsToCreate);
-
-    return prisma.notification.findMany({
+console.log('Created Notifications:', createdNotifications);
+    const createdNotifications = await createNotifications(notificationsToCreate);
+    console.log('Created Notifications:', createdNotifications);
+    return await prisma.notification.findMany({
         where: {
             entityId: {
-                in: notificationsToCreate.map((notification) => notification.entityId)
+                in: notificationsToCreate.map(n => n.entityId)
             },
             entityType: {
                 in: [ENTITY_PRODUCT_LOW_STOCK, ENTITY_PRODUCT_STOCK_RESTORED]
@@ -236,4 +230,28 @@ export const markAllNotificationsAsRead = async ({ userId }) => {
             isRead: true
         }
     });
+};
+
+export const resolveDepartmentsForNotification = async ({ type, context }) => {
+    switch (type) {
+        case 'goods-receipt':
+            return await getAllDepartmentIds();
+
+        case 'goods-issue':
+            const departments = [];
+
+            if (context.departmentId) {
+                departments.push({ id: context.departmentId });
+            }
+
+            const warehouse = await getDepartmentWarehouseId();
+            if (warehouse) {
+                departments.push({ id: warehouse.id });
+            }
+
+            return departments;
+
+        default:
+            return [];
+    }
 };
