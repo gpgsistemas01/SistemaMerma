@@ -1,5 +1,4 @@
 import { prisma } from "../../lib/prisma.js";
-import { getAllDepartmentIds, getDepartmentWarehouseId } from "../deparmentService.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const DEPARTMENT_WAREHOUSE = 'Almacén';
@@ -7,28 +6,18 @@ const ENTITY_PRODUCT_LOW_STOCK = 'product-low-stock';
 const ENTITY_PRODUCT_STOCK_RESTORED = 'product-stock-restored';
 const ENTITY_GOODS_RECEIPT = 'goods-receipt';
 
-const getNotificationWhereByUser = async (userId) => {
+const getNotificationWhereByUser = async (department, role) => {
 
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
+    const existsDepartment = await prisma.department.findUnique({
+        where: { name: department },
         select: {
-            role: {
-                select: {
-                    name: true
-                }
-            },
-            department: {
-                select: {
-                    id: true,
-                    name: true
-                }
-            }
+            id: true
         }
     });
 
-    if (!user) return {};
+    if (!existsDepartment) return {};
 
-    const canViewAllNotifications = user.role?.name === ROLE_SYSTEM_ADMIN || user.department?.name === DEPARTMENT_WAREHOUSE;
+    const canViewAllNotifications = role === ROLE_SYSTEM_ADMIN || department === DEPARTMENT_WAREHOUSE;
 
     if (canViewAllNotifications) {
         return {
@@ -48,7 +37,7 @@ const getNotificationWhereByUser = async (userId) => {
             {
                 OR: [
                     {
-                        departmentId: user.department?.id
+                        departmentId: existsDepartment.id
                     },
                     {
                         entityType: ENTITY_PRODUCT_LOW_STOCK
@@ -172,9 +161,9 @@ export const notifyProductStockStatusChanges = async ({ productIds = [], userId 
     }
 
     if (!notificationsToCreate.length) return [];
-console.log('Created Notifications:', createdNotifications);
-    const createdNotifications = await createNotifications(notificationsToCreate);
-    console.log('Created Notifications:', createdNotifications);
+
+    await createNotifications(notificationsToCreate);
+
     return await prisma.notification.findMany({
         where: {
             entityId: {
@@ -191,9 +180,9 @@ console.log('Created Notifications:', createdNotifications);
     });
 };
 
-export const findLatestNotifications = async ({ take = 10, userId } = {}) => {
+export const findLatestNotifications = async ({ take = 10, department, role } = {}) => {
 
-    const where = await getNotificationWhereByUser(userId);
+    const where = await getNotificationWhereByUser(department, role);
 
     const [items, unreadCount] = await Promise.all([
         prisma.notification.findMany({
@@ -217,9 +206,9 @@ export const findLatestNotifications = async ({ take = 10, userId } = {}) => {
     };
 };
 
-export const markAllNotificationsAsRead = async ({ userId }) => {
+export const markAllNotificationsAsRead = async ({ department, role }) => {
 
-    const where = await getNotificationWhereByUser(userId);
+    const where = await getNotificationWhereByUser(department, role);
 
     await prisma.notification.updateMany({
         where: {
@@ -230,28 +219,4 @@ export const markAllNotificationsAsRead = async ({ userId }) => {
             isRead: true
         }
     });
-};
-
-export const resolveDepartmentsForNotification = async ({ type, context }) => {
-    switch (type) {
-        case 'goods-receipt':
-            return await getAllDepartmentIds();
-
-        case 'goods-issue':
-            const departments = [];
-
-            if (context.departmentId) {
-                departments.push({ id: context.departmentId });
-            }
-
-            const warehouse = await getDepartmentWarehouseId();
-            if (warehouse) {
-                departments.push({ id: warehouse.id });
-            }
-
-            return departments;
-
-        default:
-            return [];
-    }
 };

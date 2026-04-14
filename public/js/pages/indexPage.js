@@ -47,13 +47,17 @@ const shouldDisplayRealtimeNotification = (notification) => {
 
     if (!notification) return false;
 
-    if (notification.entityType === 'product-stock-restored') return false;
+    const { entityType, departmentId } = notification;
 
-    if (isSystemAdmin || isWarehouse) return true;
+    if (entityType === 'product-stock-restored') return false;
 
-    if (notification.entityType === 'product-low-stock') return true;
+    if (isSystemAdmin) return true;
 
-    return notification.departmentId === loggedUserDepartmentId;
+    if (isWarehouse) return entityType === 'product-low-stock';
+
+    if (entityType === 'product-low-stock') return true;
+
+    return departmentId === loggedUserDepartmentId;
 };
 
 const updateUnreadCount = (count) => {

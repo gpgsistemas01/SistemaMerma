@@ -8,13 +8,11 @@ import {
     updateGoodsReceipt
 } from "../../../services/warehouse/goodsReceiptService.js";
 import {
-    createNotifications,
+    createStockNotification,
     notifyProductStockStatusChanges,
-    resolveDepartmentsForNotification
 } from "../../../services/warehouse/notificationService.js";
 import { emitStockUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
-import { getAllDepartmentIds } from "../../../services/deparmentService.js";
 
 export const getAllGoodsReceipts = async (req, res) => {
 
@@ -76,22 +74,18 @@ export const confirmGoodsReceiptStatus = async (req, res) => {
             .map((notification) => notification.entityId)
     ).size;
 
-    const departmentIds = await resolveDepartmentsForNotification({
-        type: 'goods-receipt',
+    const notification = await createStockNotification({
+        title: 'Recepción de compra',
+        message: `La recepción ${goodsReceipt.referenceNumber} restauró el stock de ${restoredProductsCount} producto(s).`,
+        type: 'info',
+        referenceNumber: goodsReceipt.referenceNumber,
+        entityId: goodsReceipt.id,
+        entityType: 'goods-receipt',
+        userId: null,
+        departmentId: null
     });
 
-    await createNotifications(
-        departmentIds.map((department) => ({
-            title: 'Recepción de compra',
-            message: `La recepción ${goodsReceipt.referenceNumber} restauró el stock de ${restoredProductsCount} producto(s).`,
-            type: 'info',
-            referenceNumber: goodsReceipt.referenceNumber,
-            entityId: goodsReceipt.id,
-            entityType: 'goods-receipt',
-            userId: req.userId,
-            departmentId: department.id
-        }))
-    );
+    emitStockUpdated({ source: 'goods-receipt-confirm', notification });
 
     for (const productNotification of productStockNotifications) {
         emitStockUpdated({ source: 'product-stock-status', notification: productNotification });
