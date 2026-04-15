@@ -55,12 +55,6 @@ model Profile {
   indicatorLogs                  indicator_logs[]
 }
 
-model Category {
-  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name     String    @unique
-  products Product[]
-}
-
 model Status {
   id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                 String                @unique
@@ -72,35 +66,41 @@ model Status {
 model Product {
   id                          String                             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                        String                             @unique @db.VarChar(50)
-  sku                         String?                            @db.VarChar(50)
-  unitCost                    Decimal                            @db.Decimal(10, 2)
+  sku                         String                            @db.VarChar(50)
+  unitCost                    Decimal?                            @db.Decimal(10, 2)
   currentStock                Decimal                            @db.Decimal(10, 2)
-  expiryDate                  DateTime?
-  thickness                   Decimal?                           @db.Decimal(10, 3)
-  color                       String?                            @db.VarChar(50)
-  type                        String?                            @db.VarChar(50)
-  presentation                String?                            @db.VarChar(50)
-  uomId                       String                             @db.Uuid
-  categoryId                  String                             @db.Uuid
+  unitMeasure                 UnitMeasure
   isActive                    Boolean                            @default(true)
-  maxStock                    Decimal                            @db.Decimal(10, 2)
-  minStock                    Decimal                            @db.Decimal(10, 2)
+  minStock                    Decimal?                            @db.Decimal(10, 2)
   base                        Decimal?                           @db.Decimal(10, 3)
   height                      Decimal?                           @db.Decimal(10, 3)
-  category                    Category                           @relation(fields: [categoryId], references: [id])
-  uom                         UoM                                @relation(fields: [uomId], references: [id])
+  weigthedM2                    Decimal?                           @db.Decimal(10, 3)
   detailsGoodsReceipts        DetailGoodsReceiptProduct[]
   detailsPurchaseRequisitions DetailPurchaseRequisitionProduct[]
   detailsGoodsIssues          DetailGoodsIssueProduct[]
   detailsMovement             DetailMovement[]
   supplierProducts            SupplierProduct[]
+  weightedM2Records            weightedM2Records[]
 }
 
-model UoM {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String    @unique @db.VarChar(10)
-  abbrevation String    @unique @db.VarChar(10)
-  product     Product[]
+enum UnitMeasure {
+  ROLLO
+  CARTUCHO
+  PIEZA
+  HOJA
+  ML775
+  LT1
+  LT3
+  LT5
+}
+
+model weightedM2Records {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId String @db.Uuid
+  date DateTime @default(now())
+  weightedM2 Decimal @db.Decimal(10, 3)
+
+  product Product @relation(fields: [productId], references: [id])
 }
 
 model Supplier {

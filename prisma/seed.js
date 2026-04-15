@@ -47,13 +47,6 @@ async function main() {
         skipDuplicates: true
     });
 
-    await prisma.reason.createMany({
-        data: [
-            { name: 'reestock' }
-        ],
-        skipDuplicates: true
-    });
-
     // const hashedPassword = await bcrypt.hash('A%54321', 10)
 
     await prisma.user.upsert({
@@ -164,24 +157,6 @@ async function main() {
         });
     }
 
-    await prisma.category.createMany({
-        data: [
-            { name: 'Flexibles' },
-            { name: 'Rígidos' },
-            { name: 'Papel' }
-        ],
-        skipDuplicates: true
-    });
-
-    await prisma.uoM.createMany({
-        data: [
-            { name: 'litros', abbrevation: 'L' },
-            { name: 'metros', abbrevation: 'm' },
-            { name: 'milimetros', abbrevation: 'mm' }
-        ],
-        skipDuplicates: true
-    });
-
     await prisma.referenceNumberCounter.createMany({
         data: [
             { prefix: 'REC' },
@@ -195,19 +170,6 @@ async function main() {
         data: [
             { name: 'Proveedor 1' },
             { name: 'Proveedor 2' },
-        ],
-        skipDuplicates: true
-    });
-
-    const uoms = await prisma.uoM.findMany();
-
-    const categories = await prisma.category.findMany();
-
-    await prisma.product.createMany({
-        data: [
-            { name: 'Producto 1', unitCost: 2, currentStock: 2, minStock: 3, maxStock: 8, categoryId: categories[0].id, uomId: uoms[0].id },
-            { name: 'Producto 2', unitCost: 4, currentStock: 3, minStock: 60, maxStock: 80, categoryId: categories[1].id, uomId: uoms[1].id },
-            { name: 'Producto 3', unitCost: 7, currentStock: 10, minStock: 2, maxStock: 20, categoryId: categories[2].id, uomId: uoms[2].id },
         ],
         skipDuplicates: true
     });
