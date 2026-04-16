@@ -65,8 +65,8 @@ model Status {
 
 model Product {
   id                          String                             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                        String                             @unique @db.VarChar(50)
-  sku                         String                            @db.VarChar(50)
+  name                        String                             @db.VarChar(50)
+  sku                         String                            @unique @db.VarChar(50)
   unitCost                    Decimal?                            @db.Decimal(10, 2)
   currentStock                Decimal                            @db.Decimal(10, 2)
   unitMeasure                 UnitMeasure
@@ -88,6 +88,7 @@ enum UnitMeasure {
   CARTUCHO
   PIEZA
   HOJA
+  OJILLOS
   ML775
   LT1
   LT3
