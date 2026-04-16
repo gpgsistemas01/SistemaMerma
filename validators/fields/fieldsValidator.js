@@ -29,12 +29,12 @@ export const validatePassword =
         .matches(passwordRegex).withMessage(errorMap['password'].INVALID_FORMAT)
 ;
 
-export const validateName = 
+export const validateName = (maxLength = 50) => 
     body('name')
         .trim()
         .notEmpty().withMessage(errorMap['name'].REQUIRED)
         .isString().withMessage(errorMap['name'].INVALID_TYPE)
-        .isLength({ max: 50 }).withMessage(errorMap['name'].TOO_LONG)
+        .isLength({ max: maxLength }).withMessage(errorMap['name'].TOO_LONG(maxLength))
         .matches(nameRegex).withMessage(errorMap['name'].INVALID_FORMAT)
 ;
 
@@ -95,20 +95,6 @@ export const validateTextOptional = (fieldName) => {
         .isString().withMessage(errors.INVALID_TYPE)
         .isLength({ max: 50 }).withMessage(errors.TOO_LONG)
 }
-
-export const validateMinMaxStock = 
-    body('minStock')
-        .custom((value, { req }) => {
-
-            const errors = errorMap['minStock'];
-            const maxStock = parseFloat(req.body.maxStock);
-            const minStock = parseFloat(value);
-
-            if (minStock > maxStock) throw new Error(errors.MIN_GREATER_THAN_MAX);
-
-            return true;
-        })
-;
 
 export const validateDate = (fieldName) => {
 

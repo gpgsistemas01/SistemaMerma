@@ -66,7 +66,8 @@ export const mapServerErrors = (serverErrors) => {
 
     for (const field in serverErrors) {
 
-        errors[field] = getErrorMessage(serverErrors[field]);
+        const error = serverErrors[field];
+        errors[field] = getErrorMessage(error);
     }
 
     return errors;

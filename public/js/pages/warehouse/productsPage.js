@@ -4,9 +4,10 @@ import { editProduct, registerProduct } from "../../application/warehouse/produc
 import { productValidators } from "../../utils/validations/validators.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { setFormReadOnly, toggleInputSelectErrors } from "../../ui/formUI.js";
-import { initProductSelect2 } from "../../plugins/select2/productSelect.js";
 
-createProductDatatable();
+const context = window.PRODUCT_CONTEXT || {};
+
+createProductDatatable(context);
 
 useForm({
     normalizeData: ({ formData }) => {
@@ -17,8 +18,6 @@ useForm({
         let errors = {};
 
         errors = validateFields(productValidators, formData);
-
-        if (!errors.minStock && formData.minStock > formData.maxStock) errors.minStock = 'El stock mínimo no debe ser mayor al stock máximo';
 
         return errors;
     },
@@ -32,7 +31,6 @@ useForm({
             update: editProduct
         });
     },
-    normalizeServerErrors: (form, serverErrors) => toggleInputSelectErrors(form, serverErrors)
 });
 
 export const openProductModal = async ({ mode, data = null }) => {
@@ -49,8 +47,6 @@ export const openProductModal = async ({ mode, data = null }) => {
         form.reset();
         document.getElementById('modalTitle').textContent = 'Registrar producto';
         document.getElementById('submitBtn').textContent = 'Guardar';
-
-        await initProductSelect2();
     }
 
     if (mode === 'edit' || mode === 'view') {
@@ -58,17 +54,9 @@ export const openProductModal = async ({ mode, data = null }) => {
         document.getElementById('nameInput').value = data.name;
         document.getElementById('unitCostInput').value = data.unitCost;
         document.getElementById('minStockInput').value = data.minStock;
-        document.getElementById('maxStockInput').value = data.maxStock;
-        document.getElementById('expiryDateInput').value = data.expiryDate ? new Date(data.expiryDate) : '';
-        document.getElementById('thicknessInput').value = data.thickness || '';
         document.getElementById('baseInput').value = data.base || '';
         document.getElementById('heightInput').value = data.height || '';
-        document.getElementById('colorInput').value = data.color || '';
-        document.getElementById('typeInput').value = data.type || '';
-        document.getElementById('presentationInput').value = data.presentation || '';
         document.getElementById('isActiveInput').checked = data.isActive;
-
-        await initProductSelect2(data);
 
         if (mode === 'edit') {
 
@@ -82,8 +70,6 @@ export const openProductModal = async ({ mode, data = null }) => {
 
             setFormReadOnly({ form, isReadOnly: true });
         }
-
-
     }
 
     const modalElement = document.getElementById('modal');

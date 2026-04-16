@@ -7,14 +7,6 @@ export const errorMap = {
         SERVER_ERROR: 'SERVER_ERROR',
         DETECTED_REUSE: 'DETECTED_REUSE'
     },
-    categoryId: {
-        REQUIRED: 'CATEGORY_ID_REQUIRED',
-        INVALID_UUID: 'CATEGORY_ID_INVALID_UUID'
-    },
-    uomId: {
-        REQUIRED: 'UOM_ID_REQUIRED',
-        INVALID_UUID: 'UOM_ID_INVALID_UUID'
-    },
     supplierId: {
         REQUIRED: 'SUPPLIER_ID_REQUIRED',
         INVALID_UUID: 'SUPPLIER_ID_INVALID_UUID'
@@ -50,7 +42,10 @@ export const errorMap = {
     name: {
         REQUIRED: 'NAME_REQUIRED',
         INVALID_TYPE: 'NAME_INVALID_TYPE',
-        TOO_LONG: 'NAME_TOO_LONG',
+        TOO_LONG: (value) => ({
+            code: 'NAME_TOO_LONG',
+            meta: { value }
+        }),
         INVALID_FORMAT: 'NAME_INVALID_FORMAT'
     },
     numberphone: {
@@ -68,14 +63,6 @@ export const errorMap = {
         TOO_LONG: 'MIN_STOCK_TOO_LONG',
         MIN_GREATER_THAN_MAX: 'MIN_STOCK_GREATER_THAN_MAX'
     },
-    maxStock: {
-        REQUIRED: 'MAX_STOCK_REQUIRED',
-        INVALID_NUMBER: 'MAX_STOCK_INVALID_NUMBER',
-        TOO_LONG: 'MAX_STOCK_TOO_LONG'
-    },
-    expiryDate: {
-        INVALID_FORMAT: 'EXPIRY_DATE_INVALID_FORMAT'
-    },
     receptionDate: {
         REQUIRED: 'RECEPTION_DATE_REQUIRED',
         INVALID_FORMAT: 'RECEPTION_DATE_INVALID_FORMAT'
@@ -84,10 +71,6 @@ export const errorMap = {
         REQUIRED: 'REQUEST_DATE_REQUIRED',
         INVALID_FORMAT: 'REQUEST_DATE_INVALID_FORMAT'
     },
-    thickness: {
-        INVALID_NUMBER: 'THICKNESS_INVALID_NUMBER',
-        TOO_LONG: 'THICKNESS_TOO_LONG'
-    },
     base: {
         INVALID_NUMBER: 'BASE_INVALID_NUMBER',
         TOO_LONG: 'BASE_TOO_LONG'
@@ -95,14 +78,6 @@ export const errorMap = {
     height: {
         INVALID_NUMBER: 'HEIGHT_INVALID_NUMBER',
         TOO_LONG: 'HEIGHT_TOO_LONG'
-    },
-    color: {
-        INVALID_TYPE: 'COLOR_INVALID_TYPE',
-        TOO_LONG: 'COLOR_TOO_LONG'
-    },
-    type: {
-        INVALID_TYPE: 'TYPE_INVALID_TYPE',
-        TOO_LONG: 'TYPE_TOO_LONG'
     },
     presentation: {
         INVALID_TYPE: 'PRESENTATION_INVALID_TYPE',

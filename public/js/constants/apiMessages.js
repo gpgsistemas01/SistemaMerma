@@ -7,14 +7,6 @@ export const errorMessages = {
     SERVER_ERROR: 'Error del servidor.',
     DETECTED_REUSE: 'Reuso de sesión detectado.',
 
-    // 📂 CATEGORY
-    CATEGORY_ID_REQUIRED: 'La categoría es requerida.',
-    CATEGORY_ID_INVALID_UUID: 'La categoría no es válida.',
-
-    // 📦 UOM
-    UOM_ID_REQUIRED: 'La unidad de medida es requerida.',
-    UOM_ID_INVALID_UUID: 'La unidad de medida no es válida.',
-
     // SUPPLIER
     SUPPLIER_ID_REQUIRED: 'El proveedor es requerido.',
     INVALID_UUID: 'El proveedor no es válido.',
@@ -54,7 +46,7 @@ export const errorMessages = {
     // 🧑 NAME
     NAME_REQUIRED: 'El nombre es requerido.',
     NAME_INVALID_TYPE: 'El nombre debe ser texto.',
-    NAME_TOO_LONG: 'El nombre no debe exceder 50 caracteres.',
+    NAME_TOO_LONG: (value) => `El nombre no debe exceder ${value} caracteres.`,
     NAME_INVALID_FORMAT: 'Contiene caracteres no válidos.',
 
     // 📞 PHONE
@@ -72,21 +64,9 @@ export const errorMessages = {
     MIN_STOCK_TOO_LONG: 'El valor es demasiado grande.',
     MIN_STOCK_GREATER_THAN_MAX: 'El stock mínimo no puede ser mayor al máximo.',
 
-    // 📈 MAX STOCK
-    MAX_STOCK_REQUIRED: 'El stock máximo es requerido.',
-    MAX_STOCK_INVALID_NUMBER: 'Debe ser un número.',
-    MAX_STOCK_TOO_LONG: 'El valor es demasiado grande.',
-
-    // 📅 EXPIRY DATE
-    EXPIRY_DATE_INVALID_FORMAT: 'La fecha de caducidad no es válida.',
-
     // RECEPTION DATE
     RECEPTION_DATE_REQUIRED: 'La fecha de recepción es requerida.',
     RECEPTION_DATE_INVALID_FORMAT: 'La fecha de recepción no es válida.',
-
-    // 📏 THICKNESS
-    THICKNESS_INVALID_NUMBER: 'Debe ser un número.',
-    THICKNESS_TOO_LONG: 'El valor es demasiado grande.',
 
     // 📐 BASE
     BASE_INVALID_NUMBER: 'Debe ser un número.',
@@ -95,18 +75,6 @@ export const errorMessages = {
     // 📏 HEIGHT
     HEIGHT_INVALID_NUMBER: 'Debe ser un número.',
     HEIGHT_TOO_LONG: 'El valor es demasiado grande.',
-
-    // 🎨 COLOR
-    COLOR_INVALID_TYPE: 'El color debe ser texto.',
-    COLOR_TOO_LONG: 'El color no debe exceder más de 50 caracteres.',
-
-    // 🏷 TYPE
-    TYPE_INVALID_TYPE: 'El tipo debe ser texto.',
-    TYPE_TOO_LONG: 'El tipo no debe exceder más de 50 caracteres.',
-
-    // 📦 PRESENTATION
-    PRESENTATION_INVALID_TYPE: 'La presentación debe ser texto.',
-    PRESENTATION_TOO_LONG: 'La presentación no debe exceder más de 50 caracteres.',
 
     // OBSERVATIONS
     OBSERVATIONS_INVALID_TYPE: 'Las observaciones deben ser texto.',
@@ -146,8 +114,6 @@ export const errorMessages = {
     GOODS_ISSUE_WAREHOUSE_STAFF_PROFILE_NOT_FOUND: 'Perfil de almacenista activo no encontrado para el usuario.',
     PRODUCT_NOT_FOUND: 'Producto no encontrado.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
-    UOM_NOT_FOUND: 'Unidad de medida no encontrada.',
-    CATEGORY_NOT_FOUND: 'Categoría no encontrada.',
     PROFILE_NOT_FOUND: 'Perfil no encontrado.',
     SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
     SUPPLIER_UPDATE_DB_ERROR: 'Error de base de datos al editar el proveedor.'
@@ -178,6 +144,18 @@ const successMessages = {
     CANCELED_PURCHASE_REQUISITION: '¡Requisición de compra cancelada exitosamente!'
 };
 
-export const getErrorMessage = (code) => errorMessages[code] ?? null;
+export const getErrorMessage = (error) => {
+
+    if (typeof error === 'string') return errorMessages[error] ?? null;
+
+    if (typeof error === 'object') {
+
+        const fn = errorMessages[error.code];
+
+        return typeof fn === 'function' ? fn(error.meta) : null;
+    }
+    
+    return null;
+}
 
 export const getSuccessMessage = (code) => successMessages[code] ?? null;

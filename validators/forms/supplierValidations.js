@@ -1,7 +1,7 @@
 import { validateIsActive, validateName, validateNumberphone } from "../fields/fieldsValidator.js";
 
 export const supplierValidation = [
-    validateName,
+    validateName(),
     validateNumberphone,
     validateIsActive
 ]

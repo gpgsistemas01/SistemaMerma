@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validateNumberphone, validatePassword, validateNumber, validateUsername, validateTextOptional, validateDimension, validateDateOptional, validateDetailsArray, validateDate, validateText } from "./fieldValidations.js";
+import { validateName, validateNumberphone, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateDetailsArray, validateDate, validateText, validateNumberOptional } from "./fieldValidations.js";
 
 export const supplierValidators = {
     name: validateName,
@@ -7,19 +7,11 @@ export const supplierValidators = {
 }
 
 export const productValidators = {
-    uomId: (value) => isEmptyOrNull(value, 'La unidad de medida'),
-    categoryId: (value) => isEmptyOrNull(value, 'La categoría'),
-    name: validateName,
-    unitCost: (value) => validateNumber(value, 'El costo unitario'),
-    minStock: (value) => validateNumber(value, 'El stock mínimo'),
-    maxStock: (value) => validateNumber(value, 'El stock máximo'),
-    expiryDate: (value) => validateDateOptional(value, 'La fecha de vencimiento'),
-    thickness: (value) => validateDimension(value, 'El espesor'),
-    base: (value) => validateDimension(value, 'La base'),
-    height: (value) => validateDimension(value, 'La altura'),
-    color: (value) => validateTextOptional(value, 'El color'),
-    type: (value) => validateTextOptional(value, 'El tipo'),
-    presentation: (value) => validateTextOptional(value, 'La presentación'),
+    name: (value) => validateName(value, 200),
+    unitCost: (value) => validateNumberOptional(value, 'El costo unitario'),
+    minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
+    base: (value) => validateNumberOptional(value, 'La base'),
+    height: (value) => validateNumberOptional(value, 'La altura'),
 }
 
 export const loginValidators = {

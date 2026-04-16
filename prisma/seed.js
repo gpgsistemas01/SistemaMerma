@@ -18,6 +18,15 @@ const getPresentation = (value) => {
     if (value === 'PIEZA') return Presentation.PIEZA;
 }
 
+const toDecimal = (value) => {
+
+    const normalized = String(value).replace(',', '.');
+
+    const parsed = parseFloat(normalized);
+
+    return parsed;
+}
+
 async function main() {
 
     await prisma.department.createMany({
@@ -226,17 +235,16 @@ async function main() {
         defval: null,
     });
 
-    const toDecimal = (value) => value !== null && value !== '' ? parseFloat(value) : null;
     const parsed = rows.map(row => ({
         name: row.name,
         sku: row.sku,
-        unitCost: toDecimal(row.unitCost),
-        currentStock: toDecimal(row.currentStock) ?? 0,
+        unitCost: isNaN(toDecimal(row.unitCost)) ? 0 : toDecimal(row.unitCost),
+        currentStock: isNaN(toDecimal(row.currentStock)) ? 0 : toDecimal(row.currentStock),
         presentation: getPresentation(row.presentation),
-        minStock: toDecimal(row.minStock),
-        base: toDecimal(row.base),
-        height: toDecimal(row.height),
-        weigthedM2: toDecimal(row.weigthedM2)
+        minStock: isNaN(toDecimal(row.minStock)) ? 0 : toDecimal(row.minStock),
+        base: isNaN(toDecimal(row.base)) ? null : toDecimal(row.base),
+        height: isNaN(toDecimal(row.height)) ? null : toDecimal(row.height),
+        totalWaste: isNaN(toDecimal(row.totalWaste)) ? 0 : toDecimal(row.totalWaste)
     }));
 
     await prisma.product.createMany({

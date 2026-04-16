@@ -1,17 +1,5 @@
 <% const form = {
     canApprove: false,
-    selects: [
-        {
-            id: 'categoryInput',
-            name: 'categoryId',
-            col: '6'
-        },
-        {
-            id: 'uomInput',
-            name: 'uomId',
-            col: '6'
-        }
-    ],
     inputs: [
         {
             id: 'nameInput',
@@ -35,27 +23,6 @@
             col: '6'
         },
         {
-            id: 'maxStockInput',
-            type: 'number',
-            name: 'maxStock',
-            label: 'Stock Máximo',
-            col: '6'
-        },
-        {
-            id: 'expiryDateInput',
-            type: 'date',
-            name: 'expiryDate',
-            label: 'Fecha de Vencimiento',
-            col: '6'
-        },
-        {
-            id: 'thicknessInput',
-            type: 'number',
-            name: 'thickness',
-            label: 'Espesor',
-            col: '6'
-        },
-        {
             id: 'baseInput',
             type: 'number',
             name: 'base',
@@ -67,27 +34,6 @@
             type: 'number',
             name: 'height',
             label: 'Altura',
-            col: '6'
-        },
-        {
-            id: 'colorInput',
-            type: 'text',
-            name: 'color',
-            label: 'Color',
-            col: '6'
-        },
-        {
-            id: 'typeInput',
-            type: 'text',
-            name: 'type',
-            label: 'Tipo',
-            col: '6'
-        },
-        {
-            id: 'presentationInput',
-            type: 'text',
-            name: 'presentation',
-            label: 'Presentación',
             col: '6'
         },
     ],
@@ -104,6 +50,10 @@
 <%- include('../../../shared/mainTable', { title: 'Productos' }) %>
 
 <%- include('../../../shared/modal', { form }) %>
+
+<script>
+    window.PRODUCT_CONTEXT = <%- JSON.stringify(user) %>;
+</script>
 
 <script type="module" src="/js/pages/warehouse/productsPage.js"></script>
 

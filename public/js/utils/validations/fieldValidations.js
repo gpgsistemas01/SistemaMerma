@@ -84,6 +84,21 @@ export const validateNumber = (number, fieldName) => {
     return result;
 }
 
+export const validateNumberOptional = (number, fieldName) => {
+
+    if (!number) return null;
+
+    number = parseFloat(number);
+
+    let result = isNumber(number, fieldName);
+
+    if (result) return result;
+
+    result = isNegative(number, fieldName);
+
+    return result;
+}
+
 export const validateDate = (date, fieldName) => {
 
     let result = isEmptyOrNull(Date, fieldName);
@@ -104,22 +119,22 @@ export const validateDateOptional = (date, fieldName) => {
     return result;
 }
 
-export const validateDimension = (dimension, fieldName) => {
+export const validateMeasure = (measure, fieldName) => {
 
-    if (!dimension) return null;
+    if (!measure) return null;
 
-    let result = isEmptyOrNull(dimension, fieldName);
+    let result = isEmptyOrNull(measure, fieldName);
 
     if (result) return result;
 
-    dimension = parseFloat(dimension);
+    measure = parseFloat(measure);
 
-    result = isNumber(dimension, fieldName);
+    result = isNumber(measure, fieldName);
 
     return result;
 }
 
-export const validateText = (name, fieldName) => {
+export const validateText = (name, length, fieldName) => {
 
     const allowedName = /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u;
     let result = isEmptyOrNull(name, fieldName);
@@ -132,21 +147,21 @@ export const validateText = (name, fieldName) => {
 
     if (!allowedName.test(name)) return `${ fieldName } debe tener solo letras, números, signos de puntuación o espacios.`;
 
-    result = isLengthInRangeMax(name, 50, fieldName);
+    result = isLengthInRangeMax(name, length, fieldName);
 
     return result;
 }
 
-export const validateTextOptional = (name, fieldName) => {
+export const validateTextOptional = (name, length, fieldName) => {
 
     if (!name) return null;
 
-    const result = validateText(name, fieldName);
+    const result = validateText(name, length, fieldName);
 
     return result;
 }
 
-export const validateName = (name) => validateText(name, 'El nombre');
+export const validateName = (name, length = 50) => validateText(name, length, 'El nombre');
 
 export const validateDetailsArray = (details) => {
 

@@ -6,6 +6,29 @@ const selectorTable = '#table';
 let lastLowStockNotification = '';
 let stockSocketConfigured = false;
 
+const table = document.querySelector(selectorTable);
+
+table.innerHTML = `
+    <thead>
+        <tr>
+            <th rowspan="2">Código</th>
+            <th rowspan="2">Nombre</th>
+            <th colspan="2">Medidas</th>
+            <th colspan="3">Existencias</th>
+            <th rowspan="2">Stock mínimo</th>
+            <th rowspan="2">Costo Unitario</th>
+            <th rowspan="2">Acciones</th>
+        </tr>
+        <tr>
+            <th>Base</th>
+            <th>Altura</th>
+            <th>Stock</th>
+            <th>Merma</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+`;
+
 const configureStockRealtime = (table) => {
 
     if (stockSocketConfigured) return;
@@ -17,43 +40,47 @@ const configureStockRealtime = (table) => {
     });
 };
 
-export const createProductDatatable = () => {
-    
+export const createProductDatatable = (context) => {
+
+    const isWarehouseDepartment = context.department === 'Almacén';
+    const isSystemDepartment = context.department === 'Sistemas';
+
+    const columns = [
+        { data: 'sku', title: 'Código' },
+        { data: 'name', title: 'Nombre' },
+        { data: 'base', title: 'Base' },
+        { data: 'height', title: 'Altura' },
+        { data: 'currentStock', title: 'Stock' },
+        { data: 'totalWaste', title: 'Merma' },
+        { 
+            data: null,
+            title: 'Total',
+            render: (data) => {
+                const total = Number(data.currentStock) + Number(data.totalWaste);
+                return isNaN(total) ? 'N/A' : total;
+            }
+        },
+        { data: 'minStock', title: 'Stock mínimo' },
+        { data: 'unitCost', title: 'Costo Unitario' },
+    ];
+
+    if (isWarehouseDepartment || isSystemDepartment) {
+        columns.push({
+            data: null,
+            title: 'Acciones',
+            render: () => {
+                return `
+                    <button class="btn-edit">✏️</button>
+                    <button class="btn-view">👁️</button>
+                `;
+            }
+        });
+    }
+
     const table = createDataTable({
         options: {
             ajax: '/api/warehouse/products/',
-            columns: [
-                { data: 'name', title: 'Nombre' },
-                { 
-                    data: null,
-                    title: 'Dimensiones (Base x Altura)',
-                    render: (data, type, row) => (row.base && row.height) ? `${row.base} x ${row.height}` : 'N/A'
-                },
-                { data: 'unitCost', title: 'Costo Unitario' },
-                { data: 'currentStock', title: 'Stock actual' },
-                { data: 'minStock', title: 'Stock mínimo' },
-                { data: 'maxStock', title: 'Stock máximo' },
-                { 
-                    data: 'expiryDate',
-                    title: 'Fecha de Caducidad',
-                    render: (data) => data ? new Date(data).toLocaleDateString() : 'N/A'
-                },
-                { 
-                    data: 'isActive', 
-                    title: 'Estado',
-                    render: (data) => data ? 'Activo' : 'Inactivo' 
-                },
-                {
-                    data: 'id',
-                    title: 'Acciones',
-                    render: () => {
-                        return `
-                            <button class="btn-edit">✏️</button>
-                            <button class="btn-view">👁️</button>
-                        `;
-                    }
-                }
-            ],
+            columns,
             createdRow: (row, data) => {
 
                 if (Number(data.currentStock) < Number(data.minStock)) {

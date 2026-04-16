@@ -2,7 +2,7 @@ import { validatecommentNotifications, validatefollowingNotifications, validateN
 
 export const profileValidation = [
     validateUsername,
-    validateName,
+    validateName(),
     validateLastName,
     validateAvatarPath,
     validateCoverPath
