@@ -1,4 +1,22 @@
-import { prisma } from "../lib/prisma.js";
+import { prisma, Presentation } from "../lib/prisma.js";
+import XLSX from 'xlsx';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const getPresentation = (value) => {
+    if (!value) return null;
+
+    if (value === 'ROLLO') return Presentation.ROLLO;
+    if (value === 'CARTUCHO') return Presentation.CARTUCHO;
+    if (value === 'HOJA') return Presentation.HOJA;
+    if (value === 'LT1') return Presentation.LT1;
+    if (value === 'LT3') return Presentation.LT3;
+    if (value === 'LT5') return Presentation.LT5;
+    if (value === 'ML775') return Presentation.ML775;
+    if (value === 'OJILLOS') return Presentation.OJILLOS;
+    if (value === 'PIEZA') return Presentation.PIEZA;
+}
 
 async function main() {
 
@@ -198,41 +216,31 @@ async function main() {
         }
     });
 
-    await prisma.reason.createMany({
-        data: [
-            {
-                name: 'Restock'
-            },
-            {
-                name: 'Consumo interno'
-            },
-        ],
-        skipDuplicates: true
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const filePath = path.join(__dirname, 'inventario_BD.xlsx');
+
+    const workbook = XLSX.readFile(filePath);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, {
+        defval: null,
     });
 
-    await prisma.machine.createMany({
-        data: [
-            {
-                name: 'Grando',
-                dailyProductionCapacity: 533
-            },
-            {
-                name: 'LX700',
-                dailyProductionCapacity: 84
-            },
-            {
-                name: 'LX365',
-                dailyProductionCapacity: 84
-            },
-            {
-                name: 'Cama plana',
-                dailyProductionCapacity: 55.58
-            },
-            {
-                name: 'Plotter',
-                dailyProductionCapacity: null
-            }
-        ],
+    const toDecimal = (value) => value !== null && value !== '' ? parseFloat(value) : null;
+    const parsed = rows.map(row => ({
+        name: row.name,
+        sku: row.sku,
+        unitCost: toDecimal(row.unitCost),
+        currentStock: toDecimal(row.currentStock) ?? 0,
+        presentation: getPresentation(row.presentation),
+        minStock: toDecimal(row.minStock),
+        base: toDecimal(row.base),
+        height: toDecimal(row.height),
+        weigthedM2: toDecimal(row.weigthedM2)
+    }));
+
+    await prisma.product.createMany({
+        data: parsed,
         skipDuplicates: true
     });
 }

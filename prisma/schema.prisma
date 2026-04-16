@@ -14,7 +14,6 @@ model Department {
   goodsReceipts        GoodsReceipt[]
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
-  indicatorRelations  IndicatorDepartment[]
   notifications        Notification[]
 }
 
@@ -34,7 +33,6 @@ model User {
   department   Department @relation(fields: [departmentId], references: [id])
   role         Role       @relation(fields: [roleId], references: [id])
   profiles     Profile[]  @relation("ProfileToUser")
-  indicatorLogs indicator_logs[]
   Notification Notification[]
 }
 
@@ -52,7 +50,6 @@ model Profile {
   requesterGoodsIssues          GoodsIssue[]          @relation("RequesterGoodsIssueRelation")
   warehouseStaffGoodsIssues     GoodsIssue[]          @relation("WarehouseStaffGoodsIssueRelation")
   deliveredPurchaseRequisitions PurchaseRequisition[] @relation("DeliveredByRelation")
-  indicatorLogs                  indicator_logs[]
 }
 
 model Status {
@@ -65,11 +62,12 @@ model Status {
 
 model Product {
   id                          String                             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                        String                             @db.VarChar(50)
-  sku                         String                            @unique @db.VarChar(50)
+  name                        String                             @db.VarChar(200)
+  sku                         String                            @unique @db.VarChar(200)
   unitCost                    Decimal?                            @db.Decimal(10, 2)
   currentStock                Decimal                            @db.Decimal(10, 2)
-  unitMeasure                 UnitMeasure
+  presentation                 Presentation
+  unitMeasure                 String?                            @default("PIEZA") @db.VarChar(20)
   isActive                    Boolean                            @default(true)
   minStock                    Decimal?                            @db.Decimal(10, 2)
   base                        Decimal?                           @db.Decimal(10, 3)
@@ -80,10 +78,10 @@ model Product {
   detailsGoodsIssues          DetailGoodsIssueProduct[]
   detailsMovement             DetailMovement[]
   supplierProducts            SupplierProduct[]
-  weightedM2Records            weightedM2Records[]
+  wastes            Waste[]
 }
 
-enum UnitMeasure {
+enum Presentation {
   ROLLO
   CARTUCHO
   PIEZA
@@ -95,7 +93,7 @@ enum UnitMeasure {
   LT5
 }
 
-model weightedM2Records {
+model Waste {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   productId String @db.Uuid
   date DateTime @default(now())
@@ -259,12 +257,6 @@ model DetailGoodsIssueProduct {
   detailMovement   DetailMovement? @relation(fields: [detailMovementId], references: [id])
 }
 
-model Reason {
-  id String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique @db.VarChar(50)
-  movements InventoryMovement[]
-}
-
 model InventoryMovement {
   id String @id  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
@@ -274,7 +266,6 @@ model InventoryMovement {
 
   goodsReceipt GoodsReceipt? @relation(fields: [goodsReceiptId], references: [id])
   goodsIssue   GoodsIssue?   @relation(fields: [goodsIssueId], references: [id])
-  reason       Reason        @relation(fields: [reasonId], references: [id])
 
   date DateTime
 
@@ -294,59 +285,4 @@ model DetailMovement {
 
   detailGoodsIssueProduct   DetailGoodsIssueProduct?
   detailGoodsReceiptProduct DetailGoodsReceiptProduct?
-}
-
-model Machine {
-  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique @db.VarChar(50)
-  dailyProductionCapacity Decimal? @db.Decimal(10, 2)
-}
-
-model indicator {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique @db.VarChar(50)
-  unit String @db.VarChar(20)
-  logs indicator_logs[]
-  departmentRelations IndicatorDepartment[]
-}
-
-model indicator_logs {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  indicatorId String @db.Uuid
-  profileId String? @db.Uuid
-  userId String? @db.Uuid
-  value Decimal @db.Decimal(10, 2)
-  period DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  indicator indicator @relation(fields: [indicatorId], references: [id])
-  profile Profile? @relation(fields: [profileId], references: [id])
-  user User? @relation(fields: [userId], references: [id])
-
-  @@unique([indicatorId, profileId, period])
-}
-
-model IndicatorDepartment {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  indicatorId String @db.Uuid
-  departmentId String @db.Uuid
-
-  indicator indicator @relation(fields: [indicatorId], references: [id])
-  department Department @relation(fields: [departmentId], references: [id])
-
-  @@unique([indicatorId, departmentId])
-}
-
-model Shift {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique @db.VarChar(50)
-  hours Decimal @db.Decimal(10, 2)
-}
-
-model Period {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  startDate DateTime
-  endDate DateTime
-  isActive Boolean @default(true)
 }
