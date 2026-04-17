@@ -113,7 +113,9 @@ export const errorMessages = {
     GOODS_ISSUE_CONFIRMATION_FORBIDDEN: 'No tienes permisos para confirmar o cancelar salidas de almacén.',
     GOODS_ISSUE_WAREHOUSE_STAFF_PROFILE_NOT_FOUND: 'Perfil de almacenista activo no encontrado para el usuario.',
     PRODUCT_NOT_FOUND: 'Producto no encontrado.',
+    PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al crear el producto.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
+    EXCEDED_MAX_RETRIES_SKU: 'Excedido el número máximo de intentos para generar un SKU único.',
     PROFILE_NOT_FOUND: 'Perfil no encontrado.',
     SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
     SUPPLIER_UPDATE_DB_ERROR: 'Error de base de datos al editar el proveedor.'

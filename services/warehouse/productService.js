@@ -1,5 +1,7 @@
-import { CategoryNotFound, ProductNotFound, ProductUpdateDatabaseError, UomNotFound } from "../../errors/warehouse/productError.js";
+import { ExcededMaxRetriesSkuError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError } from "../../errors/warehouse/productError.js";
 import { prisma } from "../../lib/prisma.js";
+
+const MAX_RETRIES = 5;
 
 export const findAllProducts = async ({
     skip = 0,
@@ -47,33 +49,72 @@ export const findAllProducts = async ({
     };
 };
 
-const generateSku = (name, base, height) => {
-    const cleanName = name
-        .toUpperCase()
-        .replace(/[^A-Z0-9 ]/g, '')
-        .split(' ')
-        .slice(0, 3)
-        .join('-');
+const normalizeWords = (name) => {
+    const words = name.split(/\s+/).filter(Boolean);
+    const result = [];
 
-    const size = base && height
-        ? `${base}X${height}`
-        : '';
+    for (let i = 0; i < words.length; i++) {
+        const current = words[i];
 
-    return `${cleanName}${size ? '-' + size : ''}`;
-}
-
-const ensureUniqueSku = async (sku) => {
-
-    let finalSku = sku;
-    let count = 1;
-
-    while (await prisma.product.findUnique({ where: { sku: finalSku }, select: { id: true } })) {
-
-        finalSku = `${sku}-${count}`;
-        count++;
+        if (/^\d+$/.test(current) && words[i + 1]) {
+            result.push(current + words[i + 1]);
+            i++;
+        } else {
+            result.push(current);
+        }
     }
 
-    return finalSku;
+    return result;
+};
+
+const getChunk = (word) => {
+    const cleaned = word
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '');
+
+    return cleaned.slice(0, 3);
+};
+
+const generateSku = (name) => {
+    const maxLength = 9;
+    return normalizeWords(name)
+        .map(getChunk)
+        .slice(0, maxLength)
+        .join('-');
+};
+
+const ensureUniqueSku = async (baseSku) => {
+
+    const existingSkus = await prisma.product.findMany({
+        where: {
+            sku: {
+                startsWith: baseSku
+            }
+        },
+        select: { sku: true }
+    });
+
+    const regex = new RegExp(`^${baseSku}(?:-(\\d+))?$`);
+
+    let max = 0;
+    let baseExists = false;
+
+    for (const item of existingSkus) {
+        const match = item.sku.match(regex);
+
+        if (match) {
+            if (match[1]) {
+                const num = parseInt(match[1], 10);
+                if (num > max) max = num;
+            } else {
+                baseExists = true;
+            }
+        }
+    }
+
+    if (!baseExists) return baseSku;
+
+    return `${baseSku}-${max + 1}`;
 }
 
 const inferPresentation = (base, height) => {
@@ -83,26 +124,44 @@ const inferPresentation = (base, height) => {
     return 'PIEZA';
 }
 
-const buildProduct = (productDto) => {
-
-    const sku = generateSku(productDto.name, productDto.base, productDto.height);
-    
-    const presentation = inferPresentation(productDto.base, productDto.height);
-
-    return {
-        ...productDto,
-        sku,
-        presentation
-    };
-}
-
 export const createProduct = async (productDto) => {
 
-    const product = await prisma.product.create({
-        data: buildProduct(productDto)
-    });
+    let uniqueSku;
+    let success = false;
+    let attempts = 0;
 
-    return product;
+    while (attempts < MAX_RETRIES) {
+        try {
+
+            const sku = generateSku(productDto.name, productDto.base, productDto.height);
+
+            uniqueSku = await ensureUniqueSku(sku);
+
+            const presentation = inferPresentation(productDto.base, productDto.height);
+
+            const product = await prisma.product.create({
+                data: {
+                    ...productDto,
+                    sku: uniqueSku,
+                    presentation
+                }
+            });
+
+            return product;
+
+        } catch (err) {
+
+            if (err.code === 'P2002') {
+
+                attempts++;
+                continue;
+            }
+
+            throw new ProductCreateDatabaseError();
+        }
+    }
+
+    throw new ExcededMaxRetriesSkuError();
 }
 
 export const updateProduct = async (productDto, id) => {
@@ -120,8 +179,18 @@ export const updateProduct = async (productDto, id) => {
 
     try {
 
+        const sku = generateSku(productDto.name, productDto.base, productDto.height);
+
+        uniqueSku = await ensureUniqueSku(sku);
+
+        const presentation = inferPresentation(productDto.base, productDto.height);
+
         const product = await prisma.product.update({
-            data: buildProduct(productDto),
+            data: {
+                ...productDto,
+                sku: uniqueSku,
+                presentation
+            },
             where: {
                 id: id
             }
