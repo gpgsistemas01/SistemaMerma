@@ -11,9 +11,9 @@
 }; 
 
 const inputs = {
-    uomDisplayInput: {
-        id: 'uomDisplayInput',
-        name: 'uomDisplay',
+    presentationDisplayInput: {
+        id: 'presentationDisplayInput',
+        name: 'presentationDisplay',
         type: 'text',
         label: 'Unidad',
         attrs: {
@@ -78,7 +78,7 @@ const buttons = {
                         <%- include('./outlineInputList', { inputs: form.table.inputs }) %>
 
                         <div class="col-2">
-                            <%- include('./outlineInput', { input: inputs.uomDisplayInput }) %>
+                            <%- include('./outlineInput', { input: inputs.presentationDisplayInput }) %>
                         </div>
 
                         <div class="col-4">

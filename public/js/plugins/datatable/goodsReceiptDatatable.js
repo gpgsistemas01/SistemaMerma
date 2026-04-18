@@ -81,7 +81,11 @@ export const initDetailsGoodsReceiptTable = (mode) => {
     const columns = [
         { data: 'name', title: 'Producto' },
         { data: 'quantity', title: 'Cantidad' },
-        { data: 'uom', title: 'Unidad' },
+        { 
+            data: 'presentation', 
+            title: 'Unidad',
+            render: (data) => `PIEZA (${ data })`
+        },
     ];
 
     if (mode !== 'view') columns.push({

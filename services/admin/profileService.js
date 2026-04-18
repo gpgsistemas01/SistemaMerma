@@ -46,3 +46,41 @@ export const findAllProfiles = async ({
         recordsFiltered: filtered
     };
 };
+
+export const findProfileById = async ({ tx, id }) => {
+
+    const db = tx || prisma;
+
+    const profile = await db.profile.findUnique({
+        where: { 
+            id,
+            isActive: true
+        },
+        select: {
+            id: true,
+        }
+    });
+
+    return profile?.id || null;
+};
+
+export const findProfileByUserId = async ({ tx, userId }) => {
+
+    const db = tx || prisma;
+
+    const profile = await db.profile.findFirst({
+        where: { 
+            isActive: true,
+            users: {
+                some: {
+                    id: userId
+                }
+            }
+        },
+        select: {
+            id: true,
+        }
+    });
+
+    return profile?.id || null;
+}

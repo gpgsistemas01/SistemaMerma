@@ -78,7 +78,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         form.reset();
         document.getElementById('modalTitle').textContent = 'Registrar salida';
         document.getElementById('submitBtn').textContent = 'Guardar';
-        document.getElementById('uomDisplayInput').value = '';
+        document.getElementById('presentationDisplayInput').value = '';
 
         await initGoodsIssueSelect2({ context });
     }
@@ -101,7 +101,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
                     0
                 ),
                 description: detail.description,
-                uom: detail.product.uom?.name || 'N/A'
+                presentation: detail.product.presentation || 'N/A'
             }))
             .map((detail) => {
                 const delivered = detail.deliveredQuantity || 0;
@@ -190,7 +190,7 @@ const addProduct = () => {
 
     $('#productInput').empty().trigger('change');
     document.getElementById('quantityInput').value = '';
-    document.getElementById('uomDisplayInput').value = '';
+    document.getElementById('presentationDisplayInput').value = '';
 };
 
 on('click', '#addProductBtn', addProduct);

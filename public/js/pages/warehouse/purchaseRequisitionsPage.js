@@ -64,7 +64,7 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
         form.reset();
         document.getElementById('modalTitle').textContent = 'Registrar requisición';
         document.getElementById('submitBtn').textContent = 'Guardar';
-        document.getElementById('uomDisplayInput').value = '';
+        document.getElementById('presentationDisplayInput').value = '';
 
         await initPurchaseRequisitionSelect2();
     }
@@ -122,14 +122,14 @@ const addProduct = () => {
         return;
     }
 
-    const product = { productId, name: productName, quantity, uom: selectedProduct?.uom || 'N/A' };
+    const product = { productId, name: productName, quantity, presentation: selectedProduct?.presentation || 'N/A' };
     details.push(product);
 
     refreshProductTable(details);
 
     $('#productInput').empty().trigger('change');
     document.getElementById('quantityInput').value = '';
-    document.getElementById('uomDisplayInput').value = '';
+    document.getElementById('presentationDisplayInput').value = '';
 };
 
 on('click', '#addProductBtn', addProduct);

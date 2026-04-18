@@ -116,6 +116,8 @@ export const errorMessages = {
     PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al crear el producto.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
     EXCEDED_MAX_RETRIES_SKU: 'Excedido el número máximo de intentos para generar un SKU único.',
+    DEPARTMENT_NOT_FOUND: 'Departamento no encontrado.',
+    PROFILE_RECEIVED_BY_NOT_FOUND: 'Perfil de quien recibe no encontrado.',
     PROFILE_NOT_FOUND: 'Perfil no encontrado.',
     SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
     SUPPLIER_UPDATE_DB_ERROR: 'Error de base de datos al editar el proveedor.'

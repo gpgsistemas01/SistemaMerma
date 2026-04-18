@@ -62,7 +62,7 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
         form.reset();
         document.getElementById('modalTitle').textContent = 'Registrar recepción';
         document.getElementById('submitBtn').textContent = 'Guardar';
-        document.getElementById('uomDisplayInput').value = '';
+        document.getElementById('presentationDisplayInput').value = '';
 
         await initGoodsReceiptSelect2();
     }
@@ -77,7 +77,7 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
             productId: detail.product.id,
             quantity: detail.quantity,
             description: detail.description,
-            uom: detail.product.uom?.name || 'N/A'
+            presentation: detail.product.presentation
         })));
 
         await initGoodsReceiptSelect2(data);
@@ -127,7 +127,7 @@ const addProduct = () => {
 
     $('#productInput').empty().trigger('change');
     document.getElementById('quantityInput').value = '';
-    document.getElementById('uomDisplayInput').value = '';
+    document.getElementById('presentationDisplayInput').value = '';
 }
 
 on('click', '#addProductBtn', addProduct);

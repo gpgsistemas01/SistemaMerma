@@ -14,10 +14,10 @@ export class SupplierNotFound extends AppError {
     }
 }
 
-export class ProfileNotFound extends AppError {
+export class ProfileReceivedByNotFound extends AppError {
 
     constructor() {
-        super('Perfil no encontrado', 'PROFILE_NOT_FOUND', 404);
+        super('Perfil de quien recibe no encontrado', 'PROFILE_RECEIVED_BY_NOT_FOUND', 404);
     }
 }
 

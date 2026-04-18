@@ -8,9 +8,15 @@ import {
     PurchaseRequisitionApproverProfileNotFound
 } from "../../errors/warehouse/purchaseRequisitionError.js";
 import { prisma } from "../../lib/prisma.js";
+import { generateReferenceNumber } from "../document/referenceNumberService.js";
 
 const allowedDepartments = ['Almcén', 'Sistemas'];
 const allowedUsers = ['Coordinador', 'Administrador del sistema'];
+const REFERENCE_NUMBER_TYPE = 'REQ';
+const STATUS_OPEN = 'Abierta';
+const STATUS_CONFIRMED = 'Confirmada';
+const STATUS_CANCELED = 'Cancelada';
+const PRISMA_RECORD_NOT_FOUND = 'P2025';
 
 export const findAllPurchaseRequisitions = async ({
     currentDepartment = '',
@@ -151,26 +157,14 @@ export const createPurchaseRequisition = async ({
 
     const result = await prisma.$transaction(async (tx) => {
 
-        const type = 'REQ';
-
-        const counter = await tx.referenceNumberCounter.update({
-            where: { prefix: type },
-            data: {
-                counter: {
-                    increment: 1
-                }
-            }
-        });
-
-        const year = new Date().getFullYear();
-        const referenceNumber = `${type}-${year}-${counter.counter.toString().padStart(6, '0')}`;
+        const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
         const purchaseRequisition = await tx.purchaseRequisition.create({
             data: {
                 ...purchaseRequisitionData,
                 status: {
                     connect: {
-                        name: 'Abierta'
+                        name: STATUS_OPEN
                     }
                 },
                 project: {
@@ -276,7 +270,7 @@ export const updatePurchaseRequisition = async ({
 
     } catch (err) {
 
-        if (err.code === 'P2025') throw new PurchaseRequisitionNotFound();
+        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new PurchaseRequisitionNotFound();
 
         throw new PurchaseRequisitionUpdateDatabaseError();
     }
@@ -309,7 +303,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
     });
 
     if (!purchaseRequisition) throw new PurchaseRequisitionNotFound();
-    if (purchaseRequisition.status?.name !== 'Abierta') throw new PurchaseRequisitionStatusNotFound();
+    if (purchaseRequisition.status?.name !== STATUS_OPEN) throw new PurchaseRequisitionStatusNotFound();
 
     try {
 
@@ -321,7 +315,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             }
         };
 
-        if (statusName === 'Confirmada') {
+        if (statusName === STATUS_CONFIRMED) {
             const approver = await prisma.profile.findFirst({
                 where: {
                     isActive: true,
@@ -369,13 +363,13 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
         };
     } catch (err) {
 
-        if (err.code === 'P2025') throw new PurchaseRequisitionStatusNotFound();
+        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new PurchaseRequisitionStatusNotFound();
         throw new PurchaseRequisitionStatusUpdateDatabaseError();
     }
 };
 
 export const confirmPurchaseRequisition = async ({ id, userId }) =>
-    await updatePurchaseRequisitionStatus({ id, statusName: 'Confirmada', userId });
+    await updatePurchaseRequisitionStatus({ id, statusName: STATUS_CONFIRMED, userId });
 
 export const cancelPurchaseRequisition = async ({ id, userId }) =>
-    await updatePurchaseRequisitionStatus({ id, statusName: 'Cancelada', userId });
+    await updatePurchaseRequisitionStatus({ id, statusName: STATUS_CANCELED, userId });

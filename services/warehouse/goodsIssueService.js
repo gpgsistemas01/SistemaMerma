@@ -12,6 +12,7 @@ import {
     GoodsIssueUpdateDatabaseError
 } from "../../errors/warehouse/goodsIssueError.js";
 import { prisma } from "../../lib/prisma.js";
+import { getDepartmentByProfileId } from "../admin/userService.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
@@ -23,7 +24,7 @@ const STATUS_APPROVED = 'Aprobada';
 const STATUS_REJECTED = 'Rechazada';
 const STATUS_CONFIRMED = 'Confirmada';
 const STATUS_CANCELED = 'Cancelada';
-const REFERENCE_TYPE_GOODS_ISSUE = 'SAL';
+const REFERENCE_NUMBER_TYPE = 'SAL';
 const REASON_INTERNAL_CONSUMPTION = 'Consumo interno';
 const WAREHOUSE_DELIVERY_ROLES = [ROLE_COORDINATOR, ROLE_AUXILIARY, ROLE_WAREHOUSE_STAFF];
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
@@ -120,11 +121,7 @@ export const findAllGoodsIssues = async ({
                         select: {
                             id: true,
                             name: true,
-                            uom: {
-                                select: {
-                                    name: true
-                                }
-                            }
+                            presentation: true
                         }
                     },
                     quantity: true
@@ -171,27 +168,6 @@ const validateGoodsIssueRelations = async ({ projectId, requesterId }) => {
     if (!project) throw new GoodsIssueProjectNotFound();
     if (!requester) throw new GoodsIssueRequesterProfileNotFound();
 };
-
-const getUserDepartmentByProfileId = async ({ tx, profileId }) => {
-
-    const user = await tx.user.findFirst({
-        where: {
-            profiles: {
-                some: {
-                    id: profileId
-                }
-            }
-        },
-        select: {
-            departmentId: true,
-            department: true
-        }
-    });
-
-    if (!user) throw new GoodsIssueRequesterProfileNotFound();
-
-    return user;
-}
 
 const getActiveProfileIdByUserId = async ({ tx, userId, errorClass }) => {
 
@@ -255,21 +231,9 @@ export const createGoodsIssue = async ({
 
     const result = await prisma.$transaction(async (tx) => {
 
-        const user = await getUserDepartmentByProfileId({ tx, profileId: requesterId });
+        const departmentId = await getDepartmentByProfileId(requesterId);
 
-        const type = REFERENCE_TYPE_GOODS_ISSUE;
-
-        const counter = await tx.referenceNumberCounter.update({
-            where: { prefix: type },
-            data: {
-                counter: {
-                    increment: 1
-                }
-            }
-        });
-
-        const year = new Date().getFullYear();
-        const referenceNumber = `${type}-${year}-${counter.counter.toString().padStart(6, '0')}`;
+        const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
         const goodsIssue = await tx.goodsIssue.create({
             data: {
@@ -291,7 +255,7 @@ export const createGoodsIssue = async ({
                 },
                 department: {
                     connect: {
-                        id: user.departmentId
+                        id: departmentId
                     }
                 },
                 referenceNumber,
@@ -350,7 +314,7 @@ export const updateGoodsIssue = async ({
 
         const result = await prisma.$transaction(async (tx) => {
 
-            const user = await getUserDepartmentByProfileId({ tx, profileId: requesterId });
+            const departmentId = await getDepartmentByProfileId(requesterId);
 
             const updatedData = {
                 ...goodsIssueData,
@@ -369,7 +333,7 @@ export const updateGoodsIssue = async ({
             if (canEditDepartment) {
                 updatedData.department = {
                     connect: {
-                        id: user.departmentId
+                        id: departmentId
                     }
                 };
             }
@@ -616,16 +580,6 @@ const updateGoodsIssueDeliveryStatus = async ({
                     .filter(Boolean);
 
                 if (detailsToDispatch.length) {
-                    const reason = await tx.reason.findFirst({
-                        where: {
-                            name: REASON_INTERNAL_CONSUMPTION
-                        },
-                        select: {
-                            id: true
-                        }
-                    });
-
-                    if (!reason) throw new GoodsIssueStatusNotFound();
 
                     await tx.inventoryMovement.create({
                         data: {
