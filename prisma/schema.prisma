@@ -104,7 +104,9 @@ model Waste {
 
 model Supplier {
   id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String         @unique @db.VarChar(50)
+  code String @unique @db.VarChar(10)
+  legalName          String         @db.VarChar(200)
+  tradeName String @db.VarChar(100)
   numberphone   String?        @db.VarChar(20)
   isActive      Boolean        @default(true)
   goodsReceipts GoodsReceipt[]
@@ -113,12 +115,16 @@ model Supplier {
 
 model SupplierProduct {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  price     Decimal  @db.Decimal(10, 2)
-  sku       String?  @db.VarChar(50)
+  price     Decimal?  @db.Decimal(10, 2)
+  sku       String  @db.VarChar(50)
   supplierId String   @db.Uuid
   productId  String   @db.Uuid
   supplier   Supplier @relation(fields: [supplierId], references: [id])
   product    Product  @relation(fields: [productId], references: [id])
+
+  @@unique([supplierId, productId])
+  @@index([supplierId])
+  @@index([productId])
 }
 
 model Notification {
