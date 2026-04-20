@@ -1,4 +1,4 @@
-import { Prisma, prisma, ReferenceType, ReferenceDetailType } from "../../lib/prisma";
+import { Prisma, prisma, ReferenceType, ReferenceDetailType } from "../../lib/prisma.js";
 
 const REFERENCE_MOVEMENT_IN = 'IN';
 const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';

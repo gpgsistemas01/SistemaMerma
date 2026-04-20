@@ -1,6 +1,8 @@
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { initbaseSelect2 } from "./baseSelect.js";
 
+const modalSelector = '#goodsIssueModal';
+
 export const initGoodsIssueSelect2 = async ({
     data = null,
     context
@@ -11,7 +13,8 @@ export const initGoodsIssueSelect2 = async ({
     const productSelector = '#productInput';
 
     initbaseSelect2({
-        selector: requesterSelector,
+        baseSelector: requesterSelector,
+        modalSelector,
         url: '/api/admin/profiles/',
         placeholder: 'Buscar solicitante...',
         data: (params) => {
@@ -37,7 +40,8 @@ export const initGoodsIssueSelect2 = async ({
     });
 
     initbaseSelect2({
-        selector: projectSelector,
+        baseSelector: projectSelector,
+        modalSelector,
         url: '/api/admin/projects/',
         placeholder: 'Buscar proyecto...',
         processResults: (data) => {
@@ -54,7 +58,8 @@ export const initGoodsIssueSelect2 = async ({
     });
 
     initbaseSelect2({
-        selector: productSelector,
+        baseSelector: productSelector,
+        modalSelector,
         url: '/api/warehouse/products/',
         placeholder: 'Buscar producto...',
         processResults: (data) => {
@@ -65,7 +70,7 @@ export const initGoodsIssueSelect2 = async ({
                 results: list.map(product => ({
                     id: product.id,
                     text: product.name,
-                    uom: product.uom?.name || 'N/A'
+                    uom: product.presentation || 'PIEZA'
                 }))
             };
         }
@@ -74,17 +79,27 @@ export const initGoodsIssueSelect2 = async ({
     $(productSelector).on('select2:select', (e) => {
 
         const selectedProduct = e.params.data;
-        const value = selectedProduct?.uom || '';
+        const value = selectedProduct?.presentation || 'PIEZA';
 
-        const instance = initMdbWrapperInput({ selector: '#uomDisplayInput', value });
+        const instance = initMdbWrapperInput({ selector: '#presentationDisplayInput', value });
         updateMdbWrapperInput(instance);
     });
 
     if (data) {
 
-        const requesterOption = new Option(`${ data.requester.name } ${ data.requester.lastName }`, data.requester.id, true, true);
+        const requesterOption = new Option(
+            `${ data.requester.name } ${ data.requester.lastName }`, 
+            data.requester.id, 
+            true, 
+            true
+        );
         $(requesterSelector).append(requesterOption).trigger('change');
-        const projectOption = new Option(`${ data.project.referenceNumber } - ${ data.project.name }`, data.project.id, true, true);
+        const projectOption = new Option(
+            `${ data.project.referenceNumber }`, 
+            data.project.id, 
+            true, 
+            true
+        );
         $(projectSelector).append(projectOption).trigger('change');
         return;
     }

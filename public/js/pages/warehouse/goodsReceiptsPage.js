@@ -9,9 +9,13 @@ import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
 
+const modalId = '#goodsReceiptModal';
+const formId = '#goodsReceiptForm';
+
 createGoodsReceiptDatatable();
 
 useForm({
+    selector: formId,
     normalizeData: ({ formData }) => {
 
         formData.details = details;
@@ -45,9 +49,10 @@ useForm({
     }
 });
 
-export const openGoodsReceiptModal = async ({ mode, data = null }) => {
+export const openGoodsReceiptModal = async ({ mode, data = null, onSave = null }) => {
 
-    const form = document.getElementById('form');
+    const form = document.querySelector(formId);
+    const modalElement = document.querySelector(modalId);
 
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
@@ -60,17 +65,17 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
     if (mode === 'create') {
         
         form.reset();
-        document.getElementById('modalTitle').textContent = 'Registrar recepción';
-        document.getElementById('submitBtn').textContent = 'Guardar';
-        document.getElementById('presentationDisplayInput').value = '';
+        modalElement.querySelector('#modalTitle').textContent = 'Registrar recepción';
+        form.querySelector('#submitBtn').textContent = 'Guardar';
+        form.querySelector('#presentationDisplayInput').value = '';
 
         await initGoodsReceiptSelect2();
     }
 
     if (mode === 'edit' || mode === 'view') {
 
-        document.getElementById('observationsInput').value = data.observations || '';
-        document.getElementById('receptionDateInput').value = formatDateLongWithTime(data.receptionDate);
+        form.querySelector('#observationsInput').value = data.observations || '';
+        form.querySelector('#receptionDateInput').value = formatDateLongWithTime(data.receptionDate);
         details.push(...data?.details.map(detail => ({
             id: detail.id,
             name: detail.product.name,
@@ -84,13 +89,13 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
 
         if (mode === 'edit') {
 
-            document.getElementById('modalTitle').textContent = 'Editar recepción';
-            document.getElementById('submitBtn').textContent = 'Actualizar';
+            modalElement.querySelector('#modalTitle').textContent = 'Editar recepción';
+            form.querySelector('#submitBtn').textContent = 'Actualizar';
         }
 
         if (mode === 'view') {
 
-            document.getElementById('modalTitle').textContent = 'Ver recepción';
+            modalElement.querySelector('#modalTitle').textContent = 'Ver recepción';
 
             setFormReadOnly({ form, isReadOnly: true });
         }
@@ -98,17 +103,18 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
 
     initDetailsGoodsReceiptTable(mode)
 
-    const modalElement = document.getElementById('modal');
+    form.onSave = onSave;
+
     const modal = mdb.Modal.getOrCreateInstance(modalElement);
     modal.show();
 }
 
 const addProduct = () => {
 
-    const productId = document.getElementById('productInput').value;
+    const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const productName = selectedProduct?.text || '';
-    const quantity = document.getElementById('quantityInput').value;
+    const quantity = document.querySelector('#quantityInput').value;
 
     if (!productId || !quantity) {
         alert('Por favor, complete los campos de producto y cantidad.');
@@ -120,16 +126,16 @@ const addProduct = () => {
         return;
     }
 
-    const product = { productId: productId, name: productName, quantity, uom: selectedProduct?.uom || 'N/A' };
+    const product = { productId: productId, name: productName, quantity, presentation: selectedProduct?.presentation || 'PIEZA' };
     details.push(product);
 
     refreshProductTable(details);
 
     $('#productInput').empty().trigger('change');
-    document.getElementById('quantityInput').value = '';
-    document.getElementById('presentationDisplayInput').value = '';
+    document.querySelector('#quantityInput').value = '';
+    document.querySelector('#presentationDisplayInput').value = '';
 }
 
 on('click', '#addProductBtn', addProduct);
-on('click', '#cancelBtn', async () => await handleAction(cancelGoodsReceipt));
-on('click', '#confirmBtn', async () => await handleAction(confirmGoodsReceipt));
+on('click', '#cancelBtn', async () => await handleAction({ action: cancelGoodsReceipt, formId }));
+on('click', '#confirmBtn', async () => await handleAction({ action: confirmGoodsReceipt, formId }));

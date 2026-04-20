@@ -1,6 +1,8 @@
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { initbaseSelect2 } from "./baseSelect.js";
 
+const modalSelector = '#goodsIssueModal';
+
 export const initPurchaseRequisitionSelect2 = async (data = null) => {
 
     const projectSelector = '#projectInput';
@@ -8,7 +10,8 @@ export const initPurchaseRequisitionSelect2 = async (data = null) => {
     const productSelector = '#productInput';
 
     initbaseSelect2({
-        selector: projectSelector,
+        baseSelector: projectSelector,
+        modalSelector,
         url: '/api/admin/projects/',
         placeholder: 'Buscar proyecto...',
         processResults: (data) => {
@@ -24,7 +27,8 @@ export const initPurchaseRequisitionSelect2 = async (data = null) => {
     });
 
     initbaseSelect2({
-        selector: requesterSelector,
+        baseSelector: requesterSelector,
+        modalSelector,
         url: '/api/admin/profiles/',
         placeholder: 'Buscar solicitante...',
         processResults: (data) => {
@@ -40,7 +44,8 @@ export const initPurchaseRequisitionSelect2 = async (data = null) => {
     });
 
     initbaseSelect2({
-        selector: productSelector,
+        baseSelector: productSelector,
+        modalSelector,
         url: '/api/warehouse/products/',
         placeholder: 'Buscar producto...',
         processResults: (data) => {
@@ -50,7 +55,7 @@ export const initPurchaseRequisitionSelect2 = async (data = null) => {
                 results: list.map(product => ({
                     id: product.id,
                     text: product.name,
-                    uom: product.uom?.name || 'N/A'
+                    uom: product.presentation || 'PIEZA'
                 }))
             };
         }
@@ -59,9 +64,9 @@ export const initPurchaseRequisitionSelect2 = async (data = null) => {
     $(productSelector).on('select2:select', (e) => {
     
         const selectedProduct = e.params.data;
-        const value = selectedProduct?.uom || '';
+        const value = `PIEZA(${selectedProduct?.presentation || 'PIEZA'})`;
 
-        const instance = initMdbWrapperInput({ selector: '#uomDisplayInput', value });
+        const instance = initMdbWrapperInput({ selector: '#presentationDisplayInput', value });
         updateMdbWrapperInput(instance);
     });
 

@@ -90,11 +90,7 @@ export const findAllPurchaseRequisitions = async ({
                         select: {
                             id: true,
                             name: true,
-                            uom: {
-                                select: {
-                                    name: true
-                                }
-                            }
+                            presentation: true
                         }
                     },
                     quantity: true

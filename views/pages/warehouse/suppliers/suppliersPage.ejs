@@ -1,4 +1,5 @@
 <% const form = {
+    id: 'supplierForm',
     canApprove: false,
     inputs: [
         {
@@ -28,7 +29,7 @@
 
 <%- include('../../../shared/mainTable', { title: 'Proveedores' }) %>
 
-<%- include('../../../shared/modal', { form }) %>
+<%- include('../../../shared/modal', { idModal: 'supplierModal', form }) %>
 
 <script type="module" src="/js/pages/warehouse/suppliersPage.js"></script>
 

@@ -193,14 +193,6 @@ async function main() {
         skipDuplicates: true
     });
 
-    await prisma.supplier.createMany({
-        data: [
-            { name: 'Proveedor 1' },
-            { name: 'Proveedor 2' },
-        ],
-        skipDuplicates: true
-    });
-
     for (const userSeed of usersSeed) {
         await prisma.user.update({
             where: { name: userSeed.name },

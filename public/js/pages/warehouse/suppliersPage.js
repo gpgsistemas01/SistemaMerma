@@ -5,9 +5,13 @@ import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { setFormReadOnly } from "../../ui/formUI.js";
 import { supplierValidators } from "../../utils/validations/validators.js";
 
+const modalId = '#supplierModal';
+const formId = '#supplierForm';
+
 createSupplierDatatable();
 
 useForm({
+    selector: formId,
     normalizeData: ({ formData }) => {
         formData.isActive = document.getElementById('isActiveInput').checked;
     },
@@ -32,7 +36,8 @@ useForm({
 
 export const openSupplierModal = ({ mode, data = null }) => {
 
-    const form = document.getElementById('form');
+    const form = document.querySelector(formId);
+    const modalElement = document.querySelector(modalId);
 
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
@@ -42,31 +47,30 @@ export const openSupplierModal = ({ mode, data = null }) => {
     if (mode === 'create') {
 
         form.reset();
-        document.getElementById('modalTitle').textContent = 'Registrar proveedor';
-        document.getElementById('submitBtn').textContent = 'Guardar';
+        modalElement.querySelector('#modalTitle').textContent = 'Registrar proveedor';
+        form.querySelector('#submitBtn').textContent = 'Guardar';
     }
 
     if (mode === 'edit' || mode === 'view') {
 
-        document.getElementById('nameInput').value = data.name;
-        document.getElementById('numberphoneInput').value = data.numberphone || '';
-        document.getElementById('isActiveInput').checked = data.isActive;
+        form.elements.name.value = data.name;
+        form.elements.numberphone.value = data.numberphone || '';
+        form.elements.isActive.checked = data.isActive;
 
         if (mode === 'edit') {
 
-            document.getElementById('modalTitle').textContent = 'Editar proveedor';
-            document.getElementById('submitBtn').textContent = 'Actualizar';
+            modalElement.querySelector('#modalTitle').textContent = 'Editar proveedor';
+            form.querySelector('#submitBtn').textContent = 'Actualizar';
         }
 
         if (mode === 'view') {
 
-            document.getElementById('modalTitle').textContent = 'Ver proveedor';
+            modalElement.querySelector('#modalTitle').textContent = 'Ver proveedor';
 
             setFormReadOnly({ form, isReadOnly: true });
         }
     }
 
-    const modalElement = document.getElementById('modal');
     const modal = mdb.Modal.getOrCreateInstance(modalElement);
     modal.show();
 }

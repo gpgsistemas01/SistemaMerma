@@ -1,0 +1,45 @@
+import { setFormReadOnly } from "../../ui/formUI.js";
+
+export const openProductModal = async ({ mode, data = null, onSave = null }) => {
+    
+    const form = document.querySelector('#productForm');
+    const modalElement = document.querySelector('#productModal');
+
+    form.dataset.mode = mode;
+    form.dataset.id = data?.id || '';
+
+    setFormReadOnly({ form, isReadOnly: false });
+
+    if (mode === 'create') {
+        
+        form.reset();
+        modalElement.querySelector('#modalTitle').textContent = 'Registrar producto';
+        form.querySelector('#submitBtn').textContent = 'Guardar';
+    }
+
+    if (mode === 'edit' || mode === 'view') {
+
+        form.elements.name.value = data.name;
+        form.elements.unitCost.value = data.unitCost;
+        form.elements.minStock.value = data.minStock;
+        form.elements.base.value = data.base || '';
+        form.elements.height.value = data.height || '';
+        form.elements.isActive.checked = data.isActive;
+
+        if (mode === 'edit') {
+
+            modalElement.querySelector('#modalTitle').textContent = 'Editar producto';
+            form.querySelector('#submitBtn').textContent = 'Actualizar';
+        }
+
+        if (mode === 'view') {
+
+            modalElement.querySelector('#modalTitle').textContent = 'Ver producto';
+
+            setFormReadOnly({ form, isReadOnly: true });
+        }
+    }
+
+    const modal = mdb.Modal.getOrCreateInstance(modalElement);
+    modal.show();
+}

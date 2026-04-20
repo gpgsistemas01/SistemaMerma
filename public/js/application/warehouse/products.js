@@ -8,11 +8,12 @@ export const registerProduct = async (formData) => {
         const response = await registerProductRequest(formData);
 
         const { data } = response;
-        const { code } = data;
+        const { code, product } = data;
         let message = getSuccessMessage(code);
 
         return {
-            message
+            message,
+            data: product
         };
 
     } catch (err) {

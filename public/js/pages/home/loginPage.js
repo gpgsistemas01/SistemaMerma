@@ -3,9 +3,11 @@ import { useForm } from "../../application/form.js";
 import { validateFields } from "../../utils/formUtils.js";
 import { loginValidators } from "../../utils/validations/validators.js";
 
+const formId = '#loginForm';
 document.getElementById('submitBtn').textContent = 'Ingresar';
 
 useForm({
+    selector: formId,
     getErrors: (formData) => {
 
         let errors = {};

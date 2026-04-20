@@ -19,13 +19,15 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
     notifications.showSuccess(response.message);
     closeModal(form);
     reloadMainTable();
+
+    return response.data;
 }
 
-export const handleAction = async (action) => {
+export const handleAction = async ({ action, formId }) => {
 
     try {
 
-        const form = document.getElementById('form');
+        const form = document.querySelector(formId);
         const id = form.dataset.id;
 
         if (!id) notifications.showError('No hay registro seleccionado.');

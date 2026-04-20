@@ -1,5 +1,6 @@
 export const initbaseSelect2 = ({ 
-    selector, 
+    baseSelector, 
+    modalSelector,
     url, 
     placeholder,
     processResults,
@@ -7,15 +8,23 @@ export const initbaseSelect2 = ({
         return {
             search: params.term
         };
+    },
+    tags = false,
+    createTag = (params) => {
+
+        return {
+            id: params.term,
+            text: params.term
+        };
     }
 }) => {
 
-    if ($(selector).hasClass("select2-hidden-accessible")) $(selector).select2('destroy');
+    if ($(baseSelector).hasClass("select2-hidden-accessible")) $(baseSelector).select2('destroy');
 
-    $(selector).select2({ 
+    $(baseSelector).select2({ 
         language: 'es',
         placeholder: placeholder, 
-        dropdownParent: $('#modal'),
+        dropdownParent: $(modalSelector),
         minimumInputLength: 0, 
         ajax: { 
             url: url, 
@@ -23,6 +32,8 @@ export const initbaseSelect2 = ({
             delay: 250, 
             data, 
             processResults: processResults 
-        } 
+        },
+        tags,
+        createTag
     });
 }

@@ -10,10 +10,13 @@ import { handleAction, handleSubmit, validateFields } from "../../utils/formUtil
 import { validatePurchaseRequisitionValidators } from "../../utils/validations/validators.js";
 
 const context = window.PURCHASE_REQUISITION_CONTEXT || {};
+const modalId = '#purchaseRequisitionModal';
+const formId = '#purchaseRequisitionForm';
 
 createPurchaseRequisitionDatatable(context);
 
 useForm({
+    selector: formId,
     normalizeData: ({ formData }) => {
 
         formData.details = details;
@@ -49,7 +52,8 @@ useForm({
 
 export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
 
-    const form = document.getElementById('form');
+    const form = document.querySelector(formId);
+    const modalElement = document.querySelector(modalId);
 
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
@@ -62,37 +66,37 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
     if (mode === 'create') {
 
         form.reset();
-        document.getElementById('modalTitle').textContent = 'Registrar requisición';
-        document.getElementById('submitBtn').textContent = 'Guardar';
-        document.getElementById('presentationDisplayInput').value = '';
+        modalElement.querySelector('#modalTitle').textContent = 'Registrar requisición';
+        form.querySelector('#submitBtn').textContent = 'Guardar';
+        form.querySelector('#presentationDisplayInput').value = '';
 
         await initPurchaseRequisitionSelect2();
     }
 
     if (mode === 'edit' || mode === 'view') {
 
-        document.getElementById('observationsInput').value = data.observations || '';
-        document.getElementById('requestDateInput').value = formatDateLongWithTime(data.requestDate);
+        form.querySelector('#observationsInput').value = data.observations || '';
+        form.querySelector('#requestDateInput').value = formatDateLongWithTime(data.requestDate);
         details.push(...data?.details.map(detail => ({
             id: detail.id,
             name: detail.product.name,
             productId: detail.product.id,
             quantity: detail.quantity,
             description: detail.description,
-            uom: detail.product.uom?.name || 'N/A'
+            uom: detail.product.presentation || 'PIEZA'
         })));
 
         await initPurchaseRequisitionSelect2(data);
 
         if (mode === 'edit') {
 
-            document.getElementById('modalTitle').textContent = 'Editar requisición';
-            document.getElementById('submitBtn').textContent = 'Actualizar';
+            modalElement.querySelector('#modalTitle').textContent = 'Editar requisición';
+            form.querySelector('#submitBtn').textContent = 'Actualizar';
         }
 
         if (mode === 'view') {
 
-            document.getElementById('modalTitle').textContent = 'Ver requisición';
+            modalElement.querySelector('#modalTitle').textContent = 'Ver requisición';
 
             setFormReadOnly({ form, isReadOnly: true });
         }
@@ -100,17 +104,16 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
 
     initDetailsPurchaseRequisitionTable(mode);
 
-    const modalElement = document.getElementById('modal');
     const modal = mdb.Modal.getOrCreateInstance(modalElement);
     modal.show();
 };
 
 const addProduct = () => {
 
-    const productId = document.getElementById('productInput').value;
+    const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const productName = selectedProduct?.text || '';
-    const quantity = document.getElementById('quantityInput').value;
+    const quantity = document.querySelector('#quantityInput').value;
 
     if (!productId || !quantity) {
         alert('Por favor, complete los campos de producto y cantidad.');
@@ -122,16 +125,16 @@ const addProduct = () => {
         return;
     }
 
-    const product = { productId, name: productName, quantity, presentation: selectedProduct?.presentation || 'N/A' };
+    const product = { productId, name: productName, quantity, presentation: selectedProduct?.presentation || 'PIEZA' };
     details.push(product);
 
     refreshProductTable(details);
 
     $('#productInput').empty().trigger('change');
-    document.getElementById('quantityInput').value = '';
-    document.getElementById('presentationDisplayInput').value = '';
+    document.querySelector('#quantityInput').value = '';
+    document.querySelector('#presentationDisplayInput').value = '';
 };
 
 on('click', '#addProductBtn', addProduct);
-on('click', '#cancelBtn', async ()=> await handleAction(cancelPurchaseRequisition));
-on('click', '#confirmBtn', async () => await handleAction(confirmPurchaseRequisition));
+on('click', '#cancelBtn', async ()=> await handleAction({ action: cancelPurchaseRequisition, formId }));
+on('click', '#confirmBtn', async () => await handleAction({ action: confirmPurchaseRequisition, formId }));

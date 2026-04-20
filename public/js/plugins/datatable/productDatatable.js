@@ -1,4 +1,4 @@
-import { openProductModal } from "../../pages/warehouse/productsPage.js";
+import { openProductModal } from "../../components/modals/productModal.js";
 import { createDataTable } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
 

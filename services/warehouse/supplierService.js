@@ -5,7 +5,7 @@ export const findAllSuppliers = async ({
     skip = 0,
     take = 10,
     search = '',
-    orderBy = 'name',
+    orderBy = 'legalName',
     orderDir = 'asc'
 }) => {
 

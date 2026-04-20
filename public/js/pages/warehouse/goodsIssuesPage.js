@@ -8,6 +8,9 @@ import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
 
+const modalId = '#goodsIssueModal';
+const formId = '#goodsIssueForm';
+
 const context = window.GOODS_ISSUE_CONTEXT || {};
 let leftAction = null;
 let rightAction = null;
@@ -26,6 +29,7 @@ const buildDeliveredByProductMap = (movement = []) => {
 createGoodsIssueDatatable(context);
 
 useForm({
+    selector: formId,
     normalizeData: ({ formData }) => {
 
         formData.details = details;
@@ -61,7 +65,8 @@ useForm({
 
 export const openGoodsIssueModal = async ({ mode, data = null }) => {
 
-    const form = document.getElementById('form');
+    const form = document.querySelector(formId);
+    const modalElement = document.querySelector(modalId);
 
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
@@ -76,9 +81,9 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
     if (mode === 'create') {
 
         form.reset();
-        document.getElementById('modalTitle').textContent = 'Registrar salida';
-        document.getElementById('submitBtn').textContent = 'Guardar';
-        document.getElementById('presentationDisplayInput').value = '';
+        modalElement.querySelector('#modalTitle').textContent = 'Registrar salida';
+        form.querySelector('#submitBtn').textContent = 'Guardar';
+        form.querySelector('#presentationDisplayInput').value = '';
 
         await initGoodsIssueSelect2({ context });
     }
@@ -87,8 +92,8 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
 
         const deliveredByProduct = buildDeliveredByProductMap(data?.movement || []);
 
-        document.getElementById('observationsInput').value = data.observations || '';
-        document.getElementById('requestDateInput').value = formatDateLongWithTime(data.requestDate);
+        form.querySelector('#observationsInput').value = data.observations || '';
+        form.querySelector('#requestDateInput').value = formatDateLongWithTime(data.requestDate);
         details.push(...(data?.details || [])
             .map(detail => ({
                 deliveredQuantity: Math.min(Number(detail.quantity), deliveredByProduct.get(detail.product.id) || 0),
@@ -101,7 +106,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
                     0
                 ),
                 description: detail.description,
-                presentation: detail.product.presentation || 'N/A'
+                presentation: detail.product.presentation || 'PIEZA'
             }))
             .map((detail) => {
                 const delivered = detail.deliveredQuantity || 0;
@@ -114,12 +119,12 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         await initGoodsIssueSelect2({ data, context });
 
         if (mode === 'edit') {
-            document.getElementById('modalTitle').textContent = 'Editar salida';
-            document.getElementById('submitBtn').textContent = 'Actualizar';
+            modalElement.querySelector('#modalTitle').textContent = 'Editar salida';
+            form.querySelector('#submitBtn').textContent = 'Actualizar';
         }
 
         if (mode === 'view') {
-            document.getElementById('modalTitle').textContent = 'Ver salida';
+            modalElement.querySelector('#modalTitle').textContent = 'Ver salida';
             setFormReadOnly({ form, isReadOnly: true });
         }
     }
@@ -134,9 +139,9 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         const canApproveReject = status === 'Abierta' && (isAdmin || isWarehouse || isCoordinatorOfArea);
         const canConfirmCancel = status === 'Aprobada' && (isAdmin || isWarehouse);
 
-        const actionContainer = document.querySelector('.approve-container');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const confirmBtn = document.getElementById('confirmBtn');
+        const actionContainer = form.querySelector('.approve-container');
+        const cancelBtn = form.querySelector('#cancelBtn');
+        const confirmBtn = form.querySelector('#confirmBtn');
 
         if (canApproveReject) {
 
@@ -162,17 +167,16 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
 
     initDetailsGoodsIssueTable(mode, data?.status?.name);
 
-    const modalElement = document.getElementById('modal');
     const modal = mdb.Modal.getOrCreateInstance(modalElement);
     modal.show();
 };
 
 const addProduct = () => {
 
-    const productId = document.getElementById('productInput').value;
+    const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const productName = selectedProduct?.text || '';
-    const quantity = document.getElementById('quantityInput').value;
+    const quantity = document.querySelector('#quantityInput').value;
 
     if (!productId || !quantity) {
         alert('Por favor, complete los campos de producto y cantidad.');
@@ -184,21 +188,21 @@ const addProduct = () => {
         return;
     }
 
-    details.push({ productId, name: productName, quantity, uom: selectedProduct?.uom || 'N/A' });
+    details.push({ productId, name: productName, quantity, presentation: selectedProduct?.presentation || 'PIEZA' });
 
     refreshProductTable(details);
 
     $('#productInput').empty().trigger('change');
-    document.getElementById('quantityInput').value = '';
-    document.getElementById('presentationDisplayInput').value = '';
+    document.querySelector('#quantityInput').value = '';
+    document.querySelector('#presentationDisplayInput').value = '';
 };
 
 on('click', '#addProductBtn', addProduct);
 on('click', '#cancelBtn', async () => {
     if (!leftAction) return;
-    await handleAction(leftAction);
+    await handleAction({ action: leftAction, formId });
 });
 on('click', '#confirmBtn', async () => {
     if (!rightAction) return;
-    await handleAction(rightAction);
+    await handleAction({ action: rightAction, formId });
 });

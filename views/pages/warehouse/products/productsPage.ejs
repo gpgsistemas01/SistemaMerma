@@ -1,61 +1,13 @@
-<% const form = {
-    canApprove: false,
-    inputs: [
-        {
-            id: 'nameInput',
-            type: 'text',
-            name: 'name',
-            label: 'Nombre',
-            col: '6'
-        },
-        {
-            id: 'unitCostInput',
-            type: 'number',
-            name: 'unitCost',
-            label: 'Costo Unitario',
-            col: '6'
-        },
-        {
-            id: 'minStockInput',
-            type: 'number',
-            name: 'minStock',
-            label: 'Stock Mínimo',
-            col: '6'
-        },
-        {
-            id: 'baseInput',
-            type: 'number',
-            name: 'base',
-            label: 'Base',
-            col: '6'
-        },
-        {
-            id: 'heightInput',
-            type: 'number',
-            name: 'height',
-            label: 'Altura',
-            col: '6'
-        },
-    ],
-    checkboxes: [
-        {
-            id: 'isActiveInput',
-            type: 'checkbox',
-            name: 'isActive',
-            label: 'Activo'
-        }
-    ]
-} %>
-
 <%- include('../../../shared/mainTable', { title: 'Productos' }) %>
 
-<%- include('../../../shared/modal', { form }) %>
+<%- include('../ui/productModal') %>
 
 <script>
     window.PRODUCT_CONTEXT = <%- JSON.stringify(user) %>;
 </script>
 
 <script type="module" src="/js/pages/warehouse/productsPage.js"></script>
+<script type="module" src="/js/components/modals/productModal.js"></script>
 
 <%- contentFor('title') %>
 Productos

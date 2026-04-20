@@ -1,5 +1,8 @@
+import { openProductModal } from "../../components/modals/productModal.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { initbaseSelect2 } from "./baseSelect.js";
+
+const modalSelector = '#goodsReceiptModal';
 
 export const initGoodsReceiptSelect2 = async (data = null) => {
 
@@ -8,7 +11,8 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
     const productSelector = '#productInput';
 
     initbaseSelect2({
-        selector: supplierSelector,
+        baseSelector: supplierSelector,
+        modalSelector,
         url: '/api/warehouse/suppliers/',
         placeholder: 'Buscar proveedor...',
         processResults: (data) => {
@@ -17,14 +21,15 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
             return { 
                 results: list.map(supplier => ({ 
                     id: supplier.id, 
-                    text: supplier.name 
+                    text: supplier.tradeName 
                 })) 
             }; 
         }
     });
 
     initbaseSelect2({
-        selector: receivedBySelector,
+        baseSelector: receivedBySelector,
+        modalSelector,
         url: '/api/admin/profiles/',
         placeholder: 'Buscar persona que recibe...',
         data: (params) => {
@@ -47,7 +52,8 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
     });
 
     initbaseSelect2({
-        selector: productSelector,
+        baseSelector: productSelector,
+        modalSelector,
         url: '/api/warehouse/products/',
         placeholder: 'Buscar producto...',
         processResults: (data) => {
@@ -57,26 +63,69 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
                 results: list.map(product => ({
                     id: product.id,
                     text: product.name,
-                    uom: product.uom?.name || 'N/A'
+                    presentation: product.presentation || 'PIEZA'
                 })) 
             }; 
-        }
+        },
+        tags: true,
+        createTag: (params) => {
+            const term = params.term.trim();
+
+            if (term === '') return null;
+
+            return {
+                id: `new:${term}`,
+                text: `${term} (Nuevo producto)`,
+                newTag: true
+            }
+        },
     });
 
     $(productSelector).on('select2:select', (e) => {
     
         const selectedProduct = e.params.data;
-        const value = selectedProduct?.uom || '';
 
-        const instance = initMdbWrapperInput({ selector: '#uomDisplayInput', value });
+        if (selectedProduct.newTag) {
+
+            const productName = selectedProduct.id.replace('new:', '');
+            openProductModal({ 
+                mode: 'create', 
+                data: { name: productName },
+                onSave: (createdProduct) => {
+                    const newOption = new Option(
+                        createdProduct.name, 
+                        createdProduct.id, 
+                        true, 
+                        true
+                    );
+                    $(productSelector).append(newOption).trigger('change');
+                }
+            });
+            $(productSelector).val(null).trigger('change');
+            return;
+        }
+
+        const value = `PIEZA(${selectedProduct?.presentation || 'PIEZA'})`;
+
+        const instance = initMdbWrapperInput({ selector: '#presentationDisplayInput', value });
         updateMdbWrapperInput(instance);
     });
 
     if (data) {
 
-        const supplierOption = new Option(data.supplier.name, data.supplier.id, true, true);
+        const supplierOption = new Option(
+            data.supplier.tradeName, 
+            data.supplier.id, 
+            true, 
+            true
+        );
         $(supplierSelector).append(supplierOption).trigger('change');
-        const receivedByOption = new Option(data.receivedBy.name, data.receivedBy.id, true, true);
+        const receivedByOption = new Option(
+            `${data.receivedBy.name} ${data.receivedBy.lastName}`, 
+            data.receivedBy.id, 
+            true, 
+            true
+        );
         $(receivedBySelector).append(receivedByOption).trigger('change');
 
     } else {

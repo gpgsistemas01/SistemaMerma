@@ -1,4 +1,5 @@
 <% const form = {
+    id: 'goodsReceiptForm',
     canApprove: true,
     selects: [
         {
@@ -46,7 +47,9 @@
 
 <%- include('../../../shared/mainTable', { title: 'Recepciones de compra' }) %>
 
-<%- include('../../../shared/modal', { form }) %>
+<%- include('../../../shared/modal', { idModal: 'goodsReceiptModal', form }) %>
+
+<%- include('../ui/productModal') %>
 
 <script type="module" src="/js/pages/warehouse/goodsReceiptsPage.js"></script>
 

@@ -5,6 +5,7 @@ import { on } from "../utils/domUtils.js";
 import { mapServerErrors } from "../utils/formUtils.js";
 
 export const useForm = async ({ 
+    selector,
     normalizeData = () => {},
     normalizeErrors = () => {},
     getErrors = () => {},
@@ -12,7 +13,7 @@ export const useForm = async ({
     normalizeServerErrors = () => {},
 }) => {
 
-    on('submit', '#form', async (e, form) => {
+    on('submit', selector, async (e, form) => {
 
         e.preventDefault();
 

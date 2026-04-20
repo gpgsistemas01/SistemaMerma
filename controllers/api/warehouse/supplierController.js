@@ -9,7 +9,7 @@ export const getAllSuppliers = async (req, res) => {
     const length = parseInt(req.query.length) || 10;
     const search = req.query['search[value]'] || '';
 
-    const columns = ['name'];
+    const columns = ['legalName'];
     const orderColumnIndex = req.query.order?.[0]?.column || 0;
     const orderDir = req.query.order?.[0]?.dir || 'asc';
 

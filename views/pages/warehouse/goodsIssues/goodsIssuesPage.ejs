@@ -1,4 +1,5 @@
 <% const form = {
+    id: 'goodsIssueForm',
     canApprove: true,
     selects: [
         {
@@ -46,7 +47,7 @@
 
 <%- include('../../../shared/mainTable', { title: 'Salidas de almacén' }) %>
 
-<%- include('../../../shared/modal', { form }) %>
+<%- include('../../../shared/modal', { idModal: 'goodsIssueModal', form }) %>
 
 <script>
     window.GOODS_ISSUE_CONTEXT = <%- JSON.stringify(user) %>;
