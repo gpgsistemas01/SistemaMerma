@@ -1,5 +1,22 @@
 import { SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { prisma } from "../../lib/prisma.js";
+import { incrementReferenceNumberCounter } from "../document/referenceNumberService.js";
+
+const SUPPLIER_CODE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+const numberToSupplierCode = (number) => {
+
+    let current = number + 1;
+    let code = '';
+
+    while (current > 0) {
+        current -= 1;
+        code = SUPPLIER_CODE_ALPHABET[current % 26] + code;
+        current = Math.floor(current / 26);
+    }
+
+    return code;
+};
 
 export const findAllSuppliers = async ({
     skip = 0,
@@ -11,10 +28,32 @@ export const findAllSuppliers = async ({
 
     const where = search
         ? {
-            name: {
-                contains: search,
-                mode: 'insensitive'
-            }
+            OR: [
+                {
+                    code: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    legalName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    tradeName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    numberphone: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            ]
         }
         : {};
 
@@ -39,16 +78,30 @@ export const findAllSuppliers = async ({
 
 export const createSupplier = async (supplierDto) => {
 
-    const supplier = await prisma.supplier.create({
-        data: {
-            name: supplierDto.name,
-            numberphone: supplierDto.numberphone,
-            isActive: supplierDto.isActive
-        }
+    const supplier = await prisma.$transaction(async (tx) => {
+
+        const counter = await incrementReferenceNumberCounter({
+            type: 'PRO',
+            tx
+        });
+
+        const codeNumber = counter.counter;
+        const generatedCode = numberToSupplierCode(codeNumber - 1);
+
+        return tx.supplier.create({
+            data: {
+                codeNumber,
+                code: generatedCode,
+                legalName: supplierDto.legalName,
+                tradeName: supplierDto.tradeName,
+                numberphone: supplierDto.numberphone,
+                isActive: supplierDto.isActive
+            }
+        });
     });
 
     return supplier;
-}
+};
 
 export const updateSupplier = async (supplierDto, id) => {
 
@@ -67,7 +120,8 @@ export const updateSupplier = async (supplierDto, id) => {
 
         const supplier = await prisma.supplier.update({
             data: {
-                name: supplierDto.name,
+                legalName: supplierDto.legalName,
+                tradeName: supplierDto.tradeName,
                 numberphone: supplierDto.numberphone,
                 isActive: supplierDto.isActive
             },

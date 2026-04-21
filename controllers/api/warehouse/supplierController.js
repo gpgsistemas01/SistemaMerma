@@ -1,4 +1,4 @@
-import { createSupplierDtoForRegister } from "../../../dtos/supplierDTO.js";
+import { createSupplierDtoForRegister } from "../../../dtos/supplierDto.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { findAllSuppliers, createSupplier, updateSupplier } from "../../../services/warehouse/supplierService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
@@ -9,7 +9,7 @@ export const getAllSuppliers = async (req, res) => {
     const length = parseInt(req.query.length) || 10;
     const search = req.query['search[value]'] || '';
 
-    const columns = ['legalName'];
+    const columns = ['code', 'legalName', 'tradeName', 'numberphone', 'isActive'];
     const orderColumnIndex = req.query.order?.[0]?.column || 0;
     const orderDir = req.query.order?.[0]?.dir || 'asc';
 

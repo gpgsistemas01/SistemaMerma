@@ -55,7 +55,8 @@ export const openSupplierModal = ({ mode, data = null }) => {
 
     if (mode === 'edit' || mode === 'view') {
 
-        form.elements.name.value = data.name;
+        form.elements.legalName.value = data.legalName;
+        form.elements.tradeName.value = data.tradeName;
         form.elements.numberphone.value = data.numberphone || '';
         form.elements.isActive.checked = data.isActive;
 

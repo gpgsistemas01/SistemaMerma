@@ -103,6 +103,7 @@ model Waste {
 
 model Supplier {
   id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codeNumber    Int
   code String @unique @db.VarChar(10)
   legalName          String         @db.VarChar(200)
   tradeName String @db.VarChar(100)

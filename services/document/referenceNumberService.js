@@ -1,12 +1,20 @@
-export const generateReferenceNumber = async ({ type, sequence, tx }) => {
+export const incrementReferenceNumberCounter = async ({ type, tx }) => {
 
-    const counter = await tx.referenceNumberCounter.update({
+    return tx.referenceNumberCounter.update({
         where: { prefix: type },
         data: {
             counter: {
                 increment: 1
             }
         }
+    });
+}
+
+export const generateReferenceNumber = async ({ type, sequence, tx }) => {
+
+    const counter = await incrementReferenceNumberCounter({
+        type,
+        tx
     });
 
     const year = new Date().getFullYear();
