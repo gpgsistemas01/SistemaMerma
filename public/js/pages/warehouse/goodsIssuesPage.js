@@ -11,6 +11,7 @@ import { backModal, openModal } from "../../ui/modalUI.js";
 
 const modalId = '#goodsIssueModal';
 const formId = '#goodsIssueForm';
+const backSelector = `#backBtn-${modalId.replace('#', '')}`;
 
 const context = window.GOODS_ISSUE_CONTEXT || {};
 let leftAction = null;
@@ -206,4 +207,4 @@ on('click', '#confirmBtn', async () => {
     if (!rightAction) return;
     await handleAction({ action: rightAction, formId });
 });
-on('click', `#backBtn-${modalId}`, backModal());
+on('click', backSelector, () => backModal());

@@ -249,13 +249,29 @@ async function main() {
         defval: null,
     });
 
-    const supplierParsed = supplierRows.map((row, index) => ({
-        codeNumber: index + 1,
-        code: row.code,
-        legalName: row.legalName,
-        tradeName: row.tradeName,
-        numberphone: null
-    }));
+    let counter;
+
+    const supplierParsed = supplierRows.map((row, index) => {
+
+        counter = index + 1;
+        
+        return {
+            codeNumber: counter,
+            code: row.code,
+            legalName: row.legalName,
+            tradeName: row.tradeName,
+            numberphone: null
+        }
+    });
+
+    await prisma.referenceNumberCounter.update({
+        where: {
+            prefix: 'PRO'
+        },
+        data: {
+            counter: counter
+        }
+    });
 
     await prisma.supplier.createMany({
         data: supplierParsed,
@@ -292,7 +308,7 @@ async function main() {
         }
     });
 
-    const supplierMao = new Map(suppliers.map(s => [s.tradeName, s.id]))
+    const supplierMap = new Map(suppliers.map(s => [s.tradeName, s.id]))
 
     const relationSupplierProductSheet = workbook.Sheets['RELACIONES'];
     const relationSupplierProductRows = XLSX.utils.sheet_to_json(relationSupplierProductSheet, {
@@ -302,7 +318,7 @@ async function main() {
     const relationsSupplierProductParsed = relationSupplierProductRows.map(row => {
 
         const productId = productMap.get(row.skuProduct);
-        const supplierId = supplierMao.get(row.supplier);
+        const supplierId = supplierMap.get(row.supplier);
 
         if (!supplierId || !productId) {
             console.log('Error en fila: ',row);

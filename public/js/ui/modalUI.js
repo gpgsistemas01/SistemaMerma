@@ -9,9 +9,12 @@ export const openModal = (modalElement) => {
 
 export const closeModal = (form) => {
     
-    const modalElement = document.getElementById('modal');
-    const modal = initMdbModal(modalElement);
-    hideModal({ el: modalElement, modal, form });
+    const current = modalStack.pop();
+
+    if (!current) return;
+
+    const currentEl = current._element;
+    hideModal({ el: currentEl, modal: current, form });
 }
 
 export const backModal = () => {

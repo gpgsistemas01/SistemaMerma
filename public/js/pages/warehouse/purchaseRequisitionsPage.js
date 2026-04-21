@@ -13,6 +13,7 @@ import { validatePurchaseRequisitionValidators } from "../../utils/validations/v
 const context = window.PURCHASE_REQUISITION_CONTEXT || {};
 const modalId = '#purchaseRequisitionModal';
 const formId = '#purchaseRequisitionForm';
+const backSelector = `#backBtn-${modalId.replace('#', '')}`;
 
 createPurchaseRequisitionDatatable(context);
 
@@ -138,4 +139,4 @@ const addProduct = () => {
 on('click', '#addProductBtn', addProduct);
 on('click', '#cancelBtn', async ()=> await handleAction({ action: cancelPurchaseRequisition, formId }));
 on('click', '#confirmBtn', async () => await handleAction({ action: confirmPurchaseRequisition, formId }));
-on('click', `#backBtn-${modalId}`, backModal());
+on('click', backSelector, () => backModal());

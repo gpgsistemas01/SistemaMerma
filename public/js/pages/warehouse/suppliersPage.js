@@ -9,6 +9,7 @@ import { on } from "../../utils/domUtils.js";
 
 const modalId = '#supplierModal';
 const formId = '#supplierForm';
+const backSelector = `#backBtn-${modalId.replace('#', '')}`;
 
 createSupplierDatatable();
 
@@ -77,4 +78,4 @@ export const openSupplierModal = ({ mode, data = null }) => {
     openModal(modalElement);
 }
 
-on('click', `#backBtn-${modalId}`, backModal());
+on('click', backSelector, () => backModal());
