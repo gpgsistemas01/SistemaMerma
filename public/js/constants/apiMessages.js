@@ -9,6 +9,7 @@ export const errorMessages = {
 
     // SUPPLIER
     SUPPLIER_ID_REQUIRED: 'El proveedor es requerido.',
+    SUPPLIER_ID_INVALID_UUID: 'El proveedor no es válido.',
     INVALID_UUID: 'El proveedor no es válido.',
 
     // RECEIVED BY
@@ -46,7 +47,7 @@ export const errorMessages = {
     // 🧑 NAME
     NAME_REQUIRED: 'El nombre es requerido.',
     NAME_INVALID_TYPE: 'El nombre debe ser texto.',
-    NAME_TOO_LONG: (value) => `El nombre no debe exceder ${value} caracteres.`,
+    NAME_TOO_LONG: (meta) => `El nombre no debe exceder ${meta.value} caracteres.`,
     NAME_INVALID_FORMAT: 'Contiene caracteres no válidos.',
 
     // 📞 PHONE

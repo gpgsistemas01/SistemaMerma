@@ -38,6 +38,15 @@ export const validateName = (maxLength = 50) =>
         .matches(nameRegex).withMessage(errorMap['name'].INVALID_FORMAT)
 ;
 
+export const validateText = (fieldName, maxLength) =>
+    body(fieldName)
+        .trim()
+        .notEmpty().withMessage(errorMap['name'].REQUIRED)
+        .isString().withMessage(errorMap['name'].INVALID_TYPE)
+        .isLength({ max: maxLength }).withMessage(errorMap['name'].TOO_LONG(maxLength))
+        .matches(nameRegex).withMessage(errorMap['name'].INVALID_FORMAT)
+;
+
 export const validateNumberphone =
         body('numberphone')
             .trim()

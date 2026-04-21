@@ -9,8 +9,10 @@ export const createSupplierDatatable = () => {
             options: {
             ajax: '/api/warehouse/suppliers/',
             columns: [
-                { data: 'name', title: 'Nombre' },
-                { data: 'numberphone', title: 'Telefóno' },
+                { data: 'code', title: 'Código' },
+                { data: 'legalName', title: 'Razón social' },
+                { data: 'tradeName', title: 'Nombre comercial' },
+                { data: 'numberphone', title: 'Teléfono' },
                 { 
                     data: 'isActive',
                     title: 'Estado',

@@ -1,7 +1,8 @@
-import { validateIsActive, validateName, validateNumberphone } from "../fields/fieldsValidator.js";
+import { validateIsActive, validateNumberphone, validateText } from "../fields/fieldsValidator.js";
 
 export const supplierValidation = [
-    validateName(),
+    validateText('legalName', 200),
+    validateText('tradeName', 100),
     validateNumberphone,
     validateIsActive
 ]

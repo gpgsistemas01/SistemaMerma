@@ -2,7 +2,8 @@ import { isEmptyOrNull } from "./baseValidations.js";
 import { validateName, validateNumberphone, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateDetailsArray, validateDate, validateText, validateNumberOptional } from "./fieldValidations.js";
 
 export const supplierValidators = {
-    name: validateName,
+    legalName: (value) => validateText(value, 200, 'La razón social'),
+    tradeName: (value) => validateText(value, 100, 'El nombre comercial'),
     numberphone: validateNumberphone,
 }
 

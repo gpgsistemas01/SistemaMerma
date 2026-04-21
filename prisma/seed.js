@@ -189,6 +189,7 @@ async function main() {
             { prefix: 'REC' },
             { prefix: 'SAL'},
             { prefix: 'REQ' },
+            { prefix: 'PRO' },
         ],
         skipDuplicates: true
     });
@@ -248,7 +249,8 @@ async function main() {
         defval: null,
     });
 
-    const supplierParsed = supplierRows.map(row => ({
+    const supplierParsed = supplierRows.map((row, index) => ({
+        codeNumber: index + 1,
         code: row.code,
         legalName: row.legalName,
         tradeName: row.tradeName,
