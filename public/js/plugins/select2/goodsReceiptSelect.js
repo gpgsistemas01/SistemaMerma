@@ -2,7 +2,7 @@ import { openProductModal } from "../../modules/products/productModal.js";
 import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { setupProductSelect } from "./domains/product.js";
-import { initProfileSelect, toggleProfileOption } from "./domains/profiles.js";
+import { initProfileSelect, toggleProfileOption } from "./domains/profile.js";
 import { setupSupplierSelect } from "./domains/supplier.js";
 
 const modalSelector = '#goodsReceiptModal';

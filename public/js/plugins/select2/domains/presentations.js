@@ -1,0 +1,52 @@
+import { PRESENTATIONS_API_ROUTE } from "../../../services/warehouse/presentationService.js";
+import { initbaseSelect2 } from "../baseSelect.js";
+
+export const initPresentationSelect = ({ 
+    modalSelector, 
+    baseSelector, 
+    allowCreate = true
+}) => {
+
+    initbaseSelect2({
+        baseSelector,
+        modalSelector,
+        url: PRESENTATIONS_API_ROUTE,
+        placeholder: 'Buscar presentación...',
+        processResults: (data) => {
+
+            const list = data.data || data;
+
+            return {
+                results: list.map(p => ({
+                    id: p.id,
+                    text: p.name,
+                }))
+            };
+        },
+        ...(allowCreate && {
+            tags: true,
+            createTag: (params) => {
+
+                const term = params.term.trim();
+
+                if (!term) return null;
+
+                return {
+                    id: `new:${ term }`,
+                    text: `${ term } (Nueva presentación)`,
+                    newTag: true
+                };
+            }
+        })
+    });
+};
+
+export const togglePresentationOption = ({ 
+    selector, 
+    id = null, 
+    name = null
+}) => toggleSelectOption({
+    selector,
+    id,
+    name,
+});

@@ -1,0 +1,19 @@
+import express from 'express';
+import { authorizeUserApi, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
+import { getAllUnitMeasures } from '../../../controllers/api/warehouse/unitMeasureController.js';
+
+const router = express.Router();
+
+const unitMeasurePermissions = {
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+    departments: ['Almacén', 'Sistemas']
+};
+
+router.get(
+    '/',
+    verifyCookiesAuthTokenRequired,
+    authorizeUserApi(unitMeasurePermissions),
+    getAllUnitMeasures
+);
+
+export default router;

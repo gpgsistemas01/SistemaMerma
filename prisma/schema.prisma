@@ -63,42 +63,38 @@ model Status {
 model Product {
   id                          String                             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                        String                             @db.VarChar(200)
-  sku                         String                            @unique @db.VarChar(200)
+  sku                         String?                            @unique @db.VarChar(200)
   currentStock                Decimal                            @default(0) @db.Decimal(10, 2)
-  presentation                 Presentation @default(PIEZA)
-  unitMeasure                 String                            @default("PIEZA") @db.VarChar(20)
+  presentationId String @db.Uuid
+  unitMasureId String @db.Uuid
   isActive                    Boolean                            @default(true)
   minStock                    Decimal                           @default(0) @db.Decimal(10, 2)
   base                        Decimal?                           @db.Decimal(10, 3)
   height                      Decimal?                           @db.Decimal(10, 3)
-  totalWaste                    Decimal                           @default(0) @db.Decimal(10, 3)
+  unitCost                    Decimal                           @db.Decimal(10, 3)
+  convertedQuantity Decimal @db.Decimal(10, 3)
+  presentation Presentation @relation(fields: [presentationId], references: [id])
+  unitMeasure UnitMeasure @relation(fields: [unitMasureId], references: [id])
   detailsGoodsReceipts        GoodsReceiptDetail[]
   detailsPurchaseRequisitions PurchaseRequisitionDetail[]
   detailsGoodsIssues          GoodsIssueDetail[]
   detailsMovement             MovementDetail[]
   supplierProducts            SupplierProduct[]
-  wastes            Waste[]
 }
 
-enum Presentation {
-  ROLLO
-  CARTUCHO
-  PIEZA
-  HOJA
-  OJILLOS
-  ML775
-  LT1
-  LT3
-  LT5
-}
-
-model Waste {
+model UnitMeasure {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  productId String @db.Uuid
-  date DateTime @default(now())
-  weightedM2 Decimal @db.Decimal(10, 3)
+  name String @db.VarChar(20)
+  symbol String @db.VarChar(10)
+  products Product[]
 
-  product Product @relation(fields: [productId], references: [id])
+  @@unique([name, symbol])
+}
+
+model Presentation {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique @db.VarChar(50)
+  products Product[]
 }
 
 model Supplier {
@@ -107,7 +103,6 @@ model Supplier {
   code String @unique @db.VarChar(10)
   legalName          String         @db.VarChar(200)
   tradeName String @db.VarChar(100)
-  numberphone   String?        @db.VarChar(20)
   isActive      Boolean        @default(true)
   goodsReceipts GoodsReceipt[]
   products       SupplierProduct[]
@@ -116,7 +111,7 @@ model Supplier {
 model SupplierProduct {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   price     Decimal?  @db.Decimal(10, 2)
-  sku       String  @db.VarChar(50)
+  sku       String?  @db.VarChar(50)
   supplierId String   @db.Uuid
   productId  String   @db.Uuid
   supplier   Supplier @relation(fields: [supplierId], references: [id])

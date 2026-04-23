@@ -1,0 +1,1 @@
+export const UNIT_MEASURES_API_ROUTE = '/api/warehouse/unit-measures';

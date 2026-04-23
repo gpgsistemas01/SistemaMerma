@@ -5,6 +5,7 @@ import { productValidation } from '../../../validators/forms/productValidations.
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
 const router = express.Router();
+
 const productPermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['Almacén', 'Sistemas']

@@ -1,0 +1,52 @@
+import { UNIT_MEASURES_API_ROUTE } from "../../../services/warehouse/unitMeasureService.js";
+import { initbaseSelect2 } from "../baseSelect.js";
+
+export const initUnitMeasureSelect = ({ 
+    modalSelector, 
+    baseSelector, 
+    allowCreate = true
+}) => {
+
+    initbaseSelect2({
+        baseSelector,
+        modalSelector,
+        url: UNIT_MEASURES_API_ROUTE,
+        placeholder: 'Buscar unidad...',
+        processResults: (data) => {
+
+            const list = data.data || data;
+
+            return {
+                results: list.map(u => ({
+                    id: u.id,
+                    text: `${ u.name } - ${ u.symbol }`,
+                }))
+            };
+        },
+        ...(allowCreate && {
+            tags: true,
+            createTag: (params) => {
+
+                const term = params.term.trim();
+
+                if (!term) return null;
+
+                return {
+                    id: `new:${ term }`,
+                    text: `${ term } (Nueva unidad)`,
+                    newTag: true
+                };
+            }
+        })
+    });
+};
+
+export const toggleUnitMeasureOption = ({ 
+    selector, 
+    id = null, 
+    name = null
+}) => toggleSelectOption({
+    selector,
+    id,
+    name,
+});

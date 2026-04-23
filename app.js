@@ -7,6 +7,8 @@ import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.j
 import purchaseRequisitionApiRoutes from './routes/api/warehouse/purchaseRequisitionApiRoute.js';
 import goodsIssueApiRoutes from './routes/api/warehouse/goodsIssueApiRoute.js';
 import notificationApiRoutes from './routes/api/warehouse/notificationApiRoute.js';
+import unitMeasuresApiRoutes from './routes/api/warehouse/unitMeasureApiRoute.js';
+import presentationApiRoutes from './routes/api/warehouse/presentationApiRoute.js';
 import profileApiRoutes from './routes/api/admin/profileApiRoute.js';
 import projectApiRoutes from './routes/api/admin/projectApiRoute.js';
 
@@ -76,7 +78,6 @@ app.use('/inicio-sesion', loginWebRoutes);
 app.use('/revocar-sesion', refreshWebRoutes);
 app.use('/cerrar-sesion', logoutWebRoutes);
 app.use('/productos', productWebRoutes);
-app.use('/proveedores', supplierWebRoutes);
 app.use('/requisiciones', purchaseRequisitionWebRoutes);
 app.use('/recepciones-compra', goodsReceiptWebRoutes);
 app.use('/salidas-almacen', goodsIssueWebRoutes);
@@ -89,6 +90,8 @@ app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);
 app.use(apiRoute + warehouse + '/purchase-requisitions', purchaseRequisitionApiRoutes);
 app.use(apiRoute + warehouse + '/goods-issues', goodsIssueApiRoutes);
 app.use(apiRoute + warehouse + '/notifications', notificationApiRoutes);
+app.use(apiRoute + warehouse + '/unit-measures', unitMeasuresApiRoutes);
+app.use(apiRoute + warehouse + '/presentations', presentationApiRoutes);
 app.use(apiRoute + admin + '/profiles', profileApiRoutes);
 app.use(apiRoute + admin + '/projects', projectApiRoutes);
 

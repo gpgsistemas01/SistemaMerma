@@ -8,26 +8,6 @@ let stockSocketConfigured = false;
 
 const table = document.querySelector(selectorTable);
 
-table.innerHTML = `
-    <thead>
-        <tr>
-            <th rowspan="2">Código</th>
-            <th rowspan="2">Nombre</th>
-            <th colspan="2">Medidas</th>
-            <th colspan="3">Existencias</th>
-            <th rowspan="2">Stock mínimo</th>
-            <th rowspan="2">Acciones</th>
-        </tr>
-        <tr>
-            <th>Base</th>
-            <th>Altura</th>
-            <th>Stock</th>
-            <th>Merma</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-`;
-
 const configureStockRealtime = (table) => {
 
     if (stockSocketConfigured) return;
@@ -45,7 +25,6 @@ export const createProductDatatable = (context) => {
     const isSystemDepartment = context.department === 'Sistemas';
 
     const columns = [
-        { data: 'sku', title: 'Código' },
         { 
             data: null, 
             title: 'Nombre',
@@ -53,29 +32,26 @@ export const createProductDatatable = (context) => {
         },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
-        { data: 'currentStock', title: 'Stock' },
-        { data: 'totalWaste', title: 'Merma' },
-        { 
-            data: null,
-            title: 'Total',
-            render: (data) => {
-                const total = Number(data.currentStock) + Number(data.totalWaste);
-                return isNaN(total) ? 'N/A' : total;
-            }
-        },
-        { data: 'minStock', title: 'Stock mínimo' },
+        { data: 'currentStock', title: 'Existencia' },
+        { data: 'minStock', title: 'Stock Mínimo' },
+        { data: 'presentation', title: 'Presentación' },
+        { data: 'convertedQuantity', title: 'Conversión' },
+        { data: 'unitMeasure', title: 'Unidad' }
     ];
 
     if (isWarehouseDepartment || isSystemDepartment) {
-        columns.push({
-            data: null,
-            title: 'Acciones',
-            render: () => {
-                return `
-                    <button class="btn-edit">✏️</button>
-                `;
+        columns.push(...[
+            { data: 'unitCost', title: 'Costo Unitario' },
+            {
+                data: null,
+                title: 'Acciones',
+                render: () => {
+                    return `
+                        <button class="btn-edit">✏️</button>
+                    `;
+                }
             }
-        });
+        ]);
     }
 
     const table = createDataTable({

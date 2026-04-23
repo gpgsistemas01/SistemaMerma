@@ -1,4 +1,4 @@
-import { prisma, Presentation } from "../lib/prisma.js";
+import { prisma } from "../lib/prisma.js";
 import XLSX from 'xlsx';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -7,15 +7,7 @@ import path from 'path';
 const getPresentation = (value) => {
     if (!value) return null;
 
-    if (value === 'ROLLO') return Presentation.ROLLO;
-    if (value === 'CARTUCHO') return Presentation.CARTUCHO;
-    if (value === 'HOJA') return Presentation.HOJA;
-    if (value === 'LT1') return Presentation.LT1;
-    if (value === 'LT3') return Presentation.LT3;
-    if (value === 'LT5') return Presentation.LT5;
-    if (value === 'ML775') return Presentation.ML775;
-    if (value === 'OJILLOS') return Presentation.OJILLOS;
-    if (value === 'PIEZA') return Presentation.PIEZA;
+    return 'PIEZA'
 }
 
 const toDecimal = (value) => {
@@ -218,31 +210,54 @@ async function main() {
         }
     });
 
+    await prisma.presentation.createMany({
+        data: [
+            { name: 'ROLLO' },
+            { name: 'PIEZA' },
+            { name: 'CARTUCHO' },
+            { name: 'HOJA' },
+        ],
+        skipDuplicates: true
+    });
+
+    await prisma.unitMeasure.createMany({
+        data: [
+            { name: 'METROS', symbol: 'm' },
+            { name: 'PIEZA', symbol: 'pza' },
+            { name: 'METROS CUADRADOS', symbol: 'm2'},
+            { name: 'LITROS', symbol: 'L' },
+            { name: 'MILILITROS', symbol: 'mL' },
+            { name: 'KILOGRAMOS', symbol: 'Kg' },
+            { name: 'GRAMOS', symbol: 'gr' }
+        ],
+        skipDuplicates: true
+    });
+
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     const filePath = path.join(__dirname, 'inventario_BD.xlsx');
 
     const workbook = XLSX.readFile(filePath);
-    const productSheet = workbook.Sheets['PRODUCTOS'];
-    const productRows = XLSX.utils.sheet_to_json(productSheet, {
-        defval: null,
-    });
+    // const productSheet = workbook.Sheets['PRODUCTOS'];
+    // const productRows = XLSX.utils.sheet_to_json(productSheet, {
+    //     defval: null,
+    // });
 
-    const productParsed = productRows.map(row => ({
-        name: row.name,
-        sku: row.sku,
-        currentStock: isNaN(toDecimal(row.currentStock)) ? 0 : toDecimal(row.currentStock),
-        presentation: getPresentation(row.presentation),
-        minStock: isNaN(toDecimal(row.minStock)) ? 0 : toDecimal(row.minStock),
-        base: isNaN(toDecimal(row.base)) ? null : toDecimal(row.base),
-        height: isNaN(toDecimal(row.height)) ? null : toDecimal(row.height),
-        totalWaste: 0
-    }));
+    // const productParsed = productRows.map(row => ({
+    //     name: row.name,
+    //     sku: row.sku,
+    //     currentStock: isNaN(toDecimal(row.currentStock)) ? 0 : toDecimal(row.currentStock),
+    //     presentation: getPresentation(row.presentation),
+    //     minStock: isNaN(toDecimal(row.minStock)) ? 0 : toDecimal(row.minStock),
+    //     base: isNaN(toDecimal(row.base)) ? null : toDecimal(row.base),
+    //     height: isNaN(toDecimal(row.height)) ? null : toDecimal(row.height),
+    //     totalWaste: 0
+    // }));
 
-    await prisma.product.createMany({
-        data: productParsed,
-        skipDuplicates: true
-    });
+    // await prisma.product.createMany({
+    //     data: productParsed,
+    //     skipDuplicates: true
+    // });
 
     const supplierSheet = workbook.Sheets['PROVEEDORES'];
     const supplierRows = XLSX.utils.sheet_to_json(supplierSheet, {
@@ -259,8 +274,7 @@ async function main() {
             codeNumber: counter,
             code: row.code,
             legalName: row.legalName,
-            tradeName: row.tradeName,
-            numberphone: null
+            tradeName: row.tradeName
         }
     });
 
@@ -278,64 +292,64 @@ async function main() {
         skipDuplicates: true,
     });
 
-    const skus = productParsed.map(p => p.sku);
+    // const skus = productParsed.map(p => p.sku);
 
-    const products = await prisma.product.findMany({
-        where: {
-            sku: {
-                in: skus
-            }
-        },
-        select: {
-            id: true,
-            sku: true
-        }
-    });
+    // const products = await prisma.product.findMany({
+    //     where: {
+    //         sku: {
+    //             in: skus
+    //         }
+    //     },
+    //     select: {
+    //         id: true,
+    //         sku: true
+    //     }
+    // });
 
-    const productMap = new Map(products.map(p => [p.sku, p.id]));
+    // const productMap = new Map(products.map(p => [p.sku, p.id]));
 
-    const supplierTradeNames = supplierParsed.map(s => s.tradeName);
+    // const supplierTradeNames = supplierParsed.map(s => s.tradeName);
 
-    const suppliers = await prisma.supplier.findMany({
-        where: {
-            tradeName: {
-                in: supplierTradeNames
-            }
-        },
-        select: {
-            id: true,
-            tradeName: true
-        }
-    });
+    // const suppliers = await prisma.supplier.findMany({
+    //     where: {
+    //         tradeName: {
+    //             in: supplierTradeNames
+    //         }
+    //     },
+    //     select: {
+    //         id: true,
+    //         tradeName: true
+    //     }
+    // });
 
-    const supplierMap = new Map(suppliers.map(s => [s.tradeName, s.id]))
+    // const supplierMap = new Map(suppliers.map(s => [s.tradeName, s.id]))
 
-    const relationSupplierProductSheet = workbook.Sheets['RELACIONES'];
-    const relationSupplierProductRows = XLSX.utils.sheet_to_json(relationSupplierProductSheet, {
-        defval: null,
-    });
+    // const relationSupplierProductSheet = workbook.Sheets['RELACIONES'];
+    // const relationSupplierProductRows = XLSX.utils.sheet_to_json(relationSupplierProductSheet, {
+    //     defval: null,
+    // });
 
-    const relationsSupplierProductParsed = relationSupplierProductRows.map(row => {
+    // const relationsSupplierProductParsed = relationSupplierProductRows.map(row => {
 
-        const productId = productMap.get(row.skuProduct);
-        const supplierId = supplierMap.get(row.supplier);
+    //     const productId = productMap.get(row.skuProduct);
+    //     const supplierId = supplierMap.get(row.supplier);
 
-        if (!supplierId || !productId) {
-            console.log('Error en fila: ',row);
-            return null;
-        }
+    //     if (!supplierId || !productId) {
+    //         console.log('Error en fila: ',row);
+    //         return null;
+    //     }
 
-        return {
-            productId,
-            supplierId,
-            sku: row.sku
-        }
-    }).filter(Boolean);
+    //     return {
+    //         productId,
+    //         supplierId,
+    //         sku: row.sku
+    //     }
+    // }).filter(Boolean);
 
-    await prisma.supplierProduct.createMany({
-        data: relationsSupplierProductParsed,
-        skipDuplicates: true
-    })
+    // await prisma.supplierProduct.createMany({
+    //     data: relationsSupplierProductParsed,
+    //     skipDuplicates: true
+    // });
 }
 
 main().finally(() => {

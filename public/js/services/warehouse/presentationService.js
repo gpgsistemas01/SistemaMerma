@@ -1,0 +1,1 @@
+export const PRESENTATIONS_API_ROUTE = '/api/warehouse/presentations';

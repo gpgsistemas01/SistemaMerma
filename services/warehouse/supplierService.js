@@ -46,12 +46,6 @@ export const findAllSuppliers = async ({
                         contains: search,
                         mode: 'insensitive'
                     }
-                },
-                {
-                    numberphone: {
-                        contains: search,
-                        mode: 'insensitive'
-                    }
                 }
             ]
         }
@@ -90,12 +84,9 @@ export const createSupplier = async (supplierDto) => {
 
         return tx.supplier.create({
             data: {
+                ...supplierDto,
                 codeNumber,
                 code: generatedCode,
-                legalName: supplierDto.legalName,
-                tradeName: supplierDto.tradeName,
-                numberphone: supplierDto.numberphone,
-                isActive: supplierDto.isActive
             }
         });
     });
@@ -119,14 +110,9 @@ export const updateSupplier = async (supplierDto, id) => {
     try {
 
         const supplier = await prisma.supplier.update({
-            data: {
-                legalName: supplierDto.legalName,
-                tradeName: supplierDto.tradeName,
-                numberphone: supplierDto.numberphone,
-                isActive: supplierDto.isActive
-            },
+            data: { ...supplierDto },
             where: {
-                id: id
+                id
             }
         });
 

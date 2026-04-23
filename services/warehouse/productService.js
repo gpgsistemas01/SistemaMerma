@@ -12,8 +12,6 @@ const mapProductWithSupplier = (product) => {
         ...product,
         supplierId: supplier?.id || null,
         supplierName: supplier ? `${supplier.code} - ${supplier.tradeName}` : null,
-        supplierCode: supplier?.code || null,
-        supplierProductSku: relation?.sku || null
     };
 };
 
@@ -159,13 +157,6 @@ const ensureUniqueSku = async (baseSku, excludeProductId = null) => {
     return `${baseSku}-${max + 1}`;
 }
 
-const inferPresentation = (base, height) => {
-
-    if (base && height) return (base > 10) ? 'ROLLO' : 'HOJA';
-
-    return 'PIEZA';
-}
-
 const buildSupplierProductSku = ({ productSku, supplierCode }) => `${productSku}-${supplierCode}`;
 
 export const createProduct = async (productDto) => {
@@ -180,7 +171,6 @@ export const createProduct = async (productDto) => {
 
                 const sku = generateSku(productDto.name);
                 const uniqueSku = await ensureUniqueSku(sku);
-                const presentation = inferPresentation(productDto.base, productDto.height);
 
                 const supplier = await tx.supplier.findUnique({
                     where: {
@@ -193,13 +183,8 @@ export const createProduct = async (productDto) => {
 
                 const createdProduct = await tx.product.create({
                     data: {
-                        name: productDto.name,
-                        minStock: productDto.minStock,
-                        base: productDto.base,
-                        height: productDto.height,
-                        isActive: productDto.isActive,
+                        ...productDto,
                         sku: uniqueSku,
-                        presentation
                     }
                 });
 
@@ -253,7 +238,6 @@ export const updateProduct = async (productDto, id) => {
 
             const sku = generateSku(productDto.name);
             const uniqueSku = await ensureUniqueSku(sku, id);
-            const presentation = inferPresentation(productDto.base, productDto.height);
 
             const supplier = await tx.supplier.findUnique({
                 where: {
@@ -266,13 +250,8 @@ export const updateProduct = async (productDto, id) => {
 
             const updatedProduct = await tx.product.update({
                 data: {
-                    name: productDto.name,
-                    minStock: productDto.minStock,
-                    base: productDto.base,
-                    height: productDto.height,
-                    isActive: productDto.isActive,
+                    ...productDto,
                     sku: uniqueSku,
-                    presentation
                 },
                 where: {
                     id
