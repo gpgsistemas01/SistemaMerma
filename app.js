@@ -79,7 +79,7 @@ app.use('/revocar-sesion', refreshWebRoutes);
 app.use('/cerrar-sesion', logoutWebRoutes);
 app.use('/productos', productWebRoutes);
 app.use('/requisiciones', purchaseRequisitionWebRoutes);
-app.use('/recepciones-compra', goodsReceiptWebRoutes);
+app.use('/compras', goodsReceiptWebRoutes);
 app.use('/salidas-almacen', goodsIssueWebRoutes);
 
 // api routes

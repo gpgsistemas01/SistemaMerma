@@ -3,14 +3,14 @@ import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { setupProductSelect } from "./domains/product.js";
 import { initProfileSelect, toggleProfileOption } from "./domains/profile.js";
-import { setupSupplierSelect } from "./domains/supplier.js";
+import { setupSupplierSelect, toggleSupplierOption } from "./domains/supplier.js";
 
 const modalSelector = '#goodsReceiptModal';
 const productSelector = '#productInput';
 const supplierSelector = '.supplier-select';
 const receivedBySelector = '#receivedByInput';
 
-export const initGoodsReceiptFormSelect2 = async (data = null) => {    
+export const initGoodsReceiptFormSelect2 = () => {    
 
     setupSupplierSelect({
         modalSelector,
@@ -37,32 +37,9 @@ export const initGoodsReceiptFormSelect2 = async (data = null) => {
         supplierSelector,
         productSelector,
     });
-
-    if (data) {
-
-        const supplierOption = new Option(
-            data.supplier.tradeName, 
-            data.supplier.id, 
-            true, 
-            true
-        );
-        $(`${modalSelector} ${supplierSelector}`).append(supplierOption).trigger('change');
-        const receivedByOption = new Option(
-            `${data.receivedBy.name} ${data.receivedBy.lastName}`, 
-            data.receivedBy.id, 
-            true, 
-            true
-        );
-        $(receivedBySelector).append(receivedByOption).trigger('change');
-
-    } else {
-
-        $(`${modalSelector} ${supplierSelector}`).empty().trigger('change');
-        $(receivedBySelector).empty().trigger('change');
-    }
 }
 
-export const setGoodsReceiptFormSelect = (data = null) => {
+export const setGoodsReceiptFormSelectOptions = (data = null) => {
 
     toggleSupplierOption({
         selector: `${ modalSelector } ${ supplierSelector }`,

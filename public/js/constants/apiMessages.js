@@ -10,22 +10,24 @@ export const errorMessages = {
     // SUPPLIER
     SUPPLIER_ID_REQUIRED: 'El proveedor es requerido.',
     SUPPLIER_ID_INVALID_UUID: 'El proveedor no es válido.',
-    INVALID_UUID: 'El proveedor no es válido.',
 
     // RECEIVED BY
     RECEIVED_BY_ID_REQUIRED: 'La person que recibe es requerida.',
     RECEIVED_BY_ID_INVALID_UUID: 'La persona que recibe no es válida.',
 
     PROJECT_ID_REQUIRED: 'El proyecto es requerido.',
-
     PROJECT_ID_INVALID_UUID: 'El proyecto no es válido.',
 
     REQUESTER_ID_REQUIRED: 'El solicitante es requerido.',
-
     REQUESTER_ID_INVALID_UUID: 'El solicitante no es válido.',
 
-    REQUEST_DATE_REQUIRED: 'La fecha de solicitud es requerida.',
+    PRESENTATION_ID_REQUIRED: 'La presentación es requerida.',
+    PRESENTATION_ID_INVALID_UUID: 'La presentación no es válida.',
 
+    UNIT_MEASURE_ID_REQUIRED: 'La unidad es requerida.',
+    UNIT_MEASURE_ID_REQUIRED: 'La unidad no es válida.',
+
+    REQUEST_DATE_REQUIRED: 'La fecha de solicitud es requerida.',
     REQUEST_DATE_INVALID_FORMAT: 'La fecha de solicitud no es válida.',
 
     // 👤 USERNAME
@@ -49,10 +51,6 @@ export const errorMessages = {
     NAME_INVALID_TYPE: 'El nombre debe ser texto.',
     NAME_TOO_LONG: (meta) => `El nombre no debe exceder ${meta.value} caracteres.`,
     NAME_INVALID_FORMAT: 'Contiene caracteres no válidos.',
-
-    // 📞 PHONE
-    NUMBERPHONE_INVALID_FORMAT: 'El teléfono no es válido.',
-    NUMBERPHONE_TOO_LONG: 'El teléfono no debe exceder 20 caracteres.',
 
     // 💰 UNIT COST
     UNIT_COST_REQUIRED: 'El costo unitario es requerido.',
@@ -120,7 +118,9 @@ export const errorMessages = {
     PROFILE_RECEIVED_BY_NOT_FOUND: 'Perfil de quien recibe no encontrado.',
     PROFILE_NOT_FOUND: 'Perfil no encontrado.',
     SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
-    SUPPLIER_UPDATE_DB_ERROR: 'Error de base de datos al editar el proveedor.'
+    SUPPLIER_UPDATE_DB_ERROR: 'Error de base de datos al editar el proveedor.',
+    UNIT_MEASURE_NOT_FOUND: 'Unidad no encontrada.',
+    PRESENTATION_NOT_FOUND: 'Presentación no encontrada.',
 };
 
 const successMessages = {

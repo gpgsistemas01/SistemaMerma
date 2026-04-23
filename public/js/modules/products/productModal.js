@@ -4,7 +4,7 @@ import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugi
 const productModalId = '#productModal';
 const formId = '#productForm';
 
-export const openProductModal = async ({ 
+export const openProductModal = ({ 
     mode = 'create', 
     data = null, 
     onSave = null 

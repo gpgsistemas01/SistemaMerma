@@ -34,9 +34,9 @@ export const createProductDatatable = (context) => {
         { data: 'height', title: 'Altura' },
         { data: 'currentStock', title: 'Existencia' },
         { data: 'minStock', title: 'Stock Mínimo' },
-        { data: 'presentation', title: 'Presentación' },
+        { data: 'presentation.name', title: 'Presentación' },
         { data: 'convertedQuantity', title: 'Conversión' },
-        { data: 'unitMeasure', title: 'Unidad' }
+        { data: 'unitMeasure.name', title: 'Unidad' }
     ];
 
     if (isWarehouseDepartment || isSystemDepartment) {

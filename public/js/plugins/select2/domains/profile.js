@@ -1,5 +1,5 @@
 import { PROFILES_API_ROUTE } from "../../../services/admin/profileService.js";
-import { initbaseSelect2 } from "../baseSelect.js";
+import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
 
 export const initProfileSelect = ({ 
     modalSelector, 

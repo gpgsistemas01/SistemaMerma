@@ -1,5 +1,5 @@
 import { UNIT_MEASURES_API_ROUTE } from "../../../services/warehouse/unitMeasureService.js";
-import { initbaseSelect2 } from "../baseSelect.js";
+import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
 
 export const initUnitMeasureSelect = ({ 
     modalSelector, 

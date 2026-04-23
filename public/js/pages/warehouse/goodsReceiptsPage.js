@@ -3,7 +3,7 @@ import { cancelGoodsReceipt, confirmGoodsReceipt, editGoodsReceipt, registerGood
 import { validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
-import { initGoodsReceiptFormSelect2 } from "../../plugins/select2/goodsReceiptSelect.js";
+import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/goodsReceiptSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
@@ -50,7 +50,7 @@ useForm({
     }
 });
 
-export const openGoodsReceiptModal = async ({ mode, data = null }) => {
+export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);
@@ -63,14 +63,15 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
 
     details.length = 0;
 
+    initGoodsReceiptFormSelect2();
+
     if (mode === 'create') {
         
         form.reset();
-        modalElement.querySelector('#modalTitle').textContent = 'Registrar recepción';
+        setGoodsReceiptFormSelectOptions();
+        modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
         form.querySelector('#submitBtn').textContent = 'Guardar';
         form.querySelector('#presentationDisplayInput').value = '';
-
-        await initGoodsReceiptFormSelect2();
     }
 
     if (mode === 'edit' || mode === 'view') {
@@ -90,17 +91,17 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
             presentation: detail.product.presentation
         })));
 
-        await initGoodsReceiptFormSelect2(data);
+        setGoodsReceiptFormSelectOptions(data);
 
         if (mode === 'edit') {
 
-            modalElement.querySelector('#modalTitle').textContent = 'Editar recepción';
+            modalElement.querySelector('#modalTitle').textContent = 'Editar compra';
             form.querySelector('#submitBtn').textContent = 'Actualizar';
         }
 
         if (mode === 'view') {
 
-            modalElement.querySelector('#modalTitle').textContent = 'Ver recepción';
+            modalElement.querySelector('#modalTitle').textContent = 'Ver compra';
 
             setFormReadOnly({ form, isReadOnly: true });
         }

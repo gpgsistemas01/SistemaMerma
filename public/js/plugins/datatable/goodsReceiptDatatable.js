@@ -47,7 +47,7 @@ export const createGoodsReceiptDatatable = () => {
             ],
             buttons: [
                 {
-                    text: 'Nueva recepción',
+                    text: 'Nueva compra',
                     action: () => {
                         openGoodsReceiptModal({ mode: 'create' });
                     }

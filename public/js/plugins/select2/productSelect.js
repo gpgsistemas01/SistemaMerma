@@ -1,7 +1,7 @@
 import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
-import { initPresentationSelect } from "./domains/presentations.js";
+import { initPresentationSelect, togglePresentationOption } from "./domains/presentations.js";
 import { setupSupplierSelect, toggleSupplierOption } from "./domains/supplier.js";
-import { initUnitMeasureSelect } from "./domains/unitMeasures.js";
+import { initUnitMeasureSelect, toggleUnitMeasureOption } from "./domains/unitMeasures.js";
 
 const modalSelector = '#productModal';
 const supplierSelector = '.supplier-select';
@@ -34,5 +34,17 @@ export const setProductFormSelectOptions = (data = null) => {
         selector: `${ modalSelector } ${ supplierSelector }`,
         supplierId: data?.supplierId,
         supplierName: data?.supplierName
+    });
+
+    toggleUnitMeasureOption({
+        selector: `${ modalSelector } ${ unitMeasureSelector }`,
+        id: data?.unitMeasure.id,
+        name: data?.unitMeasure.name
+    });
+
+    togglePresentationOption({
+        selector: `${ modalSelector } ${ presentationSelector }`,
+        id: data?.presentation.id,
+        name: data?.presentation.name
     });
 };

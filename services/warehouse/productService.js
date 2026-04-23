@@ -1,4 +1,6 @@
+import { PresentationNotFound } from "../../errors/warehouse/presentationError.js";
 import { ExcededMaxRetriesSkuError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError } from "../../errors/warehouse/productError.js";
+import { UnitMeasureNotFound } from "../../errors/warehouse/unitMeasureError.js";
 import { prisma } from "../../lib/prisma.js";
 
 const MAX_RETRIES = 5;
@@ -51,7 +53,9 @@ export const findAllProducts = async ({
                 orderBy: {
                     id: 'asc'
                 }
-            }
+            },
+            presentation: true,
+            unitMeasure: true
         },
         orderBy: {
             [orderBy]: orderDir
@@ -169,12 +173,36 @@ export const createProduct = async (productDto) => {
 
             const product = await prisma.$transaction(async (tx) => {
 
+                const { presentationId, unitMeasureId, supplierId, ...rest } = productDto;
+
+                const unitMeasure = await tx.unitMeasure.findFirst({
+                    where: {
+                        id: unitMeasureId
+                    },
+                    select: {
+                        id: true
+                    }
+                });
+
+                if (!unitMeasure) throw new UnitMeasureNotFound();
+
+                const presentation = await tx.presentation.findFirst({
+                    where: {
+                        id: presentationId
+                    },
+                    select: {
+                        id: true
+                    }
+                });
+
+                if (!presentation) throw new PresentationNotFound();
+
                 const sku = generateSku(productDto.name);
                 const uniqueSku = await ensureUniqueSku(sku);
 
                 const supplier = await tx.supplier.findUnique({
                     where: {
-                        id: productDto.supplierId
+                        id: supplierId
                     },
                     select: {
                         code: true
@@ -183,15 +211,25 @@ export const createProduct = async (productDto) => {
 
                 const createdProduct = await tx.product.create({
                     data: {
-                        ...productDto,
+                        ...rest,
                         sku: uniqueSku,
+                        presentation: {
+                            connect: {
+                                id: presentationId
+                            }
+                        },
+                        unitMeasure: {
+                            connect: {
+                                id: unitMeasureId
+                            }
+                        }
                     }
                 });
 
                 if (supplier) {
                     await tx.supplierProduct.create({
                         data: {
-                            supplierId: productDto.supplierId,
+                            supplierId,
                             productId: createdProduct.id,
                             sku: buildSupplierProductSku({ productSku: uniqueSku, supplierCode: supplier.code })
                         }
@@ -236,12 +274,36 @@ export const updateProduct = async (productDto, id) => {
 
         const product = await prisma.$transaction(async (tx) => {
 
+            const { presentationId, unitMeasureId, supplierId, ...rest } = productDto;
+
+            const unitMeasure = await tx.unitMeasure.findUnique({
+                where: {
+                    id: unitMeasureId
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (!unitMeasure) throw new UnitMeasureNotFound();
+
+            const presentation = await tx.presentation.findUnique({
+                where: {
+                    id: presentationId
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (!presentation) throw new PresentationNotFound();
+
             const sku = generateSku(productDto.name);
             const uniqueSku = await ensureUniqueSku(sku, id);
 
             const supplier = await tx.supplier.findUnique({
                 where: {
-                    id: productDto.supplierId
+                    id: supplierId
                 },
                 select: {
                     code: true
@@ -250,8 +312,23 @@ export const updateProduct = async (productDto, id) => {
 
             const updatedProduct = await tx.product.update({
                 data: {
-                    ...productDto,
+                    ...rest,
                     sku: uniqueSku,
+                    supplier: {
+                        connect: {
+                            id: supplierId
+                        }
+                    },
+                    presentation: {
+                        connect: {
+                            id: presentationId
+                        }
+                    },
+                    unitMeasure: {
+                        connect: {
+                            id: unitMeasureId
+                        }
+                    }
                 },
                 where: {
                     id
@@ -267,7 +344,7 @@ export const updateProduct = async (productDto, id) => {
             if (supplier) {
                 await tx.supplierProduct.create({
                     data: {
-                        supplierId: productDto.supplierId,
+                        supplierId,
                         productId: id,
                         sku: buildSupplierProductSku({ productSku: uniqueSku, supplierCode: supplier.code })
                     }

@@ -23,6 +23,14 @@ export const errorMap = {
         REQUIRED: 'REQUESTER_ID_REQUIRED',
         INVALID_UUID: 'REQUESTER_ID_INVALID_UUID'
     },
+    presentationId: {
+        REQUIRED: 'PRESENTATION_ID_REQUIRED',
+        INVALID_UUID: 'PRESENTATION_ID_INVALID_UUID'
+    },
+    unitMeasureId: {
+        REQUIRED: 'UNIT_MEASURE_ID_REQUIRED',
+        INVALID_UUID: 'UNIT_MEASURE_ID_REQUIRED'
+    },
     username: {
         REQUIRED: 'USERNAME_REQUIRED',
         INVALID_TYPE: 'USERNAME_INVALID_TYPE',
@@ -47,10 +55,6 @@ export const errorMap = {
             meta: { value }
         }),
         INVALID_FORMAT: 'NAME_INVALID_FORMAT'
-    },
-    numberphone: {
-        INVALID_FORMAT: 'NUMBERPHONE_INVALID_FORMAT',
-        TOO_LONG: 'NUMBERPHONE_TOO_LONG'
     },
     unitCost: {
         REQUIRED: 'UNIT_COST_REQUIRED',
@@ -77,10 +81,6 @@ export const errorMap = {
     height: {
         INVALID_NUMBER: 'HEIGHT_INVALID_NUMBER',
         TOO_LONG: 'HEIGHT_TOO_LONG'
-    },
-    presentation: {
-        INVALID_TYPE: 'PRESENTATION_INVALID_TYPE',
-        TOO_LONG: 'PRESENTATION_TOO_LONG'
     },
     observations: {
         INVALID_TYPE: 'OBSERVATIONS_INVALID_TYPE',

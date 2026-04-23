@@ -57,16 +57,6 @@ export const validateUsername = (username) => {
     return result;
 }
 
-export const validateNumberphone = (value) => {
-
-    if (!value) return null;
-
-    let result = isNumberphone(value);
-
-    return result;
-
-}
-
 export const validateNumber = (number, fieldName) => {
 
     let result = isEmptyOrNull(number, fieldName);

@@ -47,14 +47,6 @@ export const validateText = (fieldName, maxLength) =>
         .matches(nameRegex).withMessage(errorMap['name'].INVALID_FORMAT)
 ;
 
-export const validateNumberphone =
-        body('numberphone')
-            .trim()
-            .if(body('numberphone').notEmpty())
-            .isMobilePhone('es-MX').withMessage(errorMap['numberphone'].INVALID_FORMAT)
-            .isLength({ max: 20 }).withMessage(errorMap['numberphone'].TOO_LONG)
-;
-
 export const validateIsActive = 
     body('isActive')
         .notEmpty().withMessage(errorMap['isActive'].REQUIRED)
