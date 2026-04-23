@@ -4,7 +4,11 @@ import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugi
 const productModalId = '#productModal';
 const formId = '#productForm';
 
-export const openProductModal = async ({ mode = 'create', data = null, onSave = null }) => {
+export const openProductModal = async ({ 
+    mode = 'create', 
+    data = null, 
+    onSave = null 
+}) => {
     
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(productModalId);
@@ -15,11 +19,11 @@ export const openProductModal = async ({ mode = 'create', data = null, onSave = 
     initProductFormSelect2();
 
     if (mode === 'create') {
-        
+
         form.reset();
         if (form.elements.isActive) form.elements.isActive.checked = true;
         form.elements.name.value = data?.name || '';
-        setProductFormSelectOptions();
+        setProductFormSelectOptions(data);
 
         modalElement.querySelector('#modalTitle').textContent = 'Registrar producto';
         form.querySelector('#submitBtn').textContent = 'Guardar';

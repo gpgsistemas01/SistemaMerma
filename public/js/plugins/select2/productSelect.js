@@ -8,11 +8,7 @@ export const initProductFormSelect2 = () => {
 
     setupSupplierSelect({
         modalSelector,
-        supplierSelector,
-        openModal: (name, done) => openSupplierModal({
-            data: { name },
-            onSave: done,
-        })
+        supplierSelector
     });
 };
 

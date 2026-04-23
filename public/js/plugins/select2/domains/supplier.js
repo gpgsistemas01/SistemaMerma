@@ -1,3 +1,4 @@
+import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
 import { SUPPLIERS_API_ROUTE } from "../../../services/warehouse/supplierService.js";
 import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
 
@@ -41,7 +42,7 @@ const initSupplierSelect = ({
     });
 };
 
-const attachSupplierHandler = ({ supplierSelector, openModal }) => {
+const attachSupplierHandler = ({ supplierSelector }) => {
 
     $(supplierSelector).off('select2:select').on('select2:select', (e) => {
 
@@ -49,16 +50,20 @@ const attachSupplierHandler = ({ supplierSelector, openModal }) => {
 
         if (selected.newTag) {
 
-            const name = selected.id.replace('new:', '');
+            const tradeName = selected.id.replace('new:', '');
 
-            openModal(name, (createdsupplier) => {
-                const option = new Option(
-                    createdsupplier.name,
-                    createdsupplier.id,
-                    true,
-                    true
-                );
-                $(supplierSelector).append(option).trigger('change');
+            openSupplierModal({
+                data: { tradeName },
+                onSave: (createdsupplier) => {
+
+                    const option = new Option(
+                        createdsupplier.tradeName,
+                        createdsupplier.id,
+                        true,
+                        true
+                    );
+                    $(supplierSelector).append(option).trigger('change');
+                }
             });
 
             return;
@@ -78,8 +83,7 @@ export const toggleSupplierOption = ({
 
 export const setupSupplierSelect = ({ 
     modalSelector, 
-    supplierSelector, 
-    openModal 
+    supplierSelector
 }) => {
 
     initSupplierSelect({
@@ -88,7 +92,6 @@ export const setupSupplierSelect = ({
     });
 
     attachSupplierHandler({
-        supplierSelector: `${ modalSelector } ${ supplierSelector }`,
-        openModal
+        supplierSelector: `${ modalSelector } ${ supplierSelector }`
     });
 };

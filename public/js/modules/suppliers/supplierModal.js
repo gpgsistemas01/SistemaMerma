@@ -16,6 +16,8 @@ export const openSupplierModal = ({
     form.dataset.id = data?.id || '';
 
     form.reset();
+    if (form.elements.isActive) form.elements.isActive.checked = true;
+    form.elements.tradeName.value = data?.tradeName || '';
     modalElement.querySelector('#modalTitle').textContent = 'Registrar proveedor';
     form.querySelector('#submitBtn').textContent = 'Guardar';
     form.onSave = onSave;

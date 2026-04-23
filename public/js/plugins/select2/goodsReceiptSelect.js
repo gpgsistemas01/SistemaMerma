@@ -1,7 +1,7 @@
 import { openProductModal } from "../../modules/products/productModal.js";
 import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
-import { attachProductHandler, initProductSelect } from "./domains/product.js";
+import { setupProductSelect } from "./domains/product.js";
 import { initProfileSelect, toggleProfileOption } from "./domains/profiles.js";
 import { setupSupplierSelect } from "./domains/supplier.js";
 
@@ -14,11 +14,7 @@ export const initGoodsReceiptFormSelect2 = async (data = null) => {
 
     setupSupplierSelect({
         modalSelector,
-        supplierSelector,
-        openModal: (name, done) => openSupplierModal({
-            data: { name },
-            onSave: done,
-        })
+        supplierSelector
     });
 
     initProfileSelect({
@@ -34,28 +30,12 @@ export const initGoodsReceiptFormSelect2 = async (data = null) => {
             };
         },
         allowCreate: false,
-    })
-
-    initProductSelect({
-        modalSelector,
-        baseSelector: `${ modalSelector } ${ productSelector }`,
     });
 
-    attachProductHandler({
+    setupProductSelect({
+        modalSelector,
+        supplierSelector,
         productSelector,
-        openModal: (name, done) => openProductModal({
-            data: { name },
-            onSave: done,
-        }),
-        onSelect: (product) => {
-
-            const value = product.presentation;
-            const instance = initMdbWrapperInput({
-                selector: '#presentationDisplayInput',
-                value
-            });
-            updateMdbWrapperInput(instance);
-        }
     });
 
     if (data) {
