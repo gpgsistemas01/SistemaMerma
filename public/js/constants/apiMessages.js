@@ -53,9 +53,9 @@ export const errorMessages = {
     NAME_INVALID_FORMAT: 'Contiene caracteres no válidos.',
 
     // 💰 UNIT COST
-    NET_PURCHASE_AMOUNT_REQUIRED: 'El costo por rollo s/ IVA es requerido.',
-    NET_PURCHASE_AMOUNT_INVALID_NUMBER: 'El costo por rollo s/ IVA debe ser numérico.',
-    NET_PURCHASE_AMOUNT_TOO_LONG: 'El costo por rollo s/ IVA es demasiado grande.',
+    UNIT_COST_BY_QUANTITY_REQUIRED: 'El costo por rollo s/ IVA es requerido.',
+    UNIT_COST_BY_QUANTITY_INVALID_NUMBER: 'El costo por rollo s/ IVA debe ser numérico.',
+    UNIT_COST_BY_QUANTITY_TOO_LONG: 'El costo por rollo s/ IVA es demasiado grande.',
 
     // 📉 MIN STOCK
     MIN_STOCK_REQUIRED: 'El stock mínimo es requerido.',
@@ -86,7 +86,7 @@ export const errorMessages = {
     DETAILS_REQUIRED: 'La lista de detalles debe contener al menos un producto.',
     DETAILS_INVALID_FORMAT_REQUIRED: 'Cada detalle debe contener un producto y una cantidad.',
     DETAILS_INVALID_FORMAT_QUANTITY: 'La cantidad de cada detalle debe ser un número mayor a cero.',
-    DETAILS_INVALID_FORMAT_NET_PURCHASE_AMOUNT: 'El costo por rollo s/ IVA de cada detalle debe ser un número mayor a cero.',
+    DETAILS_INVALID_FORMAT_UNIT_COST_BY_QUANTITY: 'El costo por rollo s/ IVA de cada detalle debe ser un número mayor a cero.',
 
     PROJECT_NOT_FOUND: 'Proyecto no encontrado.',
     REQUESTER_PROFILE_NOT_FOUND: 'Perfil solicitante no encontrado.',

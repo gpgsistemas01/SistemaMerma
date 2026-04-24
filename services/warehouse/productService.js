@@ -212,6 +212,7 @@ export const createProduct = async (productDto) => {
                 const createdProduct = await tx.product.create({
                     data: {
                         ...rest,
+                        area: rest.base * rest.height,
                         sku: uniqueSku,
                         presentation: {
                             connect: {
@@ -314,6 +315,7 @@ export const updateProduct = async (productDto, id) => {
                 data: {
                     ...rest,
                     sku: uniqueSku,
+                    area: rest.base * rest.height,
                     supplier: {
                         connect: {
                             id: supplierId

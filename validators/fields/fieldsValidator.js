@@ -127,15 +127,15 @@ export const validateDetailsArray =
 
             details.forEach(detail => {
 
-                if (!detail.productId || !detail.quantity || !detail.netPurchaseAmount) {
+                if (!detail.productId || !detail.quantity || !detail.unitCostByQuantity) {
                     throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
                 }
 
                 const qty = Number(detail.quantity);
-                const netPurchaseAmount = Number(detail.netPurchaseAmount);
+                const unitCostByQuantity = Number(detail.unitCostByQuantity);
 
                 if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
-                if (!Number.isFinite(netPurchaseAmount) || netPurchaseAmount <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_NET_PURCHASE_AMOUNT);
+                if (!Number.isFinite(unitCostByQuantity) || unitCostByQuantity <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_UNIT_COST_BY_QUANTITY);
             });
 
             return true;

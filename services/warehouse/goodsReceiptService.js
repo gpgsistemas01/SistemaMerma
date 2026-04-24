@@ -155,14 +155,27 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
                 },
                 referenceNumber,
                 details: {
-                    create: details.map(({ productId, ...rest }) => ({
-                        ...rest,
-                        product: {
-                            connect: {
-                                id: productId
+                    create: details.map(({ productId, ...rest }) => {
+
+                        const area = (rest.base * rest.height);
+                        const netPurchaseAmount = (rest.quantity * rest.unitCostByQuantity).toFixed(2);
+                        const grossPurchaseAmount = netPurchaseAmount * 1.16;
+                        const totalArea = (area * rest.quantity).toFixed(2);
+                        const unitCostByArea = netPurchaseAmount / totalArea;
+
+                        return {
+                            ...rest,
+                            netPurchaseAmount,
+                            grossPurchaseAmount,
+                            totalArea,
+                            unitCostByArea,
+                            product: {
+                                connect: {
+                                    id: productId
+                                }
                             }
                         }
-                    }))
+                    })
                 }
             }
         });
