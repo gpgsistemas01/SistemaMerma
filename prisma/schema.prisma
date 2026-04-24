@@ -157,6 +157,7 @@ model ReferenceNumberCounter {
 model GoodsReceipt {
   id              String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   referenceNumber String                      @unique @db.VarChar(50)
+  invoice String? @db.VarChar(50)
   supplierId      String                      @db.Uuid
   receptionDate   DateTime
   approveDate     DateTime?
@@ -177,9 +178,13 @@ model GoodsReceiptDetail {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   productId        String         @db.Uuid
   goodsReceiptId   String         @db.Uuid
-  quantity         Decimal        @db.Decimal(10, 2)
-  unitCost         Decimal        @default(0) @db.Decimal(12, 2)
-  amount           Decimal        @default(0) @db.Decimal(12, 2)
+  area Decimal @db.Decimal(12, 3)
+  quantity         Decimal        @db.Decimal(10, 3)
+  unitCostByArea         Decimal  @db.Decimal(10, 3)
+  unitCostByQuantity Decimal @db.Decimal(10, 3)
+  totalArea           Decimal        @db.Decimal(10, 3)
+  netPurchaseAmount Decimal @db.Decimal(10, 3)
+  grossPurchaseAmount Decimal @db.Decimal(10, 3)
   goodsReceipt     GoodsReceipt   @relation(fields: [goodsReceiptId], references: [id])
   product          Product        @relation(fields: [productId], references: [id])
 }
