@@ -1,5 +1,5 @@
 import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.js";
-import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
+import { createDataTable, refreshProductTable } from "./baseDatatable.js";
 import { GOODS_RECEIPTS_API_ROUTE } from "../../services/warehouse/goodsReceiptService.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 
@@ -27,23 +27,9 @@ export const createGoodsReceiptDatatable = () => {
                 },
                 { data: 'supplier.tradeName', title: 'Proveedor' },
                 {
-                    data: null,
-                    title: 'Aprobación',
-                    render: (data, type, row) => {
-
-                        if (!row.approverId || !row.approveDate) return '<small>Sin aprobar</small>';
-
-                        const approver = `${ row.approver.name } ${ row.approver.lastName }`;
-                        const approveDate = new Date(row.approveDate).toLocaleString();
-
-                        return `<div>${ approver }<br><small>${ approveDate }</small></div>`;
-                    }
-                },
-                { data: 'status.name', title: 'Estado' },
-                {
                     data: 'id',
                     title: 'Acciones',
-                    render: (data, type, row) => renderActionButtons(row.status?.name)
+                    render: () => '<button class="btn-view">👁️</button>'
                 }
             ],
             buttons: [

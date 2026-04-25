@@ -1,5 +1,5 @@
 import { useForm } from "../../application/form.js";
-import { cancelGoodsReceipt, confirmGoodsReceipt, editGoodsReceipt, registerGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
+import { registerGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
 import { validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
@@ -7,7 +7,7 @@ import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from ".
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
-import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
+import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { openModal } from "../../ui/modalUI.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../plugins/mdb/baseInstance.js";
 
@@ -40,8 +40,7 @@ useForm({
         await handleSubmit({
             form,
             formData,
-            create: registerGoodsReceipt,
-            update: editGoodsReceipt
+            create: registerGoodsReceipt
         });
     },
     normalizeServerErrors: (form, serverErrors) => {
@@ -75,7 +74,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
-    if (mode === 'edit' || mode === 'view') {
+    if (mode === 'view') {
 
         form.querySelector('#observationsInput').value = data.observations || '';
         form.querySelector('#receptionDateInput').value = formatDateLongWithTime(data.receptionDate);
@@ -94,18 +93,8 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
         setGoodsReceiptFormSelectOptions(data);
 
-        if (mode === 'edit') {
-
-            modalElement.querySelector('#modalTitle').textContent = 'Editar compra';
-            form.querySelector('#submitBtn').textContent = 'Actualizar';
-        }
-
-        if (mode === 'view') {
-
-            modalElement.querySelector('#modalTitle').textContent = 'Ver compra';
-
-            setFormReadOnly({ form, isReadOnly: true });
-        }
+        modalElement.querySelector('#modalTitle').textContent = 'Ver compra';
+        setFormReadOnly({ form, isReadOnly: true });
     }
 
     initDetailsGoodsReceiptTable(mode);
@@ -200,5 +189,3 @@ export const cleanAddedProduct = () => {
 }
 
 on('click', '#addProductBtn', addProduct);
-on('click', '#cancelBtn', async () => await handleAction({ action: cancelGoodsReceipt, formId }));
-on('click', '#confirmBtn', async () => await handleAction({ action: confirmGoodsReceipt, formId }));

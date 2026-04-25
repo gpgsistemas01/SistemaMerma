@@ -1,11 +1,8 @@
 import { createGoodsReceiptDtoForRegister } from "../../../dtos/goodsReceiptDto.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
-    cancelGoodsReceipt,
-    confirmGoodsReceipt,
     createGoodsReceipt,
-    findAllGoodsReceipts,
-    updateGoodsReceipt
+    findAllGoodsReceipts
 } from "../../../services/warehouse/goodsReceiptService.js";
 import {
     createStockNotification,
@@ -40,32 +37,11 @@ export const registerGoodsReceipt = async (req, res) => {
     const goodsReceiptDto = createGoodsReceiptDtoForRegister(req.body);
     const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
 
-    const goodsReceipt = await createGoodsReceipt(sanitizedGoodsReceiptDto);
-
-    return res.status(200).json({
-        goodsReceipt,
-        code: successCodeMessages.CREATED_GOODS_RECEIPT
+    const { goodsReceipt, impactedProductIds } = await createGoodsReceipt({
+        goodsReceiptDto: sanitizedGoodsReceiptDto
     });
-}
-
-export const editGoodsReceipt = async (req, res) => {
-
-    const goodsReceiptDto = createGoodsReceiptDtoForRegister(req.body);
-    const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
-
-    const goodsReceipt = await updateGoodsReceipt(sanitizedGoodsReceiptDto, req.params.id);
-
-    return res.status(200).json({
-        goodsReceipt,
-        code: successCodeMessages.UPDATED_GOODS_RECEIPT
-    });
-}
-
-export const confirmGoodsReceiptStatus = async (req, res) => {
-
-    const goodsReceipt = await confirmGoodsReceipt({ id: req.params.id, userId: req.userId });
     const productStockNotifications = await notifyProductStockStatusChanges({
-        productIds: goodsReceipt.impactedProductIds || [],
+        productIds: impactedProductIds || [],
         userId: req.userId
     });
     const restoredProductsCount = new Set(
@@ -85,7 +61,7 @@ export const confirmGoodsReceiptStatus = async (req, res) => {
         departmentId: null
     });
 
-    emitStockUpdated({ source: 'goods-receipt-confirm', notification });
+    emitStockUpdated({ source: 'goods-receipt-create', notification });
 
     for (const productNotification of productStockNotifications) {
         emitStockUpdated({ source: 'product-stock-status', notification: productNotification });
@@ -93,16 +69,6 @@ export const confirmGoodsReceiptStatus = async (req, res) => {
 
     return res.status(200).json({
         goodsReceipt,
-        code: successCodeMessages.CONFIRMED_GOODS_RECEIPT
+        code: successCodeMessages.CREATED_GOODS_RECEIPT
     });
-};
-
-export const cancelGoodsReceiptStatus = async (req, res) => {
-
-    const goodsReceipt = await cancelGoodsReceipt({ id: req.params.id, userId: req.userId });
-
-    return res.status(200).json({
-        goodsReceipt,
-        code: successCodeMessages.CANCELED_GOODS_RECEIPT
-    });
-};
+}

@@ -7,19 +7,3 @@ export const registerGoodsReceiptRequest = (data) => apiRequest({
     url: GOODS_RECEIPTS_API_ROUTE,
     data
 });
-
-export const editGoodsReceiptRequest = (data, id) => apiRequest({
-    method: 'put',
-    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }`,
-    data
-});
-
-export const confirmGoodsReceiptRequest = (id) => apiRequest({
-    method: 'patch',
-    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/confirm`
-});
-
-export const cancelGoodsReceiptRequest = (id) => apiRequest({
-    method: 'patch',
-    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/cancel`
-});

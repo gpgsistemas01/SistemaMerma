@@ -55,16 +55,18 @@ export const applyInventoryMovement = async ({
         grouped[detail.productId] = (grouped[detail.productId] || 0) + detail.quantity;
     }
 
-    Object.entries(grouped).forEach(([productId, quantity]) => {
-        db.product.update({
-            where: { id: productId },
-            data: {
-                currentStock: {
-                    [movementType === REFERENCE_MOVEMENT_IN ? 'increment' : 'decrement']: quantity
+    await Promise.all(
+        Object.entries(grouped).map(([productId, quantity]) =>
+            db.product.update({
+                where: { id: productId },
+                data: {
+                    currentStock: {
+                        [movementType === REFERENCE_MOVEMENT_IN ? 'increment' : 'decrement']: quantity
+                    }
                 }
-            }
-        });
-    });
+            })
+        )
+    );
 
     return movement.details.map((detail) => detail.productId);
 }

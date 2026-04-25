@@ -1,26 +1,24 @@
 import {
     ProfileReceivedByNotFound,
-    GoodsReceiptNotFound,
-    GoodsReceiptUpdateDatabaseError,
-    SupplierNotFound,
-    GoodsReceiptStatusNotFound,
-    GoodsReceiptReceptionDateRequired,
-    GoodsReceiptStatusUpdateDatabaseError,
-    GoodsReceiptApproverProfileNotFound
+    SupplierNotFound
 } from "../../errors/warehouse/goodsReceiptError.js";
 import { prisma } from "../../lib/prisma.js";
 import { getDepartmentByProfileId } from "../admin/userService.js";
 import { generateReferenceNumber } from "../document/referenceNumberService.js";
-import { findProfileById, findProfileByUserId } from "../admin/profileService.js";
+import { findProfileById } from "../admin/profileService.js";
 import { applyInventoryMovement } from "../inventory/movementService.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
 const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
 const MOVEMENT_TYPE_IN = 'IN';
-const STATUS_OPEN = 'Abierta';
 const STATUS_CONFIRMED = 'Confirmada';
-const STATUS_CANCELED = 'Cancelada';
-const PRISMA_RECORD_NOT_FOUND = 'P2025';
+const IVA_RATE = 1.16;
+
+const roundTo = (value, decimals = 2) => {
+
+    const factor = 10 ** decimals;
+    return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
+};
 
 const buildGoodsReceiptDetails = async (tx, details) => {
 
@@ -34,8 +32,7 @@ const buildGoodsReceiptDetails = async (tx, details) => {
         },
         select: {
             id: true,
-            base: true,
-            height: true
+            area: true
         }
     });
 
@@ -49,23 +46,22 @@ const buildGoodsReceiptDetails = async (tx, details) => {
             throw new Error(`Producto no encontrado: ${productId}`);
         }
 
-        const area = product.base * product.height;
-
-        const netPurchaseAmount = quantity * unitCostByQuantity;
-        const grossPurchaseAmount = netPurchaseAmount * 1.16;
-
-        const totalArea = area * quantity;
-
+        const area = roundTo(product.area ?? 0);
+        const normalizedQuantity = Number(quantity);
+        const normalizedUnitCostByQuantity = Number(unitCostByQuantity);
+        const netPurchaseAmount = roundTo(normalizedQuantity * normalizedUnitCostByQuantity);
+        const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
+        const totalArea = roundTo(area * normalizedQuantity);
         const unitCostByArea = totalArea > 0
-            ? netPurchaseAmount / totalArea
+            ? roundTo(netPurchaseAmount / totalArea)
             : 0;
 
         return {
             productId,
-            quantity,
+            quantity: normalizedQuantity,
             area,
             totalArea,
-            unitCostByQuantity,
+            unitCostByQuantity: normalizedUnitCostByQuantity,
             unitCostByArea,
             netPurchaseAmount,
             grossPurchaseAmount
@@ -105,35 +101,35 @@ export const findAllGoodsReceipts = async ({
                     lastName: true
                 }
             },
-            approver: {
-                select: {
-                    id: true,
-                    name: true,
-                    lastName: true
-                }
-            },
             supplier: {
                 select: {
                     id: true,
                     tradeName: true
                 }
             },
-            status: {
-                select: {
-                    id: true,
-                    name: true
-                }
-            },
             details: {
                 select: {
+                    id: true,
+                    quantity: true,
+                    area: true,
+                    totalArea: true,
+                    unitCostByQuantity: true,
+                    unitCostByArea: true,
+                    netPurchaseAmount: true,
+                    grossPurchaseAmount: true,
                     product: {
                         select: {
                             id: true,
                             name: true,
-                            presentation: true,
+                            currentStock: true,
+                            minStock: true,
+                            isActive: true,
                             base: true,
                             height: true,
+                            area: true,
                             unitCost: true,
+                            convertedQuantity: true,
+                            presentation: true,
                             unitMeasure: true,
                         }
                     },
@@ -167,7 +163,42 @@ const validateGoodsReceiptRelations = async ({ receivedById, supplierId }) => {
     if (!receivedBy) throw new ProfileReceivedByNotFound();
 };
 
-export const createGoodsReceipt = async (goodsReceiptDto) => {
+const updateConvertedQuantityByCurrentStock = async ({ tx, productIds }) => {
+
+    const uniqueProductIds = [...new Set(productIds)];
+
+    if (!uniqueProductIds.length) return;
+
+    const products = await tx.product.findMany({
+        where: {
+            id: {
+                in: uniqueProductIds
+            }
+        },
+        select: {
+            id: true,
+            currentStock: true,
+            area: true,
+            base: true,
+            height: true
+        }
+    });
+
+    await Promise.all(products.map((product) => {
+
+        const area = Number(product.area ?? (product.base * product.height) ?? 0);
+        const convertedQuantity = Number(product.currentStock) * area;
+
+        return tx.product.update({
+            where: { id: product.id },
+            data: {
+                convertedQuantity
+            }
+        });
+    }));
+};
+
+export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
     const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
 
@@ -179,7 +210,7 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
 
         await findProfileById({ tx, id: receivedById });
 
-        const processedDetails = buildGoodsReceiptDetails(tx, details);
+        const processedDetails = await buildGoodsReceiptDetails(tx, details);
 
         const totals = processedDetails.reduce((acc, d) => {
             acc.totalQuantity += Number(d.quantity);
@@ -200,7 +231,7 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
                 ...totals,
                 status: {
                     connect: {
-                        name: STATUS_OPEN
+                        name: STATUS_CONFIRMED
                     }
                 },
                 supplier: {
@@ -230,211 +261,20 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
             }
         });
 
-        return { goodsReceipt };
+        const impactedProductIds = await applyInventoryMovement({
+            tx,
+            referenceId: goodsReceipt.id,
+            referenceType: REFERENCE_TYPE_GOODS_RECEIPT,
+            details: goodsReceipt.details,
+            movementType: MOVEMENT_TYPE_IN
+        });
+        await updateConvertedQuantityByCurrentStock({
+            tx,
+            productIds: impactedProductIds
+        });
+
+        return { goodsReceipt, impactedProductIds };
     });
 
-    return result.goodsReceipt;
+    return result;
 }
-
-export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
-
-    const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
-
-    await validateGoodsReceiptRelations({ receivedById, supplierId });
-
-    const goodsReceiptExists = await prisma.goodsReceipt.findUnique({
-        where: { id },
-        select: {
-            id: true
-        }
-    });
-
-    if (!goodsReceiptExists) throw new GoodsReceiptNotFound();
-
-    try {
-
-        const result = await prisma.$transaction(async (tx) => {
-
-            await findProfileById({ tx, id: receivedById });
-
-            const processedDetails = buildGoodsReceiptDetails(tx, details);
-
-            const totals = processedDetails.reduce((acc, d) => {
-                acc.totalQuantity += Number(d.quantity);
-                acc.totalnetPurchaseAmount += Number(d.netPurchaseAmount);
-                acc.totalGrossPurchaseAmount += Number(d.grossPurchaseAmount);
-                return acc;
-            }, {
-                totalQuantity: 0,
-                totalnetPurchaseAmount: 0,
-                totalGrossPurchaseAmount: 0
-            });
-
-            const goodsReceipt = await tx.goodsReceipt.update({
-                data: {
-                    ...goodsReceiptData,
-                    ...totals,
-                    supplier: {
-                        connect: {
-                            id: supplierId
-                        }
-                    },
-                    receivedBy: {
-                        connect: {
-                            id: receivedById
-                        }
-                    },
-                },
-                where: { id }
-            });
-
-            const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);
-            const deleteFilter = { goodsReceiptId: id };
-
-            if (incomingDetailsIds.length) deleteFilter.id = { notIn: incomingDetailsIds };
-
-            await tx.goodsReceiptDetail.deleteMany({
-                where: deleteFilter
-            });
-
-            const goodsReceiptDetails = await Promise.all(processedDetails.map(async detail => {
-
-                return await tx.goodsReceiptDetail.create({
-                    data: {
-                        ...detail,
-                        goodsReceiptId: id
-                    }
-                });
-            }));
-
-            goodsReceipt.details = goodsReceiptDetails;
-
-            return { goodsReceipt };
-        });
-
-        return result;
-
-    } catch (err) {
-
-        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new GoodsReceiptNotFound();
-
-        throw new GoodsReceiptUpdateDatabaseError();
-    }
-}
-
-const updateGoodsReceiptStatus = async ({ id, statusName, userId }) => {
-
-    try {
-        const goodsReceipt = await prisma.goodsReceipt.findUnique({
-            where: { id },
-            select: {
-                id: true,
-                receptionDate: true,
-                receivedById: true,
-                status: {
-                    select: {
-                        name: true
-                    }
-                },
-                details: {
-                    select: {
-                        productId: true,
-                        quantity: true
-                    }
-                }
-            }
-        });
-
-        if (!goodsReceipt) throw new GoodsReceiptNotFound();
-        if (!goodsReceipt.receptionDate) throw new GoodsReceiptReceptionDateRequired();
-        if (goodsReceipt.status?.name !== STATUS_OPEN) throw new GoodsReceiptStatusNotFound();
-
-        return await prisma.$transaction(async (tx) => {
-
-            const receivedById = await findProfileById({ tx, id: goodsReceipt.receivedById });
-
-            if (!receivedById) throw new ProfileReceivedByNotFound();
-
-            let impactedProductIds = [];
-
-            if (statusName === STATUS_CONFIRMED) {
-
-                impactedProductIds = await applyInventoryMovement({
-                    tx,
-                    referenceId: id,
-                    referenceType: REFERENCE_TYPE_GOODS_RECEIPT,
-                    details: goodsReceipt.details,
-                    movementType: MOVEMENT_TYPE_IN
-                });
-            }
-
-            const data = {
-                status: {
-                    connect: {
-                        name: statusName
-                    }
-                }
-            };
-
-            if (statusName === STATUS_CONFIRMED) {
-                
-                const approverId = await findProfileByUserId({ tx, userId });
-
-                if (!approverId) throw new GoodsReceiptApproverProfileNotFound();
-
-                data.approver = {
-                    connect: {
-                        id: approverId
-                    }
-                };
-                data.approveDate = new Date();
-            }
-
-            const updatedGoodsReceipt = await tx.goodsReceipt.update({
-                where: { id },
-                data,
-                select: {
-                    id: true,
-                    referenceNumber: true,
-                    department: {
-                        select: {
-                            id: true,
-                            name: true
-                        }
-                    },
-                    status: {
-                        select: {
-                            id: true,
-                            name: true
-                        }
-                    }
-                }
-            });
-
-            return {
-                ...updatedGoodsReceipt,
-                impactedProductIds
-            };
-        });
-
-    } catch (err) {
-
-        if (
-            err instanceof ProfileReceivedByNotFound ||
-            err instanceof GoodsReceiptNotFound ||
-            err instanceof GoodsReceiptReceptionDateRequired ||
-            err instanceof GoodsReceiptApproverProfileNotFound
-        ) {
-            throw new GoodsReceiptStatusUpdateDatabaseError();
-        }
-        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new GoodsReceiptStatusNotFound();
-
-        throw new GoodsReceiptStatusUpdateDatabaseError();
-    }
-};
-
-export const confirmGoodsReceipt = async ({ id, userId }) =>
-    await updateGoodsReceiptStatus({ id, statusName: STATUS_CONFIRMED, userId });
-
-export const cancelGoodsReceipt = async ({ id, userId }) =>
-    await updateGoodsReceiptStatus({ id, statusName: STATUS_CANCELED, userId });
