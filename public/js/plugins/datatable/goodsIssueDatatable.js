@@ -123,7 +123,19 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
     }
 
     const columns = [
-        { data: 'name', title: 'Material' },
+        { 
+            data: null, 
+            title: 'Material',
+            render: (data, type, row) => {
+
+                let name;
+
+                if (!row.base || !row.height) name = `${ row.name } || ${ row.supplier }`;
+                else name = `${ row.name } (${ row.base } x ${ row.height }) || ${ row.supplier }`;
+
+                return name;
+            },
+        },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
         { data: 'quantity', title: 'Cantidad' },
@@ -135,8 +147,8 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
     if (isWarehouseDepartment || isSystemDepartment) {
         columns.push(...[
             { data: 'unitCost', title: 'Costo unitario' },
-            { data: 'projectQuantity', title: 'Cantidad de proyecto' },
-            { data: 'difference', title: 'Diferencia' }
+            // { data: 'projectQuantity', title: 'Cantidad de proyecto' },
+            // { data: 'difference', title: 'Diferencia' }
         ]);
     }
 

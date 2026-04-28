@@ -1,28 +1,25 @@
-import { PROFILES_API_ROUTE } from "../../../services/admin/profileService.js";
+import { ADVISORS_API_ROUTE } from "../../../services/sales/advisorService.js";
 import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
 
-export const initProfileSelect = ({ 
+export const initAdvisorSelect = ({ 
     modalSelector, 
     baseSelector, 
-    placeholder, 
-    data, 
-    allowCreate = true 
+    allowCreate = true
 }) => {
 
     initbaseSelect2({
         baseSelector,
         modalSelector,
-        url: PROFILES_API_ROUTE,
-        data,
-        placeholder,
+        url: ADVISORS_API_ROUTE,
+        placeholder: 'Buscar asesor...',
         processResults: (data) => {
 
             const list = data.data || data;
 
             return {
-                results: list.map(p => ({
-                    id: p.id,
-                    text: `${ p.name } ${ p.lastName }`
+                results: list.map(a => ({
+                    id: a.id,
+                    text: a.name,
                 }))
             };
         },
@@ -36,7 +33,7 @@ export const initProfileSelect = ({
 
                 return {
                     id: `new:${ term }`,
-                    text: `${ term } (Nuevo perfil)`,
+                    text: `${ term } (Nuevo asesor)`,
                     newTag: true
                 };
             }
@@ -44,14 +41,14 @@ export const initProfileSelect = ({
     });
 };
 
-export const toggleProfileOption = ({ 
+export const toggleAdvisorOption = ({ 
     selector, 
-    profileId = null, 
-    profileName = null
+    id = null, 
+    name = null
 }) => toggleSelectOption({
     selector,
     data: {
-        id: profileId,
-        text: profileName
+        id,
+        text: name
     }
 });

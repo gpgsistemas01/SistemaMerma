@@ -74,9 +74,8 @@ model Product {
   convertedQuantity Decimal? @db.Decimal(10, 3)
   presentation Presentation @relation(fields: [presentationId], references: [id])
   unitMeasure UnitMeasure @relation(fields: [unitMeasureId], references: [id])
-  detailsGoodsReceipts        GoodsReceiptDetail[]
+  detailsGoodsReceipts GoodsReceiptDetail[]
   detailsPurchaseRequisitions PurchaseRequisitionDetail[]
-  detailsGoodsIssues          GoodsIssueDetail[]
   detailsMovement             MovementDetail[]
   supplierProducts            SupplierProduct[]
 }
@@ -115,6 +114,7 @@ model SupplierProduct {
   productId  String   @db.Uuid
   supplier   Supplier @relation(fields: [supplierId], references: [id])
   product    Product  @relation(fields: [productId], references: [id])
+  goodsIssueDetails GoodsIssueDetail[]
 
   @@unique([supplierId, productId])
   @@index([supplierId])
@@ -251,12 +251,12 @@ model GoodsIssue {
 
 model GoodsIssueDetail {
   id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  productId    String  @db.Uuid
+  supplierProductId    String  @db.Uuid
   goodsIssueId String  @db.Uuid
   quantity     Decimal @db.Decimal(10, 2)
 
   goodsIssue       GoodsIssue     @relation(fields: [goodsIssueId], references: [id])
-  product          Product        @relation(fields: [productId], references: [id])
+  supplierProduct          SupplierProduct        @relation(fields: [supplierProductId], references: [id])
   movementDetails  MovementDetail[]
 }
 
@@ -287,4 +287,17 @@ model MovementDetail {
   goodsReceiptDetail GoodsReceiptDetail? @relation(fields: [goodsReceiptDetailId], references: [id])
   goodsIssueDetail GoodsIssueDetail? @relation(fields: [goodsIssueDetailId], references: [id])
   movement   InventoryMovement @relation(fields: [movementId], references: [id])
+}
+
+model Advisor {
+  id String @id  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @db.VarChar(100)
+  clients Client[]
+}
+
+model Client {
+  id String @id  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @db.VarChar(100)
+  advisorId String @db.Uuid
+  advisor Advisor @relation(fields: [advisorId], references: [id])
 }

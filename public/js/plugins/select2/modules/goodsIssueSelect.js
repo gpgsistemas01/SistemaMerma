@@ -1,21 +1,42 @@
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
-import { initbaseSelect2 } from "../baseSelect.js";
+import { initAdvisorSelect, toggleAdvisorOption } from "../domains/advisor.js";
+import { initClientSelect, toggleClientOption } from "../domains/client.js";
+import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
+import { setupProductSelect, toggleProductOption } from "../domains/product.js";
+import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
 
 const modalSelector = '#goodsIssueModal';
+const requesterSelector = '#requesterInput';
+const clientSelector = '#clientInput';
+const departmentSelector = '#departmentInput';
+const advisorSelector = '#advisorInput';
+const productSelector = '#productInput';
 
-export const initGoodsIssueFormSelect2 = async ({
-    data = null,
+export const initGoodsIssueFormSelect2 = ({
     context
 }) => {
 
-    const requesterSelector = '#requesterInput';
-    const projectSelector = '#projectInput';
-    const productSelector = '#productInput';
-
-    initbaseSelect2({
-        baseSelector: requesterSelector,
+    initDepartmentSelect({
         modalSelector,
-        url: '/api/admin/profiles/',
+        baseSelector: `${ modalSelector } ${ departmentSelector }`,
+        allowCreate: false
+    });
+
+    initClientSelect({
+        modalSelector,
+        advisorSelector,
+        baseSelector: `${ modalSelector } ${ clientSelector }`,
+        allowCreate: false
+    });
+
+    initAdvisorSelect({
+        modalSelector,
+        baseSelector: `${ modalSelector } ${ advisorSelector }`,
+        allowCreate: false
+    });
+
+    initProfileSelect({
+        modalSelector, 
+        baseSelector: `${ modalSelector } ${ requesterSelector }`,
         placeholder: 'Buscar solicitante...',
         data: (params) => {
 
@@ -26,84 +47,47 @@ export const initGoodsIssueFormSelect2 = async ({
                 department: canRequestAnyDepartment ? '' : context.department
             };
         },
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(profile => ({
-                    id: profile.id,
-                    text: `${ profile.name } ${ profile.lastName }`
-                }))
-            };
-        }
+        allowCreate: false,
     });
 
-    initbaseSelect2({
-        baseSelector: projectSelector,
+    setupProductSelect({
         modalSelector,
-        url: '/api/admin/projects/',
-        placeholder: 'Buscar proyecto...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(project => ({
-                    id: project.id,
-                    text: `${ project.referenceNumber } - ${ project.name }`
-                }))
-            };
-        }
+        productSelector,
+        allowCreate: false
     });
-
-    initbaseSelect2({
-        baseSelector: productSelector,
-        modalSelector,
-        url: '/api/warehouse/products/',
-        placeholder: 'Buscar producto...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(product => ({
-                    id: product.id,
-                    text: product.name,
-                    uom: product.presentation || 'PIEZA'
-                }))
-            };
-        }
-    });
-
-    $(productSelector).on('select2:select', (e) => {
-
-        const selectedProduct = e.params.data;
-        const value = selectedProduct?.presentation || 'PIEZA';
-
-        const instance = initMdbWrapperInput({ selector: '#presentationDisplayInput', value });
-        updateMdbWrapperInput(instance);
-    });
-
-    if (data) {
-
-        const requesterOption = new Option(
-            `${ data.requester.name } ${ data.requester.lastName }`, 
-            data.requester.id, 
-            true, 
-            true
-        );
-        $(requesterSelector).append(requesterOption).trigger('change');
-        const projectOption = new Option(
-            `${ data.project.referenceNumber }`, 
-            data.project.id, 
-            true, 
-            true
-        );
-        $(projectSelector).append(projectOption).trigger('change');
-        return;
-    }
-
-    $(requesterSelector).empty().trigger('change');
-    $(projectSelector).empty().trigger('change');
 };
+
+export const setGoodsIssueFormSelectOptions = (data = null) => {
+
+    toggleDepartmentOption({
+        selector: `${ modalSelector } ${ departmentSelector }`,
+        id: data?.department?.id,
+        name: data?.department?.name
+    });
+
+    toggleClientOption({
+        selector: `${ modalSelector } ${ clientSelector }`,
+        id: data?.client?.id,
+        name: data?.client?.name
+    });
+
+    toggleAdvisorOption({
+        selector: `${ modalSelector } ${ advisorSelector }`,
+        id: data?.advisor?.id,
+        name: data?.advisor?.name
+    });
+
+    toggleProfileOption({
+        selector: `${ modalSelector } ${ requesterSelector }`,
+        profileId: data?.project?.id,
+        profileName: `${ data?.requester?.name } ${ data?.requester?.lastName }`, 
+    });
+
+    toggleProductOption({
+        selector: `${ modalSelector } ${ productSelector }`,
+        data: {
+            id: null,
+            text: null,
+        }
+    });
+}

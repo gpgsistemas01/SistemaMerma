@@ -18,7 +18,7 @@ export const findAllPresentations = async ({
         }
         : {};
 
-    const units = await prisma.presentation.findMany({
+    const presentations = await prisma.presentation.findMany({
         skip,
         take,
         where,
@@ -31,7 +31,7 @@ export const findAllPresentations = async ({
     const filtered = await prisma.presentation.count({ where });
 
     return {
-        data: units,
+        data: presentations,
         recordsTotal: total,
         recordsFiltered: filtered
     };

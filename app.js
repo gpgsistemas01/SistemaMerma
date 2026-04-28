@@ -1,6 +1,8 @@
 import 'dotenv/config.js';
 
 import authApiRoutes from './routes/api/authApiRoute.js';
+import advisorApiRoutes from './routes/api/sales/advisorApiRoute.js';
+import clientApiRoutes from './routes/api/sales/clientApiRoute.js';
 import productApiRoutes from './routes/api/warehouse/productApiRoute.js';
 import supplierApiRoutes  from './routes/api/warehouse/supplierApiRoute.js';
 import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.js';
@@ -45,6 +47,7 @@ const uploadRoute = '/upload';
 const authRoute = '/auth';
 const warehouse = '/warehouse';
 const admin = '/admin';
+const sales = '/sales';
 
 app.set('views', viewsDir);
 app.set('view engine', 'ejs');
@@ -84,6 +87,8 @@ app.use('/salidas-almacen', goodsIssueWebRoutes);
 
 // api routes
 app.use(apiRoute + authRoute, authApiRoutes);
+app.use(apiRoute + sales + '/advisors', advisorApiRoutes);
+app.use(apiRoute + sales + '/clients', clientApiRoutes);
 app.use(apiRoute + warehouse + '/products', productApiRoutes);
 app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
 app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);

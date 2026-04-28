@@ -4,7 +4,7 @@ import { validateGoodsReceiptValidators } from "../../utils/validations/validato
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
-import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, updateTotals, toggleButtons } from "../../ui/formUI.js";
+import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, updateTotals, toggleButtons, cleanAddedProductInput } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
@@ -81,11 +81,11 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     details.length = 0;
 
     initGoodsReceiptFormSelect2();
+    setGoodsReceiptFormSelectOptions(data);
 
     if (mode === 'create') {
         
         form.reset();
-        setGoodsReceiptFormSelectOptions();
         modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
         form.querySelector('#submitBtn').textContent = 'Confirmar';
         form.querySelector('#presentationDisplayInput').value = '';
@@ -108,6 +108,9 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             
             form.elements.isInvoiced[1].checked = true;
         }
+
+        const select = document.querySelector('.supplier-select');
+        const supplier = select.options[select.selectedIndex].text;
         
         form.elements.invoice.value = data.invoice || '';
         form.elements.observations.value = data.observations || '';
@@ -127,9 +130,8 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             unitCostByQuantity: detail.unitCostByQuantity,
             netPurchaseAmount: detail.netPurchaseAmount,
             grossPurchaseAmount: detail.grossPurchaseAmount,
+            supplier
         })));
-
-        setGoodsReceiptFormSelectOptions(data);
 
         form.elements.totalQuantityDisplayInput.value = data.totalQuantity;
         form.elements.totalNetPurchaseAmountDisplayInput.value = data.totalNetPurchaseAmount;
@@ -141,7 +143,8 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         toggleButtons({
             mode,
             status: 'Confirmada',
-            showActions: false
+            showActions: false,
+            withoutTotal: false
         });
     }
 
@@ -155,12 +158,11 @@ const addProduct = () => {
     const supplierId = document.querySelector('#supplierInput').value;
     const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
-    const name = selectedProduct?.text || '';
     const quantity = Number(document.querySelector('#quantityInput').value);
     const unitCostByQuantity = Number(document.querySelector('#unitCostByQuantityInput').value);
     const base = selectedProduct?.base ? Number(selectedProduct?.base) : null;
     const height = selectedProduct?.height ? Number(selectedProduct?.height) : null;
-    const { presentation, unitMeasure } = selectedProduct;
+    const { presentation, unitMeasure, name, supplier } = selectedProduct;
 
     if (!supplierId) {
         alert('Selecciona un proveedor antes de agregar productos.');
@@ -213,11 +215,12 @@ const addProduct = () => {
         netPurchaseAmount,
         grossPurchaseAmount,
         totalArea,
+        supplier
     };
     details.push(product);
 
     refreshProductTable(details);
-    cleanAddedProduct();
+    cleanAddedProductInput();
 
     updateTotals({
         quantity,
@@ -225,14 +228,6 @@ const addProduct = () => {
         gross: grossPurchaseAmount,
         operation: 'add'
     });
-}
-
-export const cleanAddedProduct = () => {
-
-    $('#productInput').empty().trigger('change');
-    document.querySelector('#quantityInput').value = '';
-    document.querySelector('#unitCostByQuantityInput').value = '';
-    document.querySelector('#presentationDisplayInput').value = '';
 }
 
 on('click', '#addProductBtn', addProduct);

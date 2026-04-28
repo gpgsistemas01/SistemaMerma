@@ -1,7 +1,7 @@
 import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
-import { initPresentationSelect, togglePresentationOption } from "../domains/presentations.js";
+import { initPresentationSelect, togglePresentationOption } from "../domains/presentation.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
-import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasures.js";
+import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
 
 const modalSelector = '#productModal';
 const supplierSelector = '.supplier-select';

@@ -1,0 +1,1 @@
+export const DEPARTMENTS_API_ROUTE = '/api/admin/departments/';

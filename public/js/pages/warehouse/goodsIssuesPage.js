@@ -2,8 +2,8 @@ import { useForm } from "../../application/form.js";
 import { approveGoodsIssue, cancelGoodsIssue, confirmGoodsIssue, editGoodsIssue, registerGoodsIssue, rejectGoodsIssue } from "../../application/warehouse/goodsIssues.js";import { validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
-import { initGoodsIssueFormSelect2 } from "../../plugins/select2/modules/goodsIssueSelect.js";
-import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
+import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../../plugins/select2/modules/goodsIssueSelect.js";
+import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons, cleanAddedProductInput } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
@@ -15,17 +15,6 @@ const formId = '#goodsIssueForm';
 const context = window.GOODS_ISSUE_CONTEXT || {};
 let leftAction = null;
 let rightAction = null;
-
-const buildDeliveredByProductMap = (movement = []) => {
-
-    return movement.reduce((acc, entry) => {
-        (entry.details || []).forEach((detail) => {
-            const current = acc.get(detail.productId) || 0;
-            acc.set(detail.productId, current + Number(detail.quantity || 0));
-        });
-        return acc;
-    }, new Map());
-};
 
 createGoodsIssueDatatable(context);
 
@@ -74,6 +63,8 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
 
     toggleButtons({ mode, status: data?.status?.name, showActions: false });
     setFormReadOnly({ form, isReadOnly: false });
+    initGoodsIssueFormSelect2({ context });
+    setGoodsIssueFormSelectOptions(data);
 
     leftAction = null;
     rightAction = null;
@@ -85,39 +76,32 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         modalElement.querySelector('#modalTitle').textContent = 'Registrar salida';
         form.querySelector('#submitBtn').textContent = 'Guardar';
         form.querySelector('#presentationDisplayInput').value = '';
-
-        await initGoodsIssueFormSelect2({ context });
     }
 
     if (mode === 'edit' || mode === 'view') {
 
-        const deliveredByProduct = buildDeliveredByProductMap(data?.movement || []);
-
         form.querySelector('#observationsInput').value = data.observations || '';
         form.querySelector('#requestDateInput').value = formatDateLongWithTime(data.requestDate);
-        details.push(...(data?.details || [])
-            .map(detail => ({
-                deliveredQuantity: Math.min(Number(detail.quantity), deliveredByProduct.get(detail.product.id) || 0),
-                id: detail.id,
-                name: detail.product.name,
-                productId: detail.product.id,
-                quantity: detail.quantity,
-                pendingQuantity: Math.max(
-                    Number(detail.quantity) - Math.min(Number(detail.quantity), deliveredByProduct.get(detail.product.id) || 0),
-                    0
-                ),
-                description: detail.description,
-                presentation: detail.product.presentation || 'PIEZA'
-            }))
-            .map((detail) => {
-                const delivered = detail.deliveredQuantity || 0;
-                const currentDeliveredByProduct = deliveredByProduct.get(detail.productId) || 0;
-                deliveredByProduct.set(detail.productId, Math.max(currentDeliveredByProduct - delivered, 0));
-                return detail;
-            })
-        );
+        form.querySelector('#projectNumberInput').value = data.projectNumber;
+        details.push(...data?.details.map(detail => ({
+            id: detail.id,
+            supplierProductId: detail.supplierProduct.id,
+            name: detail.supplierProduct.product.name,
+            base: detail.supplierProduct.product.base,
+            height: detail.supplierProduct.product.height,
+            quantity: detail.quantity,
+            presentation: detail.supplierProduct.product.presentation.name,
+            totalArea: detail.totalArea,
+            unitMeasure: detail.supplierProduct.product.unitMeasure.name,
+            unitCost: detail.supplierProduct.product.unitCost,
+            projectQuantity: detail.projectQuantity,
+            difference: detail.difference,
+            supplier: detail.supplierProduct.supplier.tradeName
+        })));
 
-        await initGoodsIssueFormSelect2({ data, context });
+        form.elements.totalQuantityDisplayInput.value = data.totalQuantity;
+        form.elements.totalNetPurchaseAmountDisplayInput.value = data.totalNetPurchaseAmount;
+        form.elements.totalGrossPurchaseAmountDisplayInput.value = data.totalGrossPurchaseAmount;
 
         if (mode === 'edit') {
             modalElement.querySelector('#modalTitle').textContent = 'Editar salida';
@@ -128,6 +112,12 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
             modalElement.querySelector('#modalTitle').textContent = 'Ver salida';
             setFormReadOnly({ form, isReadOnly: true });
         }
+
+        toggleButtons({
+            mode,
+            status: data?.status?.name,
+            showActions: false,
+        });
     }
 
     if (mode === 'view' && data?.status?.name) {
@@ -175,8 +165,10 @@ const addProduct = () => {
 
     const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
-    const productName = selectedProduct?.text || '';
-    const quantity = document.querySelector('#quantityInput').value;
+    const quantity = Number(document.querySelector('#quantityInput').value);
+    const base = selectedProduct?.base ? Number(selectedProduct?.base) : null;
+    const height = selectedProduct?.height ? Number(selectedProduct?.height) : null;
+    const { presentation, unitMeasure, name, supplier, unitCost } = selectedProduct;
 
     if (!productId || !quantity) {
         alert('Por favor, complete los campos de producto y cantidad.');
@@ -188,13 +180,38 @@ const addProduct = () => {
         return;
     }
 
-    details.push({ productId, name: productName, quantity, presentation: selectedProduct?.presentation || 'PIEZA' });
+    let area;
+    let totalArea;
+
+    if (!base || !height) {
+
+        area = null;
+        totalArea = quantity;
+
+    } else {
+
+        area = Number((base * height).toFixed(2));
+        totalArea = Number((area * quantity).toFixed(2));
+    }
+
+    const product = {
+        productId,
+        name,
+        base,
+        height,
+        area,
+        quantity,
+        unitMeasure,
+        presentation,
+        totalArea,
+        supplier,
+        unitCost
+    };
+
+    details.push(product);
 
     refreshProductTable(details);
-
-    $('#productInput').empty().trigger('change');
-    document.querySelector('#quantityInput').value = '';
-    document.querySelector('#presentationDisplayInput').value = '';
+    cleanAddedProductInput();
 };
 
 on('click', '#addProductBtn', addProduct);

@@ -109,11 +109,13 @@ export const setFormReadOnly = ({
 export const toggleButtons = ({
     mode,
     status = 'Cerrada',
-    showActions = true
+    showActions = true,
+    withoutTotal = true
 }) => {
 
     const isView = mode === 'view';
     document.querySelector('.add-product-container').classList.toggle('d-none', isView);
+    document.querySelector('.total-container').classList.toggle('d-none', withoutTotal);
     const approveContainer = document.querySelector('.approve-container');
 
     if (approveContainer) {
@@ -160,4 +162,14 @@ export const updateTotals = ({
     updateMdbWrapperInput(instanceTotalQuantity);
     updateMdbWrapperInput(instanceTotalNetPurchaseAmount);
     updateMdbWrapperInput(instanceTotalGrossPurchaseAmount);
+}
+
+export const cleanAddedProductInput = () => {
+
+    $('#productInput').empty().trigger('change');
+    document.querySelector('#quantityInput').value = '';
+    document.querySelector('#presentationDisplayInput').value = '';
+    const display = document.querySelector('#unitCostByQuantityInput');
+
+    if (display) display.value = '';
 }

@@ -1,0 +1,1 @@
+export const CLIENTS_API_ROUTE = '/api/sales/clients/';
