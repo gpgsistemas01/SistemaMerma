@@ -91,11 +91,13 @@ export const createProduct = async (productDto) => {
                 relations
             } = await prepareProductData({ tx, productDto });
 
+            const area = (!rest.base || !rest.height) ? null : rest.base * rest.height;
+
             const createdProduct = await tx.product.create({
                 data: {
                     ...rest,
                     sku,
-                    area: rest.base * rest.height,
+                    area,
                     presentation: {
                         connect: { id: relations.presentationId }
                     },
@@ -154,12 +156,14 @@ export const updateProduct = async (productDto, id) => {
                 productId: id
             });
 
+            const area = (!rest.base || !rest.height) ? null : rest.base * rest.height;
+
             const updatedProduct = await tx.product.update({
                 where: { id },
                 data: {
                     ...rest,
                     sku,
-                    area: rest.base * rest.height,
+                    area,
                     supplier: {
                         connect: { id: relations.supplierId }
                     },

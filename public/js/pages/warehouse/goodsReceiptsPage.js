@@ -99,8 +99,16 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     if (mode === 'view') {
 
-        if (form.elements.isInvoiced) form.elements.isInvoiced.checked = Boolean(data.isInvoiced);
-        if (Boolean(data.isInvoiced)) form.elements.invoice.value = data.invoice;
+        if (data.isInvoiced) {
+
+            form.elements.isInvoiced[0].checked = true;
+            form.elements.invoice.value = data.invoice;
+
+        } else {
+            
+            form.elements.isInvoiced[1].checked = true;
+        }
+        
         form.elements.invoice.value = data.invoice || '';
         form.elements.observations.value = data.observations || '';
         form.elements.receptionDate.value = formatDateLongWithTime(data.receptionDate);
@@ -123,9 +131,9 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
         setGoodsReceiptFormSelectOptions(data);
 
-        form.elements.totalQuantityDisplayInput.value = data.totalQuantityDisplayInput;
-        form.elements.totalNetPurchaseAmountDisplayInput.value = data.totalNetPurchaseAmountDisplayInput;
-        form.elements.totalGrossPurchaseAmountDisplayInput.value = data.totalGrossPurchaseAmountDisplayInput;
+        form.elements.totalQuantityDisplayInput.value = data.totalQuantity;
+        form.elements.totalNetPurchaseAmountDisplayInput.value = data.totalNetPurchaseAmount;
+        form.elements.totalGrossPurchaseAmountDisplayInput.value = data.totalGrossPurchaseAmount;
 
         modalElement.querySelector('#modalTitle').textContent = 'Ver compra';
         setFormReadOnly({ form, isReadOnly: true });
@@ -174,23 +182,23 @@ const addProduct = () => {
         return;
     }
 
+    const netPurchaseAmount = Number((quantity * unitCostByQuantity).toFixed(2));
     let area;
-    let unitCostByArea;
+    let totalArea;
 
     if (!base || !height) {
 
-        area = 0;
-        unitCostByArea = 0;
+        area = null;
+        totalArea = quantity;
 
     } else {
 
         area = Number((base * height).toFixed(2));
-        unitCostByArea = Number((netPurchaseAmount / totalArea).toFixed(2));
+        totalArea = Number((area * quantity).toFixed(2));
     }
 
-    const netPurchaseAmount = Number((quantity * unitCostByQuantity).toFixed(2));
+    const unitCostByArea = Number((netPurchaseAmount / totalArea).toFixed(2));
     const grossPurchaseAmount = Number((netPurchaseAmount * 1.16).toFixed(2));
-    const totalArea = Number((area * quantity).toFixed(2));
     const product = {
         productId,
         name,

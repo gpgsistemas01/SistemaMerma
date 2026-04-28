@@ -59,7 +59,6 @@ export const findAllGoodsReceipts = async ({
                 select: {
                     id: true,
                     quantity: true,
-                    area: true,
                     totalArea: true,
                     unitCostByQuantity: true,
                     unitCostByArea: true,
@@ -115,13 +114,13 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
         const processedDetails = await buildGoodsReceiptDetails(tx, details);
 
         const totals = processedDetails.reduce((acc, d) => {
-            acc.totalQuantity += Number(d.quantity);
-            acc.totalnetPurchaseAmount += Number(d.netPurchaseAmount);
-            acc.totalGrossPurchaseAmount += Number(d.grossPurchaseAmount);
+            acc.totalQuantity += d.quantity;
+            acc.totalNetPurchaseAmount += d.netPurchaseAmount;
+            acc.totalGrossPurchaseAmount += d.grossPurchaseAmount;
             return acc;
         }, {
             totalQuantity: 0,
-            totalnetPurchaseAmount: 0,
+            totalNetPurchaseAmount: 0,
             totalGrossPurchaseAmount: 0
         });
 

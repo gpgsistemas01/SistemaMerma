@@ -1,6 +1,5 @@
 import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierFindDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { prisma } from "../../lib/prisma.js";
-import { cleanSearchTerm } from "../../utils/formattersUtils.js";
 import { incrementReferenceNumberCounter } from "../document/referenceNumberService.js";
 
 const SUPPLIER_CODE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -27,23 +26,12 @@ export const findAllSuppliers = async ({
     orderDir = 'asc'
 }) => {
 
-    const { codeSearch, nameSearch } = cleanSearchTerm(search);
     const where = search
         ? {
-            OR: [
-                {
-                    code: {
-                        contains: codeSearch,
-                        mode: 'insensitive'
-                    }
-                },
-                {
-                    tradeName: {
-                        contains: nameSearch,
-                        mode: 'insensitive'
-                    }
-                }
-            ]
+            tradeName: {
+                contains: search,
+                mode: 'insensitive'
+            }
         }
         : {};
 

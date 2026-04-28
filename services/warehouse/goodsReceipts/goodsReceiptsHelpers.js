@@ -26,22 +26,18 @@ export const buildGoodsReceiptDetails = async (tx, details) => {
 
         if (!product) throw new ProductNotFound();
 
-        const area = roundTo(product.area ?? 0);
-        const normalizedQuantity = Number(quantity);
-        const normalizedUnitCostByQuantity = Number(unitCostByQuantity);
-        const netPurchaseAmount = roundTo(normalizedQuantity * normalizedUnitCostByQuantity);
+        const netPurchaseAmount = roundTo(quantity * unitCostByQuantity);
         const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
-        const totalArea = roundTo(area * normalizedQuantity);
-        const unitCostByArea = totalArea > 0
-            ? roundTo(netPurchaseAmount / totalArea)
-            : 0;
+        const totalArea = product.area ? roundTo(product.area * quantity) : quantity;
+        let unitCostByArea = null;
+
+        if (totalArea) unitCostByArea = totalArea > 0 ? roundTo(netPurchaseAmount / totalArea) : 0;
 
         return {
             productId,
-            quantity: normalizedQuantity,
-            area,
+            quantity,
             totalArea,
-            unitCostByQuantity: normalizedUnitCostByQuantity,
+            unitCostByQuantity,
             unitCostByArea,
             netPurchaseAmount,
             grossPurchaseAmount

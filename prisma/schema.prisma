@@ -164,7 +164,7 @@ model GoodsReceipt {
   receptionDate   DateTime
   observations    String?                     @db.VarChar(50)
   totalQuantity     Decimal                     @db.Decimal(10, 3)
-  totalnetPurchaseAmount Decimal                     @db.Decimal(10, 3)
+  totalNetPurchaseAmount Decimal                     @db.Decimal(10, 3)
   totalGrossPurchaseAmount Decimal                     @db.Decimal(10, 3)
   receivedBy      Profile                     @relation(fields: [receivedById], references: [id])
   supplier        Supplier                    @relation(fields: [supplierId], references: [id])
@@ -177,9 +177,8 @@ model GoodsReceiptDetail {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   productId        String         @db.Uuid
   goodsReceiptId   String         @db.Uuid
-  area Decimal @db.Decimal(12, 3)
   quantity         Decimal        @db.Decimal(10, 3)
-  unitCostByArea         Decimal  @db.Decimal(10, 3)
+  unitCostByArea         Decimal?  @db.Decimal(10, 3)
   unitCostByQuantity Decimal @db.Decimal(10, 3)
   totalArea           Decimal        @db.Decimal(10, 3)
   netPurchaseAmount Decimal @db.Decimal(10, 3)
