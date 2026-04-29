@@ -2,7 +2,7 @@ import { ProfileFindDatabaseError } from "../../errors/admin/profileError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllProfiles = async ({
-    department = '',
+    departments = [],
     skip = 0,
     take = 10,
     search = '',
@@ -18,11 +18,13 @@ export const findAllProfiles = async ({
                 mode: 'insensitive'
             }
         }),
-        ...(department && {
+        ...(departments.length && {
             departments: {
                 some: {
                     department: {
-                        name: department
+                        name: {
+                            in: departments
+                        }
                     }
                 }
             }
