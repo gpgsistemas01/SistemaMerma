@@ -14,7 +14,6 @@ const productSelector = '#productInput';
 export const initGoodsIssueFormSelect2 = ({
     context
 }) => {
-
     initDepartmentSelect({
         modalSelector,
         baseSelector: `${ modalSelector } ${ departmentSelector }`,
@@ -39,12 +38,8 @@ export const initGoodsIssueFormSelect2 = ({
         baseSelector: `${ modalSelector } ${ requesterSelector }`,
         placeholder: 'Buscar solicitante...',
         data: (params) => {
-
-            const canRequestAnyDepartment = context.department === 'Almacén' || context.role === 'Administrador del sistema';
-
             return {
-                search: params.term,
-                department: canRequestAnyDepartment ? '' : context.department
+                search: params.term
             };
         },
         allowCreate: false,

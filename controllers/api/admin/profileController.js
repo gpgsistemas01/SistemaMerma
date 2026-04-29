@@ -4,7 +4,7 @@ const allowedDepartments = ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'];
 
 export const getAllProfiles = async (req, res) => {
 
-    let { department } = req.query;
+    const { department } = req.query;
     const strictDepartmentFilter = req.query.strictDepartmentFilter === 'true';
     const { user } = req;
     const start = parseInt(req.query.start) || 0;
@@ -15,13 +15,19 @@ export const getAllProfiles = async (req, res) => {
     const orderColumnIndex = req.query.order?.[0]?.column || 0;
     const orderDir = req.query.order?.[0]?.dir || 'asc';
 
-    const canViewAllProfiles = allowedDepartments.includes(user?.department);
+    const userDepartments = (user?.accesses || [])
+        .map(access => access.department)
+        .filter(Boolean);
+    const canViewAllProfiles = userDepartments.some(departmentName =>
+        allowedDepartments.includes(departmentName)
+    );
 
-    if (canViewAllProfiles && !strictDepartmentFilter) department = '';
-    if (!department && !canViewAllProfiles) department = user?.department || '';
+    const departments = department
+        ? [department]
+        : (canViewAllProfiles && !strictDepartmentFilter ? [] : userDepartments);
 
     const result = await findAllProfiles({
-        department,
+        departments,
         skip: start,
         take: length,
         search,

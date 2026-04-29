@@ -22,7 +22,6 @@ export const initGoodsReceiptFormSelect2 = () => {
         baseSelector: `${ modalSelector } ${ receivedBySelector }`,
         placeholder: 'Buscar persona que recibe...',
         data: (params) => {
-
             return {
                 search: params.term,
                 department: 'ALMACÉN Y PROVEDURÍA',
