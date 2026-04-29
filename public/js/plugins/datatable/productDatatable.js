@@ -3,6 +3,7 @@ import { createDataTable } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { PRODUCTS_API_ROUTE } from "../../services/warehouse/productService.js";
+import { renderMaterialName } from "./utils/renderProductDatatable.js";
 
 const selectorTable = '#table';
 let lastLowStockNotification = '';
@@ -49,15 +50,7 @@ export const createProductDatatable = (context) => {
         { 
             data: null, 
             title: 'Material',
-            render: (data, type, row) => {
-
-                let name;
-
-                if (!row.base || !row.height) name = `${ row.name } || ${ row.supplier.tradeName }`;
-                else name = `${ row.name } (${ row.base } x ${ row.height }) || ${ row.supplier.tradeName }`;
-
-                return name;
-            }
+            render: (data, type, row) => renderMaterialName(row)
         },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },

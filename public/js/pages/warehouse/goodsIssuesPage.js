@@ -61,7 +61,12 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
-    toggleButtons({ mode, status: data?.status?.name, showActions: false });
+    toggleButtons({
+        mode,
+        status: data?.status?.name,
+        showActions: false,
+        withTotal: false
+    });
     setFormReadOnly({ form, isReadOnly: false });
     initGoodsIssueFormSelect2({ context });
     setGoodsIssueFormSelectOptions(data);
@@ -112,12 +117,6 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
             modalElement.querySelector('#modalTitle').textContent = 'Ver salida';
             setFormReadOnly({ form, isReadOnly: true });
         }
-
-        toggleButtons({
-            mode,
-            status: data?.status?.name,
-            showActions: false,
-        });
     }
 
     if (mode === 'view' && data?.status?.name) {

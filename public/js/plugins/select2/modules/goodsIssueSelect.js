@@ -1,3 +1,4 @@
+import { bindChangeResetSelect } from "../../../utils/domUtils.js";
 import { initAdvisorSelect, toggleAdvisorOption } from "../domains/advisor.js";
 import { initClientSelect, toggleClientOption } from "../domains/client.js";
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
@@ -10,24 +11,6 @@ const clientSelector = '#clientInput';
 const departmentSelector = '#departmentInput';
 const advisorSelector = '#advisorInput';
 const productSelector = '#productInput';
-
-const bindChangeResetSelect = ({ sourceSelector, targetSelector, reset }) => {
-    const source = document.querySelector(sourceSelector);
-
-    if (!source) return;
-    if (source.dataset.resetBound === 'true') return;
-    source.dataset.resetBound = 'true';
-
-    source.addEventListener('change', () => {
-        if (typeof reset === 'function') reset();
-        else {
-            const target = document.querySelector(targetSelector);
-            if (!target) return;
-            target.value = '';
-            target.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-    });
-};
 
 export const initGoodsIssueFormSelect2 = ({
     context
@@ -56,11 +39,13 @@ export const initGoodsIssueFormSelect2 = ({
         baseSelector: `${ modalSelector } ${ requesterSelector }`,
         placeholder: 'Buscar solicitante...',
         data: (params) => {
-            const departmentName = $(`${ modalSelector } ${ departmentSelector }`).find(':selected').text()?.trim();
+
+            const select = document.querySelector(`${modalSelector} ${departmentSelector}`);
+            const department = select?.selectedOptions[0]?.text.trim();
 
             return {
                 search: params.term,
-                department: departmentName || '',
+                department,
                 strictDepartmentFilter: true
             };
         },

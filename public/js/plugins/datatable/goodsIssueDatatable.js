@@ -1,6 +1,8 @@
 import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
+import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
+import { renderMaterialName } from "./utils/renderProductDatatable.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -118,95 +120,29 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
 
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
+        $(selectorProductTable).empty();
     }
 
     const table = document.querySelector(selectorProductTable);
 
-    let extraHeaders = '';
-    let extraSubHeaders = '';
+    table.innerHTML = buildDetailsHeader({
+        type: 'issue',
+        mode,
+        isWarehouse,
+        isSystem
+    });
 
-    if (isWarehouse || isSystem) {
-        extraHeaders += `
-            <th rowspan="2">Costo unitario de Conversión</th>
-            <th rowspan="2">Cantidad de proyecto</th>
-            <th rowspan="2">Diferencia</th>
-        `;
-    }
-
-    if (mode !== 'view') {
-        extraHeaders += `<th rowspan="2">Acciones</th>`;
-    }
-
-    table.innerHTML = `
-        <thead>
-            <tr>
-                <th rowspan="2">Material</th>
-                <th colspan="2">Medidas</th>
-                <th rowspan="2">Salida</th>
-                <th rowspan="2">Presentación</th>
-                <th colspan="2">Conversión</th>
-                ${extraHeaders}
-            </tr>
-            <tr>
-                <th>Base</th>
-                <th>Altura</th>
-                <th>Cantidad</th>
-                <th>Unidad</th>
-                ${extraSubHeaders}
-            </tr>
-        </thead>
-    `;
-
-    const columns = [
-        { 
-            data: null, 
-            title: 'Material',
-            render: (data, type, row) => {
-
-                let name;
-
-                if (!row.base || !row.height) name = `${ row.name } || ${ row.supplier }`;
-                else name = `${ row.name } (${ row.base } x ${ row.height }) || ${ row.supplier }`;
-
-                return name;
-            },
-        },
-        { data: 'base', title: 'Base' },
-        { data: 'height', title: 'Altura' },
-        { data: 'quantity', title: 'Salida' },
-        { data: 'presentation', title: 'Presentación' },
-        { data: 'totalArea', title: 'Cantidad' },
-        { data: 'unitMeasure', title: 'Unidad' },
-    ];
-
-    if (isWarehouse || isSystem) {
-        columns.push(...[
-            { data: 'unitCost', title: 'Costo unitario de Conversión' },
-            { data: 'projectQuantity', title: 'Cantidad de proyecto' },
-            { data: 'difference', title: 'Diferencia' }
-        ]);
-    }
-
-    if (mode !== 'view') {
-        columns.push({
-            title: 'Acciones',
-            data: null,
-            render: (data, type, row, meta) => {
-                return `
-                    <button class="btn btn-danger btn-sm delete-btn" data-index="${meta.row}">
-                        Eliminar
-                    </button>
-                `;
-            }
-        });
-    }
+    const columns = buildDetailsColumns({
+        type: 'issue',
+        mode,
+        render: (_, __, row) => renderMaterialName(row),
+        isWarehouse,
+        isSystem
+    });
 
     createDataTable({
         selector: selectorProductTable,
-        options: {
-            data: details,
-            columns
-        }
+        options: { data: details, columns }
     });
 };
 

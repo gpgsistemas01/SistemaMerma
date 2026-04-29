@@ -3,6 +3,8 @@ import { createDataTable, refreshProductTable } from "./baseDatatable.js";
 import { GOODS_RECEIPTS_API_ROUTE } from "../../services/warehouse/goodsReceiptService.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { updateTotals } from "../../ui/formUI.js";
+import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
+import { renderMaterialName } from "./utils/renderProductDatatable.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -77,58 +79,35 @@ export const createGoodsReceiptDatatable = () => {
 
 export const initDetailsGoodsReceiptTable = (mode) => {
 
+    const table = document.querySelector(selectorProductTable);
+
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
+        $(selectorProductTable).empty();
     }
 
-    const columns = [
-        { 
-            data: null, 
-            title: 'Material',
-            render: (data, type, row) => {
+    table.innerHTML = buildDetailsHeader({
+        type: 'receipt',
+        mode
+    });
 
-                let name;
-                const select = document.querySelector('.supplier-select');
-                const supplier = select.options[select.selectedIndex].text;
+    const columns = buildDetailsColumns({
+        type: 'receipt',
+        mode,
+        render: (_, __, row) => {
 
-                if (!row.base || !row.height) name = `${ row.name } || ${ supplier }`;
-                else name = `${ row.name } (${ row.base } x ${ row.height }) || ${ supplier }`;
-
-                return name;
-            },
-        },
-        { data: 'base', title: 'Base' },
-        { data: 'height', title: 'Altura' },
-        { data: 'quantity', title: 'Compra' },
-        { data: 'presentation', title: 'Presentación' },
-        { data: 'totalArea', title: 'Cantidad' },
-        { data: 'unitMeasure', title: 'Unidad' },
-        { data: 'unitCostByArea', title: 'Costo Unitario de Conversión' },
-        { data: 'unitCostByQuantity', title: 'Costo por Presentación' },
-        { data: 'netPurchaseAmount', title: 'Monto s/ IVA' },
-        { data: 'grossPurchaseAmount', title: 'Monto c/ IVA' },
-    ];
-
-    if (mode !== 'view') columns.push({
-        title: 'Acciones',
-        data: null,
-        render: (data, type, row, meta) => {
-            return `
-                <button class="btn btn-danger btn-sm delete-btn" data-index="${meta.row}">
-                    Eliminar
-                </button>
-            `;
+            const select = document.querySelector('.supplier-select');
+            const supplier = select.options[select.selectedIndex].text;
+            
+            return renderMaterialName(row, supplier);
         }
     });
 
-    const table = createDataTable({
-        selector: selectorProductTable, 
-        options: {
-            data: details,
-            columns
-        }
+    createDataTable({
+        selector: selectorProductTable,
+        options: { data: details, columns }
     });
-}
+};
 
 $(selectorProductTable).on('click', '.delete-btn', function () {
 

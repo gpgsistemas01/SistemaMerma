@@ -69,10 +69,6 @@
 
 <%- include('../../../shared/modal', { modalId: 'goodsIssueModal', form }) %>
 
-<script>
-    window.GOODS_ISSUE_CONTEXT = <%- JSON.stringify(user) %>;
-</script>
-
 <script type="module" src="/js/pages/warehouse/goodsIssuesPage.js"></script>
 
 <%- contentFor('title') %>
