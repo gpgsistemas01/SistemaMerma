@@ -4,13 +4,14 @@ import { buildDetailsColumns, buildDetailsHeader } from "./builderDetailDatatabl
 
 export const renderMaterialName = (row, supplierOverride) => {
 
-    const supplier = supplierOverride || row.supplier?.tradeName || row.supplier;
+    const supplierName = supplierOverride || row.supplier?.tradeName || row.supplierName;
+    const productName = row.productName || row.name;
 
-    if (!row.base || !row.height) {
-        return `${row.name} || ${supplier}`;
+    if (!row.productBase || !row.productHeight) {
+        return `${ productName } || ${ supplierName }`;
     }
 
-    return `${row.name} (${row.base} x ${row.height}) || ${supplier}`;
+    return `${ productName } (${ row.productBase } x ${ row.productHeight }) || ${ supplierName }`;
 };
 
 export const initDetailsTable = ({ selector, type, mode, context, data }) => {

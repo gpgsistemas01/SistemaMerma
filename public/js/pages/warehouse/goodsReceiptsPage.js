@@ -78,6 +78,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);
+    let value;
 
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
@@ -92,9 +93,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     if (mode === 'create') {
         
         form.reset();
-        const value = data?.isInvoiced ? 'invoice' : 'none';
-        form.elements.isInvoiced.value = value;
-        toggleInvoiceInput(value);
+        value = 'invoice';
         modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
         form.querySelector('#submitBtn').textContent = 'Confirmar';
         form.querySelector('#presentationDisplayInput').value = '';
@@ -108,18 +107,16 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     if (mode === 'view') {
 
-        const select = document.querySelector('.supplier-select');
-        const supplier = select.options[select.selectedIndex].text;
-        
-        form.elements.invoice.value = data.invoice || '';
+        value = data.isInvoiced ? 'invoice' : 'none';
+        const supplierName = data.supplierName;
         form.elements.observations.value = data.observations || '';
         form.elements.receptionDate.value = formatDateLongWithTime(data.receptionDate);
-        details.push(...data?.details.map(detail => ({
+        details.push(...data.details.map(detail => ({
             id: detail.id,
             productId: detail.productId,
-            name: detail.productName,
-            base: detail.productBase,
-            height: detail.productHeight,
+            productName: detail.productName,
+            productBase: detail.productBase,
+            productHeight: detail.productHeight,
             quantity: detail.quantity,
             presentationName: detail.presentationName,
             convertedQuantity: detail.convertedQuantity,
@@ -128,7 +125,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             costPerUnitType: detail.costPerUnitType,
             netPurchaseAmount: detail.netPurchaseAmount,
             grossPurchaseAmount: detail.grossPurchaseAmount,
-            supplierName: supplier
+            supplierName
         })));
 
         form.elements.totalQuantityDisplayInput.value = data.totalQuantity;
@@ -144,6 +141,10 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             showActions: false
         });
     }
+    
+    form.elements.invoice.value = data?.invoice || '';
+    form.elements.isInvoiced.value = value;
+    toggleInvoiceInput({ value, mode, form });
 
     initDetailsGoodsReceiptTable(mode);
 
@@ -156,7 +157,7 @@ const addProduct = () => {
     const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const quantity = Number(document.querySelector('#quantityInput').value);
-    const costPerUnitType = Number(document.querySelector('#unitCostByQuantityInput').value);
+    const costPerUnitType = Number(document.querySelector('#costPerUnitInput').value);
     const base = selectedProduct?.base ? Number(selectedProduct?.base) : null;
     const height = selectedProduct?.height ? Number(selectedProduct?.height) : null;
     const { presentation, unitMeasure, name, supplier } = selectedProduct;
@@ -232,6 +233,6 @@ invoiceRadios.forEach(radio => {
 
     radio.addEventListener('change', () => {
 
-        if (radio.checked) toggleInvoiceInput(radio.value);
+        if (radio.checked) toggleInvoiceInput({ value: radio.value, mode: 'update', form: document.querySelector(formId) });
     });
 });

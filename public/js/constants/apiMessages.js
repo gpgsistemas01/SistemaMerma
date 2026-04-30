@@ -126,7 +126,7 @@ export const errorMessages = {
     PRODUCT_NOT_FOUND: 'Producto no encontrado.',
     PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al crear el producto.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
-    PRODUCT_DIMENSIONS_FIND_DB_ERROR: 'Error de base de datos al buscar las medidas del producto.',
+    PRODUCT_SNAPSHOT_FIND_DB_ERROR: 'Error de base de datos al buscar los datos históricos del producto.',
     PRODUCT_UNIT_COST_UPDATE_DB_ERROR: 'Error de base de datos al editar el costo unitario del producto.',
     SUPPLIER_PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al relacionar el producto a un proveedor.',
     SUPPLIER_PRODUCT_DELETE_DB_ERROR: 'Error de base de datos al eliminar la relación entre producto y proveedor.',

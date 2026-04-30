@@ -1,4 +1,4 @@
-import { ProductDimensionsFindDatabaseError, ProductCreateDatabaseError, ProductCurrentStockUpdateDatabaseError, ProductNotFound, ProductQuantityUpdateDatabaseError, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
+import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductCurrentStockUpdateDatabaseError, ProductNotFound, ProductQuantityUpdateDatabaseError, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
 import { prisma } from "../../../lib/prisma.js";
 import { findAllSupplierProducts, findSupplierProductByIds } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
@@ -26,7 +26,7 @@ export const findAllProducts = async ({
     });
 };
 
-export const findAllProductDimensions = async ({
+export const findProductsSnapshot = async ({
     tx,
     productIds
 }) => {
@@ -56,7 +56,7 @@ export const findAllProductDimensions = async ({
 
     } catch (err) {
 
-        throw new ProductDimensionsFindDatabaseError();
+        throw new ProductSnapshotFindDatabaseError();
     }
 }
 
@@ -258,13 +258,13 @@ export const updateProductUnitCostIfHigher = async ({
 
         for (const detail of details) {
 
-            const { productId, unitCostByArea } = detail;
+            const { productId, conversionUnitCost } = detail;
 
             if (
                 !maxCostByProduct[productId] ||
-                unitCostByArea > maxCostByProduct[productId]
+                conversionUnitCost > maxCostByProduct[productId]
             ) {
-                maxCostByProduct[productId] = unitCostByArea;
+                maxCostByProduct[productId] = conversionUnitCost;
             }
         }
 
@@ -294,6 +294,7 @@ export const updateProductUnitCostIfHigher = async ({
         }));
 
     } catch (err) {
+
         throw new ProductQuantityUpdateDatabaseError();
     }
 };

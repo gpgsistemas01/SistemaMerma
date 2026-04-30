@@ -1,5 +1,5 @@
 import { ProductNotFound } from "../../../errors/warehouse/productError.js";
-import { findAllProductDimensions } from "../products/productService.js";
+import { findProductsSnapshot } from "../products/productService.js";
 
 const IVA_RATE = 1.16;
 
@@ -13,14 +13,14 @@ export const buildGoodsReceiptDetails = async (tx, details) => {
 
     const productIds = details.map(d => d.productId);
 
-    const products = await findAllProductDimensions({
+    const products = await findProductsSnapshot({
         tx,
         productIds
     });
 
     const productMap = new Map(products.map(p => [p.id, p]));
 
-    return details.map(({ productId, quantity, unitCostByQuantity: costPerUnitType }) => {
+    return details.map(({ productId, quantity, costPerUnitType }) => {
 
         const product = productMap.get(productId);
 

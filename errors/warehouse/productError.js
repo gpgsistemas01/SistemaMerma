@@ -29,10 +29,10 @@ export class SupplierProductDeleteDatabaseError extends AppError {
     }
 }
 
-export class ProductDimensionsFindDatabaseError extends AppError {
+export class ProductSnapshotFindDatabaseError extends AppError {
 
     constructor () {
-        super('Error de base de datos al buscar las medidas del producto', 'PRODUCT_DIMENSIONS_FIND_DB_ERROR', 500);
+        super('Error de base de datos al buscar los datos históricos del producto', 'PRODUCT_SNAPSHOT_FIND_DB_ERROR', 500);
     }
 }
 
