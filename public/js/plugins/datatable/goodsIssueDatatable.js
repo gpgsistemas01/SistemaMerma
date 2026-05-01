@@ -1,4 +1,5 @@
 import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
+import { GOODS_ISSUES_API_ROUTE } from "../../services/warehouse/goodsIssueService.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
@@ -80,7 +81,7 @@ export const createGoodsIssueDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                url: '/api/warehouse/goods-issues/',
+                url: GOODS_ISSUES_API_ROUTE,
                 data: (d) => {
                     d.department = context.department || '';
                 }
