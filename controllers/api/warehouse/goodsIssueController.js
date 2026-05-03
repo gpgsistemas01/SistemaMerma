@@ -50,8 +50,9 @@ export const registerGoodsIssue = async (req, res) => {
     });
 };
 
-export const editGoodsIssue = async (req, res) => {
-
+export const editGoodsIssueDetails = async (req, res) => {
+console.log(req.body)
+console.log(req.params.id)
     const goodsIssueDto = createGoodsIssueDtoForRegister(req.body);
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
 

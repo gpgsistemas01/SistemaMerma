@@ -10,6 +10,16 @@ export const validate = (req, res, next) => {
         const errors = {};
         
         errorsArray.forEach(error => {
+            if (error.path === 'details') {
+                try {
+                    const parsed = JSON.parse(error.msg);
+                    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                        Object.assign(errors, parsed);
+                        return;
+                    }
+                } catch (_) {}
+            }
+            
             errors[error.path] = error.msg;
         });
 

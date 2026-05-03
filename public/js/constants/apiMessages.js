@@ -92,6 +92,9 @@ export const errorMessages = {
     MIN_STOCK_INVALID_NUMBER: 'Debe ser un número.',
     MIN_STOCK_GREATER_THAN_MAX: 'El stock mínimo no puede ser mayor al máximo.',
 
+    REQUIRED_QUANTITY: 'La cantidad es requerido.',
+    INVALID_FORMAT_QUANTITY: 'La cantidad debe ser un número mayor a cero.',
+
     // RECEPTION DATE
     RECEPTION_DATE_REQUIRED: 'La fecha de recepción es requerida.',
     RECEPTION_DATE_INVALID_FORMAT: 'La fecha de recepción no es válida.',
@@ -114,6 +117,9 @@ export const errorMessages = {
     // 🔘 ACTIVE
     ACTIVE_REQUIRED: 'El estado activo es requerido.',
     ACTIVE_INVALID_BOOLEAN: 'El estado activo debe ser verdadero o falso.',
+
+    SUPPLIED_REQUIRED: 'El estado surtido es requerido.',
+    SUPPLIED_INVALID_BOOLEAN: 'El estado surtido debe ser verdadero o falso',
 
     // DETAILS
     DETAILS_REQUIRED: 'La lista de detalles debe contener al menos un producto.',

@@ -5,12 +5,12 @@ import {
     approveGoodsIssueStatus,
     cancelGoodsIssueStatus,
     confirmGoodsIssueStatus,
-    editGoodsIssue,
+    editGoodsIssueDetails,
     getAllGoodsIssues,
     registerGoodsIssue,
     rejectGoodsIssueStatus
 } from '../../../controllers/api/warehouse/goodsIssueController.js';
-import { goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
+import { goodsIssueDetailsValidation, goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
 
 const router = express.Router();
 
@@ -30,6 +30,11 @@ const goodsIssuePermissions = {
         'TALLER 3D',
         'VENTAS Y PROYECTOS ESPECIALES'
     ]
+};
+
+const goodsIssueDetailsPermissions = {
+    roles: ['Coordinador', 'Administrador del sistema'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
 const goodsIssueApprovalPermissions = {
@@ -72,10 +77,10 @@ router.post(
 router.patch(
     '/:id/details',
     verifyCookiesAuthTokenRequired,
-    goodsIssueValidation,
+    goodsIssueDetailsValidation,
     validate,
-    authorizeUserApi(goodsIssuePermissions),
-    editGoodsIssue
+    authorizeUserApi(goodsIssueDetailsPermissions),
+    editGoodsIssueDetails
 );
 
 router.patch(

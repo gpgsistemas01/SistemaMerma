@@ -56,7 +56,9 @@ export const validateFields = (validators, formData) => {
     const errors = {};
 
     Object.keys(validators).forEach(field => {
-        errors[field] = validators[field](formData[field]);
+        const error = validators[field](formData[field]);
+
+        if (error) errors[field] = error;
     });
 
     return errors;
@@ -76,15 +78,22 @@ export const validateDetailsFields = (validators, details) => {
     return errors;
 }
 
-export const mapServerErrors = (serverErrors) => {
+export const mapServerErrors = (obj) => {
 
-    const errors = {};
-
-    for (const field in serverErrors) {
-
-        const error = serverErrors[field];
-        errors[field] = getErrorMessage(error);
+    if (Array.isArray(obj)) {
+        return obj.map(mapErrorsRecursive);
     }
 
-    return errors;
-}
+    if (typeof obj === 'object' && obj !== null) {
+
+        const result = {};
+
+        for (const key in obj) {
+            result[key] = mapErrorsRecursive(obj[key]);
+        }
+
+        return result;
+    }
+
+    return getErrorMessage(obj);
+};

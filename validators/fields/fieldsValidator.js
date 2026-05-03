@@ -190,3 +190,56 @@ export const validateGoodsIssueDetailsArray =
             return true;
         })
 ;
+
+export const validateGoodsIssueDetailsEdition =
+    body('details')
+        .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
+        .custom((details) => {
+
+            const errors = {};
+
+            details.forEach((detail) => {
+
+                const detailId = detail?.id;
+                if (!detailId) return;
+
+                const quantity = Number(detail?.projectConvertedQuantity);
+                const isSupplied = Boolean(detail?.isSupplied);
+
+                if (!quantity) {
+
+                    if (!errors[detailId]) errors[detailId] = {};
+
+                    errors[detailId].projectConvertedQuantity = errorMap['details'].REQUIRED_QUANTITY;
+                }
+
+                if (!Number.isFinite(quantity) || quantity < 0) {
+
+                    if (!errors[detailId]) errors[detailId] = {};
+
+                    errors[detailId].projectConvertedQuantity = errorMap['details'].INVALID_FORMAT_QUANTITY;
+                }
+
+                if (isSupplied === null || isSupplied === undefined) {
+
+                    if (!errors[detailId]) errors[detailId] = {};
+
+                    errors[detailId].isSupplied = errorMap['isSupplied'].REQUIRED;
+                }
+
+                if (typeof isSupplied !== 'boolean') {
+
+                    if (!errors[detailId]) errors[detailId] = {};
+
+                    errors[detailId].isSupplied = errorMap['isSupplied'].INVALID_BOOLEAN;
+                }
+
+            });
+
+            if (Object.keys(errors).length) {
+                throw new Error(JSON.stringify(errors));
+            }
+
+            return true;
+        })
+;
