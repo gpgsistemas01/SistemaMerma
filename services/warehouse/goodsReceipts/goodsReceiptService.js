@@ -8,7 +8,7 @@ import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
-import { updateConvertedQuantityByCurrentStock, updateProductUnitCostIfHigher } from "../products/productService.js";
+import { updateProductUnitCostIfHigher } from "../products/productService.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
 const MOVEMENT_TYPE_IN = 'IN';
@@ -139,25 +139,31 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                 }
             },
             include: {
-                details: true
+                details: {
+                    select: {
+                        id: true,
+                        productId: true,
+                        quantity: true,
+                        conversionUnitCost: true
+                    }
+                }
             }
         });
 
         const impactedProductIds = await applyInventoryMovement({
             tx,
-            goodsReceiptId: goodsReceipt.id,
-            details: goodsReceipt.details,
+            reference: { goodsReceiptId: goodsReceipt.id },
+            details: goodsReceipt.details.map(detail => ({
+                productId: detail.productId,
+                goodsReceiptDetailId: detail.id,
+                quantity: detail.quantity
+            })),
             movementType: MOVEMENT_TYPE_IN
         });
 
         await updateProductUnitCostIfHigher({
             tx,
             details: goodsReceipt.details
-        });
-
-        await updateConvertedQuantityByCurrentStock({
-            tx,
-            productIds: impactedProductIds
         });
 
         return { goodsReceipt, impactedProductIds };

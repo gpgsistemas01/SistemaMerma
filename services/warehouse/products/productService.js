@@ -1,4 +1,4 @@
-import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductCurrentStockUpdateDatabaseError, ProductNotFound, ProductQuantityUpdateDatabaseError, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
+import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
 import { prisma } from "../../../lib/prisma.js";
 import { findAllSupplierProducts, findSupplierProductByIds } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
@@ -60,6 +60,18 @@ export const findProductsSnapshot = async ({
         throw new ProductSnapshotFindDatabaseError();
     }
 }
+
+export const findProductsByIds = async ({ tx, productIds, select }) => {
+
+    return await tx.product.findMany({
+        where: { 
+            id: { 
+                in: productIds 
+            } 
+        },
+        select
+    });
+};
 
 export const findExistingSkus = (tx) => async ({ 
     baseSku, 
@@ -185,7 +197,13 @@ export const updateProduct = async (productDto, id) => {
                 isUpdate: true
             });
 
-            return updatedProduct;
+            const fullProduct = await findSupplierProductByIds({
+                tx,
+                productId: updatedProduct.id,
+                supplierId: relations.supplierId
+            });
+
+            return fullProduct;
         });
 
     }).catch((err) => {
@@ -198,54 +216,6 @@ export const updateProduct = async (productDto, id) => {
     });
 };
 
-export const updateConvertedQuantityByCurrentStock = async ({ 
-    tx, 
-    productIds 
-}) => {
-
-    const db = tx || prisma;
-    const uniqueProductIds = [...new Set(productIds)];
-
-    if (!uniqueProductIds.length) return;
-
-    try {
-
-        const products = await db.product.findMany({
-            where: {
-                id: {
-                    in: uniqueProductIds
-                }
-            },
-            select: {
-                id: true,
-                currentStock: true,
-                base: true,
-                height: true
-            }
-        });
-
-        await Promise.all(products.map((product) => {
-
-            const { base, height, currentStock } = product;
-            const hasDimensions = base !== null && height !== null && base > 0 && height > 0;
-            const convertedQuantity = hasDimensions
-                ? currentStock * (base * height)
-                : currentStock;
-
-            return db.product.update({
-                where: { id: product.id },
-                data: {
-                    convertedQuantity
-                }
-            });
-        }));
-
-    } catch (err) {
-
-        throw new ProductQuantityUpdateDatabaseError();
-    }
-};
-
 export const updateProductUnitCostIfHigher = async ({
     tx,
     details
@@ -253,51 +223,44 @@ export const updateProductUnitCostIfHigher = async ({
 
     const db = tx || prisma;
 
-    try {
+    const maxCostByProduct = {};
 
-        const maxCostByProduct = {};
+    for (const detail of details) {
 
-        for (const detail of details) {
+        const { productId, conversionUnitCost } = detail;
 
-            const { productId, conversionUnitCost } = detail;
+        if (
+            !maxCostByProduct[productId] ||
+            conversionUnitCost > maxCostByProduct[productId]
+        ) {
+            maxCostByProduct[productId] = conversionUnitCost;
+        }
+    }
 
-            if (
-                !maxCostByProduct[productId] ||
-                conversionUnitCost > maxCostByProduct[productId]
-            ) {
-                maxCostByProduct[productId] = conversionUnitCost;
-            }
+    const productIds = Object.keys(maxCostByProduct);
+
+    const products = await db.product.findMany({
+        where: {
+            id: { in: productIds }
+        },
+        select: {
+            id: true,
+            maxUnitCost: true
+        }
+    });
+
+    await Promise.all(products.map(product => {
+
+        const newCost = maxCostByProduct[product.id];
+
+        if (newCost > product.maxUnitCost) {
+            return db.product.update({
+                where: { id: product.id },
+                data: { maxUnitCost: newCost }
+            });
         }
 
-        const productIds = Object.keys(maxCostByProduct);
-
-        const products = await db.product.findMany({
-            where: {
-                id: { in: productIds }
-            },
-            select: {
-                id: true,
-                maxUnitCost: true
-            }
-        });
-
-        await Promise.all(products.map(product => {
-
-            const newCost = maxCostByProduct[product.id];
-
-            if (newCost > product.maxUnitCost) {
-                return db.product.update({
-                    where: { id: product.id },
-                    data: { maxUnitCost: newCost }
-                });
-            }
-
-        }));
-
-    } catch (err) {
-
-        throw new ProductQuantityUpdateDatabaseError();
-    }
+    }));
 };
 
 export const updateProductCurrentStock = async ({
@@ -308,22 +271,46 @@ export const updateProductCurrentStock = async ({
 
     const db = tx || prisma;
 
-    try {
-        await Promise.all(
-            Object.entries(grouped).map(([productId, quantity]) =>
-                db.product.update({
-                    where: { id: productId },
-                    data: {
-                        currentStock: {
-                            [movementType === REFERENCE_MOVEMENT_IN ? 'increment' : 'decrement']: quantity
-                        }
-                    }
-                })
-            )
+    const productIds = Array.from(grouped.keys());
+
+    const products = await findProductsByIds({
+        tx,
+        productIds,
+        select: {
+            id: true,
+            currentStock: true,
+            base: true,
+            height: true
+        }
+    });
+
+    const productMap = new Map(products.map(p => [p.id, p]));
+
+    const operations = [];
+
+    for (const [productId, quantity] of grouped.entries()) {
+
+        const product = productMap.get(productId);
+
+        const newStock = movementType === REFERENCE_MOVEMENT_IN
+            ? product.currentStock + quantity
+            : product.currentStock - quantity;
+
+        const hasDimensions = product.base && product.height;
+        const convertedQuantity = hasDimensions
+            ? newStock * (product.base * product.height)
+            : newStock;
+
+        operations.push(
+            db.product.update({
+                where: { id: productId },
+                data: {
+                    currentStock: newStock,
+                    convertedQuantity
+                }
+            })
         );
-
-    } catch (err) {
-
-        throw new ProductCurrentStockUpdateDatabaseError();
     }
+
+    await Promise.all(operations);
 }

@@ -12,3 +12,11 @@ export const createGoodsIssueDtoForRegister = (body = {}) => ({
         quantity: Number(d.quantity)
     }))
 });
+
+export const createGoodsIssueDetailsDtoForEdit = (body = {}) => ({
+    details: (body.details).map(d => ({
+        id: d.id,
+        isSupplied: Boolean(d.isSupplied),
+        projectConvertedQuantity: Number(d.projectConvertedQuantity)
+    }))
+});

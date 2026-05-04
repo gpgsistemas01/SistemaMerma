@@ -2,6 +2,11 @@ import { ProductNotFound } from "../../../errors/warehouse/productError.js";
 import { roundTo } from "../../../utils/formattersUtils.js";
 import { findSupplierProductsSnapshot } from "../products/supplierProductService.js";
 
+const FLOAT_EPSILON = 0.000001;
+const FULFILLMENT_PENDING = 'Pendiente';
+const FULFILLMENT_PARTIAL = 'Surtido parcial';
+const FULFILLMENT_COMPLETE = 'Surtido';
+
 export const buildGoodsIssueDetails = async ({
     details
 }) => {
@@ -56,3 +61,51 @@ export const buildGoodsIssueDetails = async ({
         };
     });
 }
+
+export const buildGoodsIssueDetailUpdate = ({ current, detail, currentStock }) => {
+
+    const pendingBase = Math.max(0, current.quantity - current.suppliedQuantity);
+
+    const suppliedPartialBase = Math.min(pendingBase, currentStock);
+
+    const suppliedBase = current.suppliedQuantity + suppliedPartialBase;
+
+    const difference = current.convertedQuantity - detail.projectConvertedQuantity;
+
+    const isSupplied = suppliedBase + FLOAT_EPSILON >= current.quantity;
+
+    const fulfillmentName = isSupplied
+        ? FULFILLMENT_COMPLETE
+        : (suppliedBase > 0 ? FULFILLMENT_PARTIAL : FULFILLMENT_PENDING);
+
+    return {
+        updateData: {
+            projectConvertedQuantity: detail.projectConvertedQuantity,
+            suppliedQuantity: suppliedBase,
+            convertedQuantityDifference: difference,
+            isSupplied
+        },
+        fulfillmentName,
+        movement: suppliedPartialBase > FLOAT_EPSILON
+            ? {
+                productId: current.productId,
+                goodsIssueDetailId: current.id,
+                quantity: suppliedPartialBase
+            }
+            : null,
+        remainingStock: currentStock - suppliedPartialBase
+    };
+};
+
+export const resolveFulfillmentStatus = (details) => {
+
+    const allSupplied = details.every((d) => d.isSupplied);
+
+    const anySupplied = details.some(
+        (d) => (d.suppliedQuantity ?? 0) > FLOAT_EPSILON
+    );
+
+    return allSupplied
+        ? FULFILLMENT_COMPLETE
+        : (anySupplied ? FULFILLMENT_PARTIAL : FULFILLMENT_PENDING);
+};

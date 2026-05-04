@@ -67,7 +67,7 @@ export const createProductDatatable = (context) => {
             {
                 data: null,
                 title: 'Acciones',
-                render: () => renderActionButtons({ status: 'Abierta', context: 'product' }) // Pasamos 'Abierta' para mostrar siempre el botón de editar, ya que no tenemos un estado específico para los productos
+                render: () => renderActionButtons({ status: 'Abierta', context: 'product' })
             }
         ]);
     }

@@ -110,8 +110,8 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
     if (mode !== 'view' && mode !== 'edit-detail') {
         columns.push({
             data: null,
-            render: (_, __, ___, meta) => `
-                <button class="btn btn-danger btn-sm delete-btn" data-index="${ meta.row }">
+            render: (_, __, row) => `
+                <button class="btn btn-danger btn-sm delete-btn" data-id="${ row.id }">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             `

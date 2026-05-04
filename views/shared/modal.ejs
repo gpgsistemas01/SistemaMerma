@@ -72,16 +72,6 @@ const buttons = {
         attrs: {
             'data-mdb-dismiss': 'modal'
         }
-    },
-    cancelButton: {
-        id: 'cancelBtn',
-        class: 'btn btn-secondary',
-        content: 'Cancelar'
-    },
-    confirmButton: {
-        id: 'confirmBtn',
-        class: 'btn btn-primary',
-        content: 'Confirmar'
     }
 }; %>
 
@@ -145,14 +135,6 @@ const buttons = {
 
                 <div class="col-12">
                     <%- include('./button', { button: buttons.backButton }) %>
-
-                    <% if (form.canApprove) { %>
-                        <div class="approve-container">
-                            <%- include('./button', { button: buttons.cancelButton }) %>
-
-                            <%- include('./button', { button: buttons.confirmButton }) %>
-                        </div>
-                    <% } %>
                     
                     <%- include('./submit') %>
                 </div>

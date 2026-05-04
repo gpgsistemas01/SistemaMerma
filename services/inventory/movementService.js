@@ -5,26 +5,24 @@ const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
 const REFERENCE_TYPE_GOODS_ISSUE = 'GOODS_ISSUE';
 const REFERENCE_TYPE_PURCHASE_REQUISITION = 'PURCHASE_REQUISITION';
 
-export const applyInventoryMovement = async ({ 
-    tx, 
-    goodsReceiptId,
-    details, 
-    movementType 
+export const applyInventoryMovement = async ({
+    tx,
+    reference = {},
+    details,
+    movementType
 }) => {
 
     const db = tx || prisma;
 
-    const data = {};
-
-    if (goodsReceiptId) {
-        
-        data.goodsReceiptId = goodsReceiptId;
-        data.date = new Date();
-        data.details = {
+    const data = {
+        date: new Date(),
+        ...reference,
+        details: {
             create: details.map(detail => ({
-                goodsReceiptDetailId: detail.id,
                 productId: detail.productId,
-                quantity: detail.quantity
+                quantity: detail.quantity,
+                ...(detail.goodsReceiptDetailId && { goodsReceiptDetailId: detail.goodsReceiptDetailId }),
+                ...(detail.goodsIssueDetailId && { goodsIssueDetailId: detail.goodsIssueDetailId })
             }))
         }
     };
@@ -41,10 +39,13 @@ export const applyInventoryMovement = async ({
         }
     });
 
-    const grouped = [];
+    const grouped = new Map();
 
     for (const detail of movement.details) {
-        grouped[detail.productId] = (grouped[detail.productId] || 0) + detail.quantity;
+        grouped.set(
+            detail.productId,
+            Number((grouped.get(detail.productId) || 0)) + Number(detail.quantity)
+        );
     }
 
     await updateProductCurrentStock({
@@ -53,5 +54,5 @@ export const applyInventoryMovement = async ({
         movementType
     });
 
-    return movement.details.map((detail) => detail.productId);
-}
+    return movement.details.map(d => d.productId);
+};

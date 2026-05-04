@@ -3,7 +3,7 @@ import { GOODS_ISSUES_API_ROUTE } from "../../services/warehouse/goodsIssueServi
 import { hasPermission } from "../../utils/permissions.js";
 import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
-import { renderMaterialName } from "./utils/renderProductDatatable.js";
+import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -71,7 +71,7 @@ export const createGoodsIssueDatatable = (context) => {
                 return `<div>${ deliveredBy }<br><small>${ deliveryDate }</small></div>`;
             }
         },
-        { data: 'dispatchStatus', title: 'Estado surtido' },
+        { data: 'fulfillmentStatus', title: 'Estado surtido' },
         {
             data: 'id',
             title: 'Acciones',
@@ -143,11 +143,13 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
 
 $(selectorProductTable).on('click', '.delete-btn', function () {
 
-    const index = $(this).data('index');
+    const id = $(this).data('id');
 
-    details.splice(index, 1);
-
-    refreshProductTable(details);
+    handleDelete({
+        id,
+        details,
+        context: 'issue'
+    })
 });
 
 export const updateDetailRow = (input, product) => {
