@@ -151,7 +151,7 @@ export const errorMessages = {
 
     REFERENCE_NUMBER_UPDATE_DB_ERROR: 'Error de base de datos al actualizar el folio.',
 
-    GOODS_ISSUE_INSUFFICIENT_STOCK: 'Stock insuficiente para realizar la salida.'
+    GOODS_ISSUE_FULFILLMENT_COMPLETE: 'La salida ya está completamente surtida y no puede modificarse.'
 };
 
 const successMessages = {

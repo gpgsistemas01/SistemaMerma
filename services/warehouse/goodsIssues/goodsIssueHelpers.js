@@ -64,13 +64,41 @@ export const buildGoodsIssueDetails = async ({
 
 export const buildGoodsIssueDetailUpdate = ({ current, detail, currentStock }) => {
 
+    const difference = current.convertedQuantity - detail.projectConvertedQuantity;
+
+    if (current.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) {
+
+        return {
+            updateData: {
+                projectConvertedQuantity: detail.projectConvertedQuantity,
+                convertedQuantityDifference: current.convertedQuantity - detail.projectConvertedQuantity,
+                isSupplied: true
+            },
+            fulfillmentName: FULFILLMENT_COMPLETE,
+            movement: null,
+            remainingStock: currentStock
+        }
+    }
+
+    if (!detail.isSupplied) {
+
+        return {
+            updateData: {
+                projectConvertedQuantity: detail.projectConvertedQuantity,
+                convertedQuantityDifference: difference,
+                isSupplied: false
+            },
+            fulfillmentName: current.fulfillmentStatus?.name ?? FULFILLMENT_PENDING,
+            movement: null,
+            remainingStock: currentStock
+        };
+    }
+
     const pendingBase = Math.max(0, current.quantity - current.suppliedQuantity);
 
     const suppliedPartialBase = Math.min(pendingBase, currentStock);
 
     const suppliedBase = current.suppliedQuantity + suppliedPartialBase;
-
-    const difference = current.convertedQuantity - detail.projectConvertedQuantity;
 
     const isSupplied = suppliedBase + FLOAT_EPSILON >= current.quantity;
 

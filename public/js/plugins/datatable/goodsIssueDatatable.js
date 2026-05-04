@@ -71,7 +71,7 @@ export const createGoodsIssueDatatable = (context) => {
                 return `<div>${ deliveredBy }<br><small>${ deliveryDate }</small></div>`;
             }
         },
-        { data: 'fulfillmentStatus', title: 'Estado surtido' },
+        { data: 'fulfillmentStatus.name', title: 'Estado surtido' },
         {
             data: 'id',
             title: 'Acciones',

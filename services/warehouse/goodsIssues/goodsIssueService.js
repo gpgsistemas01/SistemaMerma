@@ -3,7 +3,8 @@ import {
     GoodsIssueNotFound,
     GoodsIssueRequesterProfileNotFound,
     GoodsIssueUpdateDatabaseError,
-    GoodsIssueAdvisorProfileNotFound
+    GoodsIssueAdvisorProfileNotFound,
+    GoodsIssueFulfillmentComplete
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { prisma } from "../../../lib/prisma.js";
 import { findProfileById } from "../../admin/profileService.js";
@@ -17,6 +18,7 @@ import { findProductsByIds } from "../products/productService.js";
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
 const DEPARTMENT_WAREHOUSE = 'ALMACÉN Y PROVEDURÍA';
+const FULFILLMENT_COMPLETE = 'Surtido';
 const STATUS_APPROVED = 'Aprobada';
 const REFERENCE_NUMBER_TYPE = 'SAL';
 const REFERENCE_MOVEMENT_OUT = 'OUT';
@@ -46,6 +48,11 @@ export const findAllGoodsIssues = async ({
                 mode: 'insensitive'
             }
         }),
+        NOT: {
+            fulfillmentStatus: {
+                name: FULFILLMENT_COMPLETE
+            }
+        },
         ...(!canViewAll && {
             department: {
                 name: {
@@ -213,6 +220,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 where: { id },
                 select: {
                     id: true,
+                    fulfillmentStatus: true,
                     details: {
                         select: {
                             id: true,
@@ -227,6 +235,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             });
 
             if (!goodsIssue) throw new GoodsIssueNotFound();
+
+            if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) throw new GoodsIssueFulfillmentComplete();
 
             const detailIds = details.map(d => d.id).filter(Boolean);
 
@@ -279,9 +289,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                     }
                 });
 
-                if (result.movement) {
-                    movementDetails.push(result.movement);
-                }
+                if (result.movement) movementDetails.push(result.movement);
 
                 availableStockById.set(
                     current.productId,
@@ -328,7 +336,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         });
 
     } catch (err) {
-
+console.log(err)
         throw new GoodsIssueUpdateDatabaseError();
     }
 };
