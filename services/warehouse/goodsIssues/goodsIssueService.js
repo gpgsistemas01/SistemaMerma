@@ -18,6 +18,7 @@ import { findProductsByIds } from "../products/productService.js";
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
 const DEPARTMENT_WAREHOUSE = 'ALMACÉN Y PROVEDURÍA';
+const FULFILLMENT_PENDING = 'Pendiente';
 const FULFILLMENT_COMPLETE = 'Surtido';
 const STATUS_APPROVED = 'Aprobada';
 const REFERENCE_NUMBER_TYPE = 'SAL';
@@ -30,6 +31,7 @@ export const findAllGoodsIssues = async ({
     search = '',
     orderBy = 'referenceNumber',
     orderDir = 'asc',
+    onlyPending = true,
     accesses = []
 }) => {
 
@@ -48,11 +50,13 @@ export const findAllGoodsIssues = async ({
                 mode: 'insensitive'
             }
         }),
-        NOT: {
+        ...(onlyPending && {
             fulfillmentStatus: {
-                name: FULFILLMENT_COMPLETE
+                name: {
+                    not: FULFILLMENT_COMPLETE
+                }
             }
-        },
+        }),
         ...(!canViewAll && {
             department: {
                 name: {
@@ -110,8 +114,8 @@ export const findAllGoodsIssues = async ({
         }
     });
 
-    const total = await prisma.goodsIssue.count();
-    const filtered = await prisma.goodsIssue.count({ where });
+    const total = await prisma.goodsIssue.count({ where });
+    const filtered = total;
 
     return {
         data: goodsIssues,
@@ -174,6 +178,11 @@ export const createGoodsIssue = async ({
                 client: {
                     connect: {
                         id: clientId
+                    }
+                },
+                fulfillmentStatus: {
+                    connect: {
+                        name: FULFILLMENT_PENDING
                     }
                 },
                 details: {

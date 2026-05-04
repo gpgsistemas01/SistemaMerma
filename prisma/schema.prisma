@@ -206,6 +206,9 @@ model GoodsReceipt {
   status          Status                      @relation(fields: [statusId], references: [id])
   movements        InventoryMovement[]
   details         GoodsReceiptDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model GoodsReceiptDetail {
@@ -229,6 +232,9 @@ model GoodsReceiptDetail {
   goodsReceipt     GoodsReceipt   @relation(fields: [goodsReceiptId], references: [id])
   product          Product        @relation(fields: [productId], references: [id])
   movementDetails        MovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PurchaseRequisition {
@@ -254,6 +260,9 @@ model PurchaseRequisition {
   project     Project    @relation(fields: [projectId], references: [id])
 
   details PurchaseRequisitionDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PurchaseRequisitionDetail {
@@ -264,6 +273,9 @@ model PurchaseRequisitionDetail {
 
   purchaseRequisition PurchaseRequisition @relation(fields: [purchaseRequisitionId], references: [id])
   product             Product             @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model GoodsIssue {
@@ -301,6 +313,9 @@ model GoodsIssue {
 
   details  GoodsIssueDetail[]
   movements InventoryMovement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model GoodsIssueDetail {
@@ -335,6 +350,9 @@ model GoodsIssueDetail {
   goodsIssue       GoodsIssue     @relation(fields: [goodsIssueId], references: [id])
   fulfillmentStatus FulfillmentStatus? @relation(fields: [fulfillmentStatusId], references: [id])
   movementDetails  MovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model FulfillmentStatus {
@@ -350,11 +368,14 @@ model InventoryMovement {
   goodsReceiptId String? @db.Uuid
   goodsIssueId String? @db.Uuid
 
-  date DateTime
+  date DateTime @default(now())
 
   goodsReceipt GoodsReceipt? @relation(fields: [goodsReceiptId], references: [id])
   goodsIssue GoodsIssue? @relation(fields: [goodsIssueId], references: [id])
   details MovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model MovementDetail {
@@ -371,4 +392,7 @@ model MovementDetail {
   goodsReceiptDetail GoodsReceiptDetail? @relation(fields: [goodsReceiptDetailId], references: [id])
   goodsIssueDetail GoodsIssueDetail? @relation(fields: [goodsIssueDetailId], references: [id])
   movement   InventoryMovement @relation(fields: [movementId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

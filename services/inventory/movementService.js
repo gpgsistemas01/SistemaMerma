@@ -15,7 +15,6 @@ export const applyInventoryMovement = async ({
     const db = tx || prisma;
 
     const data = {
-        date: new Date(),
         ...reference,
         details: {
             create: details.map(detail => ({
