@@ -3,6 +3,8 @@ import { ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, S
 import { prisma } from "../../../lib/prisma.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 
+const MOVEMENT_TYPE_IN = 'IN';
+
 const mapSupplierProduct = (sp) => {
 
     const { product, supplier, maxUnitCost, currentStock, convertedQuantity } = sp;
@@ -143,12 +145,13 @@ export const findSupplierProductByIds = async ({
     return mapSupplierProduct(supplierProduct);
 };
 
-export const findSupplierProductStocks = async ({ tx, where }) => {
+export const findSupplierProductStocks = async ({ tx, where, select }) => {
 
     const db = tx || prisma;
 
     return await db.supplierProduct.findMany({
-        where
+        where,
+        select
     });
 }
 
@@ -172,7 +175,6 @@ export const findSupplierProductsSnapshot = async ({
                         name:true,
                         base: true,
                         height: true,
-                        maxUnitCost: true,
                         presentation: true,
                         unitMeasure: true
                     }
@@ -248,31 +250,29 @@ export const updateProductUnitCostIfHigher = async ({
 
     const productIds = Object.keys(maxCostByProduct);
 
-    const products = await db.product.findMany({
+    const supplierProducts = await findSupplierProductStocks({
+        tx,
         where: {
-            id: { in: productIds }
+            productId: { in: productIds },
+            supplierId
         },
         select: {
-            id: true,
+            productId: true,
             maxUnitCost: true
         }
     });
 
-    await Promise.all(products.map(product => {
-
-        const newCost = maxCostByProduct[product.id];
-
-        if (newCost > product.maxUnitCost) {
-            return db.supplierProduct.update({
+    await Promise.all(supplierProducts
+        .filter(sp => maxCostByProduct[sp.productId] > sp.maxUnitCost)
+        .map(sp => db.supplierProduct.update({
                 where: { 
-                    productId: product.id,
-                    supplierId
+                    supplierId_productId: { supplierId, productId: sp.productId }
                 },
-                data: { maxUnitCost: newCost }
-            });
-        }
+                data: { maxUnitCost: maxCostByProduct[sp.productId] }
+            })
+        )
 
-    }));
+    );
 };
 
 export const updateSupplierProductStock = async ({
@@ -295,6 +295,7 @@ export const updateSupplierProductStock = async ({
             id: true,
             productId: true,
             supplierId: true,
+            currentStock: true,
             product: {
                 select: {
                     base: true,
@@ -304,7 +305,7 @@ export const updateSupplierProductStock = async ({
             },
             supplier: {
                 select: {
-                    name: true
+                    tradeName: true
                 }
             }
         }
@@ -316,7 +317,7 @@ export const updateSupplierProductStock = async ({
 
     for (const [key, quantity] of grouped.entries()) {
 
-        const [productId, supplierId] = key.split('-');
+        const { productId, supplierId } = parseStockKey(key);
 
         const ps = psMap.get(key);
 
@@ -327,9 +328,9 @@ export const updateSupplierProductStock = async ({
             supplierName: ps?.supplier?.name ?? 'Proveedor desconocido'
         });
 
-        const newStock = movementType === REFERENCE_MOVEMENT_IN
-            ? ps.currentStock + quantity
-            : ps.currentStock - quantity;
+        const newStock = movementType === MOVEMENT_TYPE_IN
+            ? Number(ps.currentStock) + Number(quantity)
+            : Number(ps.currentStock) - Number(quantity);
 
         if (newStock < -1e-6) throw new GoodsIssueInsufficientStock({
             productName: ps?.product?.name ?? 'Producto desconocido',
@@ -371,10 +372,7 @@ export const deleteSupplierProduct = async ({
 
         return await db.supplierProduct.delete({
             where: {
-                supplierId_productId: {
-                    productId,
-                    supplierId
-                }
+                supplierId_productId: {productId, supplierId }
             }
         });
 

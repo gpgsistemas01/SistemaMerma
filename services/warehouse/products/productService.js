@@ -48,8 +48,7 @@ export const findProductsSnapshot = async ({
                 base: true,
                 height: true,
                 presentation: true,
-                unitMeasure: true,
-                maxUnitCost: true
+                unitMeasure: true
             }
         });
 
@@ -60,18 +59,6 @@ export const findProductsSnapshot = async ({
         throw new ProductSnapshotFindDatabaseError();
     }
 }
-
-export const findProductsByIds = async ({ tx, productIds, select }) => {
-
-    return await tx.product.findMany({
-        where: { 
-            id: { 
-                in: productIds 
-            } 
-        },
-        select
-    });
-};
 
 export const findExistingSkus = (tx) => async ({ 
     baseSku, 

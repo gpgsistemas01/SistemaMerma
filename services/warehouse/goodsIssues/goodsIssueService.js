@@ -12,8 +12,8 @@ import { generateReferenceNumber } from "../../document/referenceNumberService.j
 import { findClientById } from "../../sales/clientService.js";
 import { buildGoodsIssueDetails, buildGoodsIssueDetailUpdate, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
-import { findProductsByIds } from "../products/productService.js";
 import { buildStockKey } from "../../../utils/formattersUtils.js";
+import { findSupplierProductStocks } from "../products/supplierProductService.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
@@ -22,7 +22,7 @@ const FULFILLMENT_PENDING = 'Pendiente';
 const FULFILLMENT_COMPLETE = 'Surtido';
 const STATUS_APPROVED = 'Aprobada';
 const REFERENCE_NUMBER_TYPE = 'SAL';
-const REFERENCE_MOVEMENT_OUT = 'OUT';
+const MOVEMENT_TYPE_OUT = 'OUT';
 const FLOAT_EPSILON = 0.000001;
 
 export const findAllGoodsIssues = async ({
@@ -253,14 +253,14 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             const currentById = new Map(currentDetails.map(d => [d.id, d]));
             const productIds = [...new Set(currentDetails.map(d => d.productId))];
 
-            const supplierProducts = await findProductsByIds({
+            const supplierProducts = await findSupplierProductStocks({
                 tx,
                 where: {
                     productId: { in: productIds }
                 },
                 select: {
                     id: true,
-                    produuctId: true,
+                    productId: true,
                     supplier: true,
                     currentStock: true
                 }
@@ -310,7 +310,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                     tx,
                     reference: { goodsIssueId: goodsIssue.id },
                     details: movementDetails,
-                    movementType: REFERENCE_MOVEMENT_OUT
+                    movementType: MOVEMENT_TYPE_OUT
                 });
             }
 
@@ -344,7 +344,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         });
 
     } catch (err) {
-
+console.log(err)
         throw new GoodsIssueUpdateDatabaseError();
     }
 };

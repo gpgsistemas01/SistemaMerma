@@ -5,13 +5,9 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 
 const toDecimal = (value) => {
-
-    const normalized = String(value).replace(',', '.');
-
-    const parsed = parseFloat(normalized);
-
-    return parsed;
-}
+    if (value === null || value === undefined || value === '') return NaN;
+    return Number(value);
+};
 
 const cleanValue = val => {
     if (val === 0 || val === "0" || val == null) return null;
@@ -43,6 +39,13 @@ async function main() {
         data: departmentParsed,
         skipDuplicates: true
     });
+
+    const departments = await prisma.department.findMany({
+        select: {
+            id: true,
+            name: true
+        }
+    });
     
     const countProfile = await prisma.profile.count();
 
@@ -72,12 +75,6 @@ async function main() {
         });
         const profileMap = new Map(profiles.map(p => [cleanValue(p.fullName), p.id]));
 
-        const departments = await prisma.department.findMany({
-            select: {
-                id: true,
-                name: true
-            }
-        });
         const departmentMap = new Map(departments.map(d => [cleanValue(d.name), d.id]));
 
         const relationProfileDepartmentParsed = relationProfileDepartmentRows.map(row => {
@@ -157,7 +154,7 @@ async function main() {
 
     // const hashedPassword = await bcrypt.hash('A%54321', 10)
 
-    const countUser = prisma.user.count();
+    const countUser = await prisma.user.count();
 
     if (countUser < 1) {
 
@@ -250,15 +247,25 @@ async function main() {
         defval: null,
     });
 
-    const productParsed = productRows.map(row => ({
-        name: row.name,
-        sku: row.sku,
-        minStock: isNaN(toDecimal(row.minStock)) ? 0 : toDecimal(row.minStock),
-        base: isNaN(toDecimal(row.base)) || row.base === 0 ? null : toDecimal(row.base),
-        height: isNaN(toDecimal(row.height)) || row.height === 0 ? null : toDecimal(row.height),
-        presentationId: presentationMap.get(row.presentation.trim()) || null,
-        unitMeasureId: unitMeasureMap.get(row.unitMeasure.trim()) || null,
-    }));
+    const productParsed = productRows.map(row => {
+
+        const base = toDecimal(row.base);
+        const height = toDecimal(row.height);
+        const minStock = toDecimal(row.minStock);
+
+        return {
+            name: row.name,
+            sku: row.sku,
+
+            minStock: isNaN(minStock) ? 0 : minStock,
+
+            base: (!base || isNaN(base)) ? null : base,
+            height: (!height || isNaN(height)) ? null : height,
+
+            presentationId: presentationMap.get(row.presentation.trim()) || null,
+            unitMeasureId: unitMeasureMap.get(row.unitMeasure.trim()) || null,
+        };
+    });
 
     if(productParsed.some(p => !p.presentationId || !p.unitMeasureId)) {
         console.log('Error: Algunos productos tienen presentación o unidad de medida no encontrados');
@@ -344,6 +351,8 @@ async function main() {
 
         const productId = productMap.get(row.skuProduct);
         const supplierId = supplierMap.get(row.supplier);
+        const currentStock = toDecimal(row.currentStock);
+        const convertedQuantity = toDecimal(row.convertedQuantity);
 
         if (!supplierId || !productId) {
             console.log('Error en fila: ',row);
@@ -353,8 +362,8 @@ async function main() {
         return {
             productId,
             supplierId,
-            currentStock: row.currentStock,
-            convertedQuantity: row.convertedQuantity,
+            currentStock: isNaN(currentStock) ? 0 : currentStock,
+            convertedQuantity: isNaN(convertedQuantity) ? 0 : convertedQuantity,
             sku: row.sku
         }
     }).filter(Boolean);

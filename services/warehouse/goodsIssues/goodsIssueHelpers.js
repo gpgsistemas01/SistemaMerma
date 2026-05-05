@@ -13,40 +13,40 @@ export const buildGoodsIssueDetails = async ({
 
     const pairs = [
         ...new Map(
-            details.map(d => [
-                `${d.productId}-${d.supplierId}`,
+            details.map(detail => [
+                buildStockKey(detail.productId, detail.supplierId),
                 {
-                    productId: d.productId,
-                    supplierId: d.supplierId
+                    productId: detail.productId,
+                    supplierId: detail.supplierId
                 }
             ])
         ).values()
     ];
 
-    const products = await findSupplierProductsSnapshot({ pairs });
+    const supplierProducts = await findSupplierProductsSnapshot({ pairs });
 
-    const productMap = new Map(
-        products.map(p => [
-            `${p.id}-${p.supplier.id}`,
-            p
+    const spMap = new Map(
+        supplierProducts.map(sp => [
+            buildStockKey(sp.id, sp.supplier.id),
+            sp
         ])
     );
 
     return details.map(({ productId, quantity, supplierId }) => {
 
         const key = buildStockKey(productId, supplierId);
-        const product = productMap.get(key);
+        const sp = spMap.get(key);
 
-        if (!product) throw new ProductNotFound();
+        if (!sp) throw new ProductNotFound();
 
-        const { name, base, height, presentation, unitMeasure, maxUnitCost } = product;
+        const { name, base, height, presentation, unitMeasure, maxUnitCost } = sp;
         const hasDimensions = base !== null && height !== null && base > 0 && height > 0;
         const convertedQuantity = hasDimensions ? roundTo((base * height) * quantity) : quantity;
 
         return {
             productId,
             supplierId,
-            supplierName: product.supplier.tradeName,
+            supplierName: sp.supplier.tradeName,
             quantity,
             convertedQuantity,
             maxUnitCost,

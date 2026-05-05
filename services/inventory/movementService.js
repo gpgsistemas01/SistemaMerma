@@ -16,7 +16,7 @@ export const applyInventoryMovement = async ({
 
     for (const detail of details) {
 
-        if (!detail.productId || !detail.suppliedId) throw new MovementDetailRelationConflict();
+        if (!detail.productId || !detail.supplierId) throw new MovementDetailRelationConflict();
     }
 
     const db = tx || prisma;
@@ -26,7 +26,7 @@ export const applyInventoryMovement = async ({
         details: {
             create: details.map(detail => ({
                 productId: detail.productId,
-                supplierId: detail.suppliedId,
+                supplierId: detail.supplierId,
                 quantity: detail.quantity,
                 ...(detail.goodsReceiptDetailId && { goodsReceiptDetailId: detail.goodsReceiptDetailId }),
                 ...(detail.goodsIssueDetailId && { goodsIssueDetailId: detail.goodsIssueDetailId })
@@ -50,7 +50,7 @@ export const applyInventoryMovement = async ({
     const grouped = new Map();
 
     for (const detail of movement.details) {
-        const key = buildStockKey(detail.productId, detail.suppliedId);
+        const key = buildStockKey(detail.productId, detail.supplierId);
         grouped.set(
             key,
             Number((grouped.get(key) || 0)) + Number(detail.quantity)
@@ -65,6 +65,6 @@ export const applyInventoryMovement = async ({
 
     return movement.details.map(detail => ({
         productId: detail.productId,
-        suppliedId: detail.suppliedId
+        supplierId: detail.supplierId
     }));
 };

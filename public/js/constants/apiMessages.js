@@ -181,12 +181,12 @@ export const getErrorMessage = (data) => {
 
     if (meta) {
 
-        const fn = errorMessages[error.code];
+        const fn = errorMessages[code];
 
-        return typeof fn === 'function' ? fn(error.meta) : null;
+        return typeof fn === 'function' ? fn(meta) : null;
     }
 
-    if (code) return errorMessages[error] ?? null;
+    if (code) return errorMessages[code] ?? null;
     
     return null;
 }
