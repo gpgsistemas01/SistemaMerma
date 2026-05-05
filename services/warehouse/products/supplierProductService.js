@@ -1,6 +1,7 @@
 import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
 import { ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
 import { prisma } from "../../../lib/prisma.js";
+import { findSupplierProduct } from "../../../repository/warehouse/productRepository.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 
 const MOVEMENT_TYPE_IN = 'IN';
@@ -145,16 +146,6 @@ export const findSupplierProductByIds = async ({
     return mapSupplierProduct(supplierProduct);
 };
 
-export const findSupplierProductStocks = async ({ tx, where, select }) => {
-
-    const db = tx || prisma;
-
-    return await db.supplierProduct.findMany({
-        where,
-        select
-    });
-}
-
 export const findSupplierProductsSnapshot = async ({
     tx,
     pairs
@@ -250,7 +241,7 @@ export const updateProductUnitCostIfHigher = async ({
 
     const productIds = Object.keys(maxCostByProduct);
 
-    const supplierProducts = await findSupplierProductStocks({
+    const supplierProducts = await findSupplierProduct({
         tx,
         where: {
             productId: { in: productIds },
@@ -286,7 +277,7 @@ export const updateSupplierProductStock = async ({
     const keys = Array.from(grouped.keys());
     const filters = keys.map(key => parseStockKey(key));
 
-    const supplierProducts = await findSupplierProductStocks({
+    const supplierProducts = await findSupplierProduct({
         tx,
         where: {
             OR: filters

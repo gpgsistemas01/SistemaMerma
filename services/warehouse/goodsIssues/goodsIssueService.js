@@ -13,7 +13,7 @@ import { findClientById } from "../../sales/clientService.js";
 import { buildGoodsIssueDetails, buildGoodsIssueDetailUpdate, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { buildStockKey } from "../../../utils/formattersUtils.js";
-import { findSupplierProductStocks } from "../products/supplierProductService.js";
+import { findSupplierProduct } from "../../../repository/warehouse/productRepository.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
@@ -255,7 +255,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             const currentById = new Map(currentDetails.map(d => [d.id, d]));
             const productIds = [...new Set(currentDetails.map(d => d.productId))];
 
-            const supplierProducts = await findSupplierProductStocks({
+            const supplierProducts = await findSupplierProduct({
                 tx,
                 where: {
                     productId: { in: productIds }
