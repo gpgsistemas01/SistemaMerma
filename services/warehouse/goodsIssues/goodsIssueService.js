@@ -107,7 +107,9 @@ export const findAllGoodsIssues = async ({
                     convertedQuantityDifference: true,
                     suppliedQuantity: true,
                     isSupplied: true,
-                    fulfillmentStatus: true
+                    fulfillmentStatus: true,
+                    supplierId: true,
+                    supplierName: true
                 }
             },
             movements: true
@@ -261,7 +263,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 select: {
                     id: true,
                     productId: true,
-                    supplier: true,
+                    supplierId: true,
                     currentStock: true
                 }
             });
@@ -344,7 +346,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         });
 
     } catch (err) {
-console.log(err)
+
         throw new GoodsIssueUpdateDatabaseError();
     }
 };

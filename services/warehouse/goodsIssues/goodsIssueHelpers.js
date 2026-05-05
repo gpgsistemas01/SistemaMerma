@@ -95,17 +95,21 @@ export const buildGoodsIssueDetailUpdate = ({ current, detail, currentStock }) =
     }
 
     const pendingBase = Math.max(0, current.quantity - current.suppliedQuantity);
-
     const suppliedPartialBase = Math.min(pendingBase, currentStock);
+    const suppliedBase = Number(current.suppliedQuantity) + suppliedPartialBase;
+    const isFullySupplied = suppliedBase + FLOAT_EPSILON >= current.quantity;
+    const isSupplied = suppliedBase > FLOAT_EPSILON;
 
-    const suppliedBase = current.suppliedQuantity + suppliedPartialBase;
-
-    const isSupplied = suppliedBase + FLOAT_EPSILON >= current.quantity;
-
-    const fulfillmentName = isSupplied
+    const fulfillmentName = isFullySupplied
         ? FULFILLMENT_COMPLETE
-        : (suppliedBase > 0 ? FULFILLMENT_PARTIAL : FULFILLMENT_PENDING);
-
+        : (isSupplied ? FULFILLMENT_PARTIAL : FULFILLMENT_PENDING);
+console.log({
+    quantity: current.quantity,
+    suppliedQty: current.suppliedQuantity,
+    currentStock,
+    suppliedPartialBase,
+    suppliedBase
+});
     return {
         updateData: {
             projectConvertedQuantity: detail.projectConvertedQuantity,
