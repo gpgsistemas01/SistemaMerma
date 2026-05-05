@@ -1,5 +1,7 @@
+import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
 import { prisma } from "../../lib/prisma.js";
-import { updateProductCurrentStock } from "../warehouse/products/productService.js";
+import { buildStockKey } from "../../utils/formattersUtils.js";
+import { updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
 
 const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
 const REFERENCE_TYPE_GOODS_ISSUE = 'GOODS_ISSUE';
@@ -12,6 +14,11 @@ export const applyInventoryMovement = async ({
     movementType
 }) => {
 
+    for (const detail of details) {
+
+        if (!detail.productId || !detail.suppliedId) throw new MovementDetailRelationConflict();
+    }
+
     const db = tx || prisma;
 
     const data = {
@@ -19,6 +26,7 @@ export const applyInventoryMovement = async ({
         details: {
             create: details.map(detail => ({
                 productId: detail.productId,
+                supplierId: detail.suppliedId,
                 quantity: detail.quantity,
                 ...(detail.goodsReceiptDetailId && { goodsReceiptDetailId: detail.goodsReceiptDetailId }),
                 ...(detail.goodsIssueDetailId && { goodsIssueDetailId: detail.goodsIssueDetailId })
@@ -32,6 +40,7 @@ export const applyInventoryMovement = async ({
             details: {
                 select: {
                     productId: true,
+                    supplierId: true,
                     quantity: true
                 }
             }
@@ -41,17 +50,21 @@ export const applyInventoryMovement = async ({
     const grouped = new Map();
 
     for (const detail of movement.details) {
+        const key = buildStockKey(detail.productId, detail.suppliedId);
         grouped.set(
-            detail.productId,
-            Number((grouped.get(detail.productId) || 0)) + Number(detail.quantity)
+            key,
+            Number((grouped.get(key) || 0)) + Number(detail.quantity)
         );
     }
 
-    await updateProductCurrentStock({
+    await updateSupplierProductStock({
         tx,
         grouped,
         movementType
     });
 
-    return movement.details.map(d => d.productId);
+    return movement.details.map(detail => ({
+        productId: detail.productId,
+        suppliedId: detail.suppliedId
+    }));
 };

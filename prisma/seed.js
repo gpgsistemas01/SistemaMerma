@@ -256,7 +256,6 @@ async function main() {
         minStock: isNaN(toDecimal(row.minStock)) ? 0 : toDecimal(row.minStock),
         base: isNaN(toDecimal(row.base)) || row.base === 0 ? null : toDecimal(row.base),
         height: isNaN(toDecimal(row.height)) || row.height === 0 ? null : toDecimal(row.height),
-        convertedQuantity: 0,
         presentationId: presentationMap.get(row.presentation.trim()) || null,
         unitMeasureId: unitMeasureMap.get(row.unitMeasure.trim()) || null,
     }));
@@ -355,6 +354,7 @@ async function main() {
             productId,
             supplierId,
             currentStock: row.currentStock,
+            convertedQuantity: row.convertedQuantity,
             sku: row.sku
         }
     }).filter(Boolean);

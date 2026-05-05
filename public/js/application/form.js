@@ -39,9 +39,8 @@ export const useForm = async ({
             if (err.response) {
 
                 const { status, data } = err.response;
-                const { errors, code } = data;
 
-                const message = getErrorMessage(code);
+                const message = getErrorMessage(data);
 
                 switch (status) {
                     case 400: {
@@ -57,8 +56,11 @@ export const useForm = async ({
                         return;
                     
                     case 404:
-                        notifications.showError(err.message);
+                        notifications.showError(message);
                         return;
+
+                    case 409:
+                        notifications.showError(message);
                     
                     default:
                         throw err;

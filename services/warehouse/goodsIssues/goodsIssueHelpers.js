@@ -1,5 +1,5 @@
 import { ProductNotFound } from "../../../errors/warehouse/productError.js";
-import { roundTo } from "../../../utils/formattersUtils.js";
+import { buildStockKey, roundTo } from "../../../utils/formattersUtils.js";
 import { findSupplierProductsSnapshot } from "../products/supplierProductService.js";
 
 const FLOAT_EPSILON = 0.000001;
@@ -34,7 +34,7 @@ export const buildGoodsIssueDetails = async ({
 
     return details.map(({ productId, quantity, supplierId }) => {
 
-        const key = `${productId}-${supplierId}`;
+        const key = buildStockKey(productId, supplierId);
         const product = productMap.get(key);
 
         if (!product) throw new ProductNotFound();
@@ -118,6 +118,7 @@ export const buildGoodsIssueDetailUpdate = ({ current, detail, currentStock }) =
             ? {
                 productId: current.productId,
                 goodsIssueDetailId: current.id,
+                supplierId: current.supplierId,
                 quantity: suppliedPartialBase
             }
             : null,

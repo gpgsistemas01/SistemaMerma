@@ -7,10 +7,10 @@ export class GoodsIssueNotFound extends AppError {
     }
 }
 
-export class GoodsIssueFulfillmentComplete extends AppError {
+export class GoodsIssueFulfillmentCompleteConflict extends AppError {
 
     constructor () {
-        super('La salida ya está completamente surtida y no puede modificarse', 'GOODS_ISSUE_FULFILLMENT_COMPLETE', 409);
+        super('La salida ya está completamente surtida y no puede modificarse', 'GOODS_ISSUE_FULFILLMENT_COMPLETE_CONFLICT', 409);
     }
 }
 

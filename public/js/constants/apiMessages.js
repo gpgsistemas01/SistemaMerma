@@ -151,7 +151,11 @@ export const errorMessages = {
 
     REFERENCE_NUMBER_UPDATE_DB_ERROR: 'Error de base de datos al actualizar el folio.',
 
-    GOODS_ISSUE_FULFILLMENT_COMPLETE: 'La salida ya está completamente surtida y no puede modificarse.'
+    GOODS_ISSUE_INSUFFICIENT_STOCK: (meta) => `Stock insuficiente para realizar la salida con el producto: ${ meta.productName } y proveedor: ${ meta.supplierName }.`,
+    GOODS_ISSUE_INEXISTENT_STOCK: (meta) => `Stock inexistente para realizar la salida con el producto: ${ productName } y proveedor: ${ supplierName }.`,
+    GOODS_ISSUE_FULFILLMENT_COMPLETE_CONFLICT: 'La salida ya está completamente surtida y no puede modificarse.',
+
+    MOVEMENT_DETAIL_RELATION_CONFLICT: 'El detalle del movimiento no está asociado a un producto o proveedor.'
 };
 
 const successMessages = {
@@ -171,16 +175,18 @@ const successMessages = {
     CANCELED_PURCHASE_REQUISITION: '¡Requisición de compra cancelada exitosamente!'
 };
 
-export const getErrorMessage = (error) => {
+export const getErrorMessage = (data) => {
 
-    if (typeof error === 'string') return errorMessages[error] ?? null;
+    const { code, meta } = data;
 
-    if (typeof error === 'object') {
+    if (meta) {
 
         const fn = errorMessages[error.code];
 
         return typeof fn === 'function' ? fn(error.meta) : null;
     }
+
+    if (code) return errorMessages[error] ?? null;
     
     return null;
 }
