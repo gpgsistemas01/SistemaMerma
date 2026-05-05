@@ -8,7 +8,7 @@ import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
-import { updateProductUnitCostIfHigher } from "../products/productService.js";
+import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
 const MOVEMENT_TYPE_IN = 'IN';
@@ -156,6 +156,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             details: goodsReceipt.details.map(detail => ({
                 productId: detail.productId,
                 goodsReceiptDetailId: detail.id,
+                supplierId: goodsReceipt.supplierId,
                 quantity: detail.quantity
             })),
             movementType: MOVEMENT_TYPE_IN
@@ -163,6 +164,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         await updateProductUnitCostIfHigher({
             tx,
+            supplierId: goodsReceipt.supplierId,
             details: goodsReceipt.details
         });
 

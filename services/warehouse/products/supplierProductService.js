@@ -1,12 +1,17 @@
+import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
 import { ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
 import { prisma } from "../../../lib/prisma.js";
+import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 
 const mapSupplierProduct = (sp) => {
 
-    const { product, supplier } = sp;
+    const { product, supplier, maxUnitCost, currentStock, convertedQuantity } = sp;
 
     return {
         ...product,
+        maxUnitCost,
+        currentStock,
+        convertedQuantity,
         supplier: { ...supplier }
     };
 };
@@ -43,17 +48,17 @@ export const findAllSupplierProducts = async ({
         where,
         select: {
             id: true,
+            maxUnitCost: true,
+            currentStock: true,
+            convertedQuantity: true,
             product: {
                 select: {
                     id: true,
                     name: true,
-                    currentStock: true,
                     minStock: true,
                     isActive: true,
                     base: true,
                     height: true,
-                    maxUnitCost: true,
-                    convertedQuantity: true,
                     presentation: true,
                     unitMeasure: true
                 }
@@ -138,6 +143,15 @@ export const findSupplierProductByIds = async ({
     return mapSupplierProduct(supplierProduct);
 };
 
+export const findSupplierProductStocks = async ({ tx, where }) => {
+
+    const db = tx || prisma;
+
+    return await db.supplierProduct.findMany({
+        where
+    });
+}
+
 export const findSupplierProductsSnapshot = async ({
     tx,
     pairs
@@ -208,6 +222,141 @@ export const createSupplierProduct = async ({
 
         throw new SupplierProductCreateDatabaseError();
     }
+}
+
+export const updateProductUnitCostIfHigher = async ({
+    tx,
+    supplierId,
+    details
+}) => {
+
+    const db = tx || prisma;
+
+    const maxCostByProduct = {};
+
+    for (const detail of details) {
+
+        const { productId, conversionUnitCost } = detail;
+
+        if (
+            !maxCostByProduct[productId] ||
+            conversionUnitCost > maxCostByProduct[productId]
+        ) {
+            maxCostByProduct[productId] = conversionUnitCost;
+        }
+    }
+
+    const productIds = Object.keys(maxCostByProduct);
+
+    const products = await db.product.findMany({
+        where: {
+            id: { in: productIds }
+        },
+        select: {
+            id: true,
+            maxUnitCost: true
+        }
+    });
+
+    await Promise.all(products.map(product => {
+
+        const newCost = maxCostByProduct[product.id];
+
+        if (newCost > product.maxUnitCost) {
+            return db.supplierProduct.update({
+                where: { 
+                    productId: product.id,
+                    supplierId
+                },
+                data: { maxUnitCost: newCost }
+            });
+        }
+
+    }));
+};
+
+export const updateSupplierProductStock = async ({
+    tx,
+    grouped,
+    movementType
+}) => {
+
+    const db = tx || prisma;
+
+    const keys = Array.from(grouped.keys());
+    const filters = keys.map(key => parseStockKey(key));
+
+    const supplierProducts = await findSupplierProductStocks({
+        tx,
+        where: {
+            OR: filters
+        },
+        select: {
+            id: true,
+            productId: true,
+            supplierId: true,
+            product: {
+                select: {
+                    base: true,
+                    height: true,
+                    name: true
+                }
+            },
+            supplier: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    });
+
+    const psMap = new Map(supplierProducts.map(ps => [buildStockKey(ps.productId, ps.supplierId), ps]));
+
+    const operations = [];
+
+    for (const [key, quantity] of grouped.entries()) {
+
+        const [productId, supplierId] = key.split('-');
+
+        const ps = psMap.get(key);
+
+        if (!ps) throw new GoodsIssueInexistentStock({
+            productName: ps?.product?.name ?? 'Producto desconocido',
+            height: ps?.product?.height ?? 'Desconocido',
+            base: ps?.product?.base ?? 'Desconocido',
+            supplierName: ps?.supplier?.name ?? 'Proveedor desconocido'
+        });
+
+        const newStock = movementType === REFERENCE_MOVEMENT_IN
+            ? ps.currentStock + quantity
+            : ps.currentStock - quantity;
+
+        if (newStock < -1e-6) throw new GoodsIssueInsufficientStock({
+            productName: ps?.product?.name ?? 'Producto desconocido',
+            height: ps?.product?.height ?? 'Desconocido',
+            base: ps?.product?.base ?? 'Desconocido',
+            supplierName: ps?.supplier?.name ?? 'Proveedor desconocido'
+        });
+
+        const hasDimensions = ps.product.base && ps.product.height;
+        const convertedQuantity = hasDimensions
+            ? newStock * (ps.product.base * ps.product.height)
+            : newStock;
+
+        operations.push(
+            db.supplierProduct.update({
+                where: { 
+                    supplierId_productId: { supplierId, productId } 
+                },
+                data: {
+                    currentStock: newStock,
+                    convertedQuantity
+                }
+            })
+        );
+    }
+
+    await Promise.all(operations);
 }
 
 export const deleteSupplierProduct = async ({

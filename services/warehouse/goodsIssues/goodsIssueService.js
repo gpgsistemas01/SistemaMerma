@@ -1,10 +1,9 @@
-import { GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
 import {
     GoodsIssueNotFound,
     GoodsIssueRequesterProfileNotFound,
     GoodsIssueUpdateDatabaseError,
     GoodsIssueAdvisorProfileNotFound,
-    GoodsIssueFulfillmentComplete
+    GoodsIssueFulfillmentCompleteConflict
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { prisma } from "../../../lib/prisma.js";
 import { findProfileById } from "../../admin/profileService.js";
@@ -14,10 +13,12 @@ import { findClientById } from "../../sales/clientService.js";
 import { buildGoodsIssueDetails, buildGoodsIssueDetailUpdate, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findProductsByIds } from "../products/productService.js";
+import { buildStockKey } from "../../../utils/formattersUtils.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
 const DEPARTMENT_WAREHOUSE = 'ALMACÉN Y PROVEDURÍA';
+const FULFILLMENT_PENDING = 'Pendiente';
 const FULFILLMENT_COMPLETE = 'Surtido';
 const STATUS_APPROVED = 'Aprobada';
 const REFERENCE_NUMBER_TYPE = 'SAL';
@@ -30,6 +31,7 @@ export const findAllGoodsIssues = async ({
     search = '',
     orderBy = 'referenceNumber',
     orderDir = 'asc',
+    onlyPending = true,
     accesses = []
 }) => {
 
@@ -48,11 +50,13 @@ export const findAllGoodsIssues = async ({
                 mode: 'insensitive'
             }
         }),
-        NOT: {
+        ...(onlyPending && {
             fulfillmentStatus: {
-                name: FULFILLMENT_COMPLETE
+                name: {
+                    not: FULFILLMENT_COMPLETE
+                }
             }
-        },
+        }),
         ...(!canViewAll && {
             department: {
                 name: {
@@ -110,8 +114,8 @@ export const findAllGoodsIssues = async ({
         }
     });
 
-    const total = await prisma.goodsIssue.count();
-    const filtered = await prisma.goodsIssue.count({ where });
+    const total = await prisma.goodsIssue.count({ where });
+    const filtered = total;
 
     return {
         data: goodsIssues,
@@ -176,6 +180,11 @@ export const createGoodsIssue = async ({
                         id: clientId
                     }
                 },
+                fulfillmentStatus: {
+                    connect: {
+                        name: FULFILLMENT_PENDING
+                    }
+                },
                 details: {
                     createMany: {
                         data: processedDetails
@@ -226,6 +235,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                             id: true,
                             productId: true,
                             quantity: true,
+                            supplierId: true,
                             convertedQuantity: true,
                             suppliedQuantity: true,
                             projectConvertedQuantity: true
@@ -236,32 +246,28 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
             if (!goodsIssue) throw new GoodsIssueNotFound();
 
-            if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) throw new GoodsIssueFulfillmentComplete();
+            if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) throw new GoodsIssueFulfillmentCompleteConflict();
 
             const detailIds = details.map(d => d.id).filter(Boolean);
+            const currentDetails = goodsIssue.details.filter(d => detailIds.includes(d.id));
+            const currentById = new Map(currentDetails.map(d => [d.id, d]));
+            const productIds = [...new Set(currentDetails.map(d => d.productId))];
 
-            const currentDetails = goodsIssue.details
-                .filter(d => detailIds.includes(d.id));
-
-            const currentById = new Map(
-                currentDetails.map(d => [d.id, d])
-            );
-
-            const productIds = [
-                ...new Set(currentDetails.map(d => d.productId))
-            ];
-
-            const products = await findProductsByIds({
+            const supplierProducts = await findProductsByIds({
                 tx,
-                productIds,
+                where: {
+                    productId: { in: productIds }
+                },
                 select: {
                     id: true,
+                    produuctId: true,
+                    supplier: true,
                     currentStock: true
                 }
             });
 
-            const availableStockById = new Map(
-                products.map(p => [p.id, Number(p.currentStock ?? 0)])
+            const availableStockByKey = new Map(supplierProducts.map(sp => 
+                [buildStockKey(sp.productId, sp.supplierId), Number(sp.currentStock ?? 0)])
             );
 
             const movementDetails = [];
@@ -271,7 +277,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 const current = currentById.get(detail.id);
                 if (!current) continue;
 
-                const currentStock = availableStockById.get(current.productId) ?? 0;
+                const key = buildStockKey(current.productId, current.supplierId);
+                const currentStock = availableStockByKey.get(key) ?? 0;
 
                 const result = buildGoodsIssueDetailUpdate({
                     current,
@@ -291,13 +298,14 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
                 if (result.movement) movementDetails.push(result.movement);
 
-                availableStockById.set(
-                    current.productId,
+                availableStockByKey.set(
+                    key,
                     result.remainingStock
                 );
             }
 
             if (movementDetails.length) {
+                
                 await applyInventoryMovement({
                     tx,
                     reference: { goodsIssueId: goodsIssue.id },
@@ -336,7 +344,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         });
 
     } catch (err) {
-console.log(err)
+
         throw new GoodsIssueUpdateDatabaseError();
     }
 };
