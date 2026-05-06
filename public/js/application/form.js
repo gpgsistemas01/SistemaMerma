@@ -36,38 +36,30 @@ export const useForm = async ({
 
         } catch (err) {
 
-            if (err.response) {
+            const { status, data, message } = err;
 
-                const { status, data } = err.response;
+            switch (status) {
 
-                const message = getErrorMessage(data);
+                case 400:
+                    const serverErrors = mapServerErrors(data);
+                    normalizeErrors({ form, errors: serverErrors });
+                    toggleErrorMessages(form, serverErrors);
+                    return;
 
-                switch (status) {
-                    case 400: {
-                        const serverErrors = mapServerErrors(errors);
-                        normalizeServerErrors(form, serverErrors);
-                        toggleErrorMessages(form, serverErrors);
-                        return;
-                    }
+                case 401:
+                    localStorage.setItem('showErrorToast', message);
+                    window.location.replace('/');
+                    return;
 
-                    case 401:
-                        localStorage.setItem('showErrorToast', message);
-                        window.location.replace('/');
-                        return;
-                    
-                    case 404:
-                        notifications.showError(message);
-                        return;
+                case 404:
+                case 409:
+                    notifications.showError(message);
+                    return;
 
-                    case 409:
-                        notifications.showError(message);
-                    
-                    default:
-                        throw err;
-                }
+                default:
+                    notifications.showError(err);
+                    throw err;
             }
-            
-            throw err;
         }
     });
 }

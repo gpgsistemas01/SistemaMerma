@@ -1,3 +1,5 @@
+import { normalizeHttpError } from "../api/utils.js";
+
 const api = axios.create({
     baseURL: 'http://localhost:3000',
     timeout: 5000,
@@ -35,20 +37,8 @@ api.interceptors.response.use(
             }
         }
 
-        return Promise.reject(err);
+        return Promise.reject(normalizeHttpError(err));
     }
 );
 
-export const apiRequest = async ({ method, url, params, data }) =>{
-
-    try {
-
-        const response = await api({ method, url, params, data });
-
-        return response;
-
-    } catch (error) {
-
-        throw error;
-    }
-}
+export const apiRequest = async ({ method, url, params, data }) => await api({ method, url, params, data });

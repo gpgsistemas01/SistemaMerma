@@ -10,9 +10,9 @@ import { findProfileById } from "../../admin/profileService.js";
 import { findDepartmentById } from "../../admin/departmentService.js";
 import { generateReferenceNumber } from "../../document/referenceNumberService.js";
 import { findClientById } from "../../sales/clientService.js";
-import { buildGoodsIssueDetails, buildGoodsIssueDetailUpdate, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
+import { buildGoodsIssueDetails, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
-import { buildStockKey } from "../../../utils/formattersUtils.js";
+import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 import { findSupplierProduct } from "../../../repository/warehouse/productRepository.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
@@ -225,7 +225,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
     try {
 
-        const goodsIssue = await tx.goodsIssue.findUnique({
+        const goodsIssue = await prisma.goodsIssue.findUnique({
             where: { id },
             select: {
                 id: true,
@@ -234,9 +234,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                     select: {
                         id: true,
                         productId: true,
-                        quantity: true,
                         supplierId: true,
-                        convertedQuantity: true,
+                        quantity: true,
                         suppliedQuantity: true,
                         projectConvertedQuantity: true
                     }
@@ -246,43 +245,63 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
         if (!goodsIssue) throw new GoodsIssueNotFound();
 
-        if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) throw new GoodsIssueFulfillmentCompleteConflict();
+        if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) {
+            throw new GoodsIssueFulfillmentCompleteConflict();
+        }
 
         const detailIds = details.map(d => d.id).filter(Boolean);
         const currentDetails = goodsIssue.details.filter(d => detailIds.includes(d.id));
         const currentById = new Map(currentDetails.map(d => [d.id, d]));
-        const productIds = [...new Set(currentDetails.map(d => d.productId))];
 
         return await prisma.$transaction(async (tx) => {
 
             const movementDetails = [];
+            const updates = [];
 
             for (const detail of details) {
 
                 const current = currentById.get(detail.id);
-
                 if (!current) continue;
 
+                const pending = current.quantity - (current.suppliedQuantity ?? 0);
+
                 if (!detail.isSupplied) {
-                    await tx.goodsIssueDetail.update({
-                        where: { id: current.id },
+                    updates.push({
+                        id: current.id,
                         data: {
-                            projectConvertedQuantity: detail.projectConvertedQuantity,
-                            isSupplied: false
+                            projectConvertedQuantity: detail.projectConvertedQuantity
                         }
                     });
                     continue;
                 }
 
-                const pending = current.quantity - current.suppliedQuantity;
+                const quantityToSupply = pending;
 
-                if (pending <= FLOAT_EPSILON) continue;
+                if (quantityToSupply <= FLOAT_EPSILON) continue;
 
                 movementDetails.push({
                     productId: current.productId,
                     supplierId: current.supplierId,
                     goodsIssueDetailId: current.id,
-                    quantity: pending // 🔥 aquí va TODO lo pendiente
+                    quantity: quantityToSupply
+                });
+
+                const newSupplied = (current.suppliedQuantity ?? 0) + quantityToSupply;
+
+                updates.push({
+                    id: current.id,
+                    data: {
+                        suppliedQuantity: newSupplied,
+                        isSupplied: newSupplied >= current.quantity,
+                        projectConvertedQuantity: detail.projectConvertedQuantity
+                    }
+                });
+            }
+
+            for (const u of updates) {
+                await tx.goodsIssueDetail.update({
+                    where: { id: u.id },
+                    data: u.data
                 });
             }
 
@@ -290,26 +309,25 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
                 const grouped = new Map();
 
-                for (const detail of movementDetails) {
-                    const key = buildStockKey(detail.productId, detail.supplierId);
+                for (const d of movementDetails) {
+                    const key = buildStockKey(d.productId, d.supplierId);
                     grouped.set(
                         key,
-                        Number((grouped.get(key) || 0)) + Number(detail.quantity)
+                        Number((grouped.get(key) || 0)) + Number(d.quantity)
                     );
                 }
 
-                const filters = Array.from(grouped.keys()).map(key => parseStockKey(key));
+                const filters = Array.from(grouped.keys()).map(parseStockKey);
 
                 const supplierProducts = await findSupplierProduct({
                     tx,
-                    where: {
-                        OR: filters
-                    },
+                    where: { OR: filters },
                     select: {
                         id: true,
                         productId: true,
                         supplierId: true,
                         currentStock: true,
+                        convertedQuantity: true,
                         product: {
                             select: {
                                 base: true,
@@ -324,7 +342,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                         }
                     }
                 });
-                
+
                 await applyInventoryMovement({
                     tx,
                     reference: { goodsIssueId: goodsIssue.id },
@@ -338,7 +356,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             const refreshed = await tx.goodsIssueDetail.findMany({
                 where: { goodsIssueId: id },
                 select: {
-                    isSupplied: true,
+                    quantity: true,
                     suppliedQuantity: true
                 }
             });

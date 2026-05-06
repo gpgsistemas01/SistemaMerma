@@ -20,26 +20,25 @@ const context = window.meta || {};
 
 createGoodsIssueDatatable(context);
 
+const normalizeGoodsIssueData = ({ form, formData }) => {
+    const { mode } = form.dataset;
+
+    if (mode === MODE_EDIT_DETAIL) {
+        return {
+            id: form.dataset.id,
+            details
+        };
+    }
+
+    return {
+        ...formData,
+        details
+    };
+};
+
 useForm({
     selector: formId,
-    normalizeData: ({ form, formData }) => {
-
-        const { mode } = form.dataset;
-
-        if (mode === MODE_EDIT_DETAIL) {
-
-            formData = {
-                id: form.dataset.id,
-                details
-            };
-
-        } else {
-
-            formData.details = details;
-        }
-
-        return formData;
-    },
+    normalizeData: normalizeGoodsIssueData,
     getErrors: ({ form, formData }) => {
 
         const { mode } = form.dataset;

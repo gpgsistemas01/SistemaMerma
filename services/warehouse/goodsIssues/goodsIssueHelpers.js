@@ -62,68 +62,6 @@ export const buildGoodsIssueDetails = async ({
     });
 }
 
-export const buildGoodsIssueDetailUpdate = ({ current, detail, currentStock }) => {
-
-    const difference = current.convertedQuantity - detail.projectConvertedQuantity;
-
-    if (current.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) {
-
-        return {
-            updateData: {
-                projectConvertedQuantity: detail.projectConvertedQuantity,
-                convertedQuantityDifference: current.convertedQuantity - detail.projectConvertedQuantity,
-                isSupplied: true
-            },
-            fulfillmentName: FULFILLMENT_COMPLETE,
-            movement: null,
-            remainingStock: currentStock
-        }
-    }
-
-    if (!detail.isSupplied) {
-
-        return {
-            updateData: {
-                projectConvertedQuantity: detail.projectConvertedQuantity,
-                convertedQuantityDifference: difference,
-                isSupplied: false
-            },
-            fulfillmentName: current.fulfillmentStatus?.name ?? FULFILLMENT_PENDING,
-            movement: null,
-            remainingStock: currentStock
-        };
-    }
-
-    const pendingBase = Math.max(0, current.quantity - current.suppliedQuantity);
-    const suppliedPartialBase = Math.min(pendingBase, currentStock);
-    const suppliedBase = Number(current.suppliedQuantity) + suppliedPartialBase;
-    const isFullySupplied = suppliedBase + FLOAT_EPSILON >= current.quantity;
-    const isSupplied = suppliedBase > FLOAT_EPSILON;
-
-    const fulfillmentName = isFullySupplied
-        ? FULFILLMENT_COMPLETE
-        : (isSupplied ? FULFILLMENT_PARTIAL : FULFILLMENT_PENDING);
-
-    return {
-        updateData: {
-            projectConvertedQuantity: detail.projectConvertedQuantity,
-            suppliedQuantity: suppliedBase,
-            convertedQuantityDifference: difference,
-            isSupplied
-        },
-        fulfillmentName,
-        movement: suppliedPartialBase > FLOAT_EPSILON
-            ? {
-                productId: current.productId,
-                goodsIssueDetailId: current.id,
-                supplierId: current.supplierId,
-                quantity: suppliedPartialBase
-            }
-            : null,
-        remainingStock: currentStock - suppliedPartialBase
-    };
-};
-
 export const resolveFulfillmentStatus = (details) => {
 
     const allSupplied = details.every((d) => d.isSupplied);
