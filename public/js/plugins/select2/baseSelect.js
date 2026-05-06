@@ -44,20 +44,15 @@ export const toggleSelectOption = ({ selector, data = null }) => {
     
     $(selector).val(null).trigger('change');
 
-    const { id, text, ...rest } = data || {};
+    const { id, text } = data || {};
 
     if (!text || !id) return;
 
-    const option = new Option(
-        text,
-        id,
-        true,
-        true
-    );
+    const option = new Option(text, id, true, true);
 
-    if (rest) {
-        $(option).data({...rest});
-    }
+    Object.entries(data).forEach(([key, value]) => {
+        option.dataset[key] = value;
+    });
 
     $(selector).append(option).trigger('change');
 };

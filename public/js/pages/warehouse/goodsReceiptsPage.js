@@ -156,15 +156,20 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
 const addProduct = () => {
 
+    const option = document.querySelector('#productInput option:checked');
+
+    if (!option) return null;
+
+    let { productBase, productHeight, presentationName, unitMeasureName, supplierName, productName } = option.dataset;
+    productHeight = Number(productHeight);
+    productBase = Number(productBase);
+
+    const productId = option.value;
+
     const supplierId = document.querySelector('#supplierInput').value;
-    const productId = document.querySelector('#productInput').value;
-    const selectedProduct = $('#productInput').select2('data')?.[0];
     const quantity = Number(document.querySelector('#quantityInput').value);
     const costPerUnitType = Number(document.querySelector('#costPerUnitInput').value);
-    const productBase = selectedProduct?.productBase ? Number(selectedProduct?.productBase) : null;
-    const productHeight = selectedProduct?.productHeight ? Number(selectedProduct?.productHeight) : null;
-    const { presentationName, unitMeasureName, productName, supplierName } = selectedProduct;
-console.log($('#productInput').select2('data'))
+
     if (!supplierId) {
         alert('Selecciona un proveedor antes de agregar productos.');
         return;

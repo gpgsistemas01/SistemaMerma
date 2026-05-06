@@ -80,11 +80,11 @@ const attachProductHandler = ({
 
     $(productSelector).off('select2:select').on('select2:select', (e) => {
 
-        const selected = e.params.data;
+        const { data } = e.params;
 
-        if (selected.newTag) {
+        if (data.newTag) {
 
-            const name = selected.id.replace('new:', '');
+            const name = data.id.replace('new:', '');
             const id = $(`${ modalSelector } ${ supplierSelector }`).val();
             const tradeName = $(`${ modalSelector } ${ supplierSelector } option:selected`).text();
 
@@ -114,10 +114,11 @@ const attachProductHandler = ({
                         data: {
                             id: createdProduct.id,
                             text,
-                            base: createdProduct.base,
-                            height: createdProduct.height,
+                            productName: createdProduct.name,
                             presentationName: createdProduct.presentation.name,
                             unitMeasureName: createdProduct.unitMeasure.name,
+                            productBase: createdProduct.base,
+                            productHeight: createdProduct.height,
                             supplierName: createdProduct.supplier.tradeName,
                             supplierId: createdProduct.supplier.id
                         }
@@ -133,7 +134,15 @@ const attachProductHandler = ({
             return;
         }
 
-        const value = selected.presentationName || '';
+        const option = document.querySelector('#productInput option:checked');
+
+        if (!option) return;
+
+        Object.entries(data).forEach(([key, value]) => {
+            option.dataset[key] = value;
+        });
+
+        const value = data.presentationName || '';
         setMdbWrapperInputValue({
             selector: wrapperSelector,
             value
