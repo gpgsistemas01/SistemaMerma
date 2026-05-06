@@ -88,19 +88,10 @@ export const findUniqueSupplierCode = async ({
 }) => {
 
     const db = tx || prisma;
-    let supplier;
-
-    try {
-
-        supplier = await db.supplier.findUnique({
-            where: { id },
-            select: { code: true }
-        });
-
-    } catch (err) {
-
-        throw new SupplierCodeFindDatabaseError();
-    }
+    const supplier = await db.supplier.findUnique({
+        where: { id },
+        select: { code: true }
+    });
 
     if (!supplier) throw new SupplierCodeNotFound();
 

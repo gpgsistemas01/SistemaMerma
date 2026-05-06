@@ -43,19 +43,10 @@ export const findUniqueUnitMeasure = async ({
 }) => {
 
     const db = tx || prisma;
-    let unit;
-
-    try {
-
-        unit = await db.unitMeasure.findUnique({
-            where: { id },
-            select: { id: true }
-        });
-
-    } catch (err) {
-
-        throw new UnitMeasureFindDatabaseError();
-    }
+    const unit = await db.unitMeasure.findUnique({
+        where: { id },
+        select: { id: true }
+    });
 
     if (!unit) throw new UnitMeasureNotFound();
 

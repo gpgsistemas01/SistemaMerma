@@ -65,6 +65,8 @@ export const findExistingSkus = (tx) => async ({
     excludeProductId 
 }) => {
 
+    const db = tx || prisma;
+
     const where = {
         sku: {
             startsWith: baseSku
@@ -77,7 +79,7 @@ export const findExistingSkus = (tx) => async ({
         };
     }
 
-    return tx.product.findMany({
+    return db.product.findMany({
         where,
         select: { sku: true }
     });
@@ -129,7 +131,7 @@ export const createProduct = async (productDto) => {
             return fullProduct;
         });
 
-    }).catch((err) => { console.log(err)
+    }).catch((err) => {
         throw new ProductCreateDatabaseError();
     });
 };

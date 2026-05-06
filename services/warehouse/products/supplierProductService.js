@@ -153,38 +153,31 @@ export const findSupplierProductsSnapshot = async ({
 
     const db = tx || prisma;
 
-    try {
-
-        const products = await db.supplierProduct.findMany({
-            where: {
-                OR: pairs
+    const products = await db.supplierProduct.findMany({
+        where: {
+            OR: pairs
+        },
+        include: {
+            product: {
+                select: {
+                    id: true,
+                    name:true,
+                    base: true,
+                    height: true,
+                    presentation: true,
+                    unitMeasure: true
+                }
             },
-            include: {
-                product: {
-                    select: {
-                        id: true,
-                        name:true,
-                        base: true,
-                        height: true,
-                        presentation: true,
-                        unitMeasure: true
-                    }
-                },
-                supplier: {
-                    select: {
-                        id: true,
-                        tradeName: true
-                    }
+            supplier: {
+                select: {
+                    id: true,
+                    tradeName: true
                 }
             }
-        });
+        }
+    });
 
-        return products.map(mapSupplierProduct);
-
-    } catch (err) {
-
-        throw new ProductSnapshotFindDatabaseError();
-    }
+    return products.map(mapSupplierProduct);
 }
 
 export const countTotalSupplierProducts = async ({
@@ -201,20 +194,13 @@ export const createSupplierProduct = async ({
 
     const db = tx || prisma;
 
-    try {
-
-        return db.supplierProduct.create({
-            data: {
-                supplierId,
-                productId,
-                sku: `${ skuProduct }-${ skuSupllier }`
-            }
-        });
-
-    } catch (err) {
-
-        throw new SupplierProductCreateDatabaseError();
-    }
+    return db.supplierProduct.create({
+        data: {
+            supplierId,
+            productId,
+            sku: `${ skuProduct }-${ skuSupllier }`
+        }
+    });
 }
 
 export const updateProductUnitCostIfHigher = async ({
@@ -335,16 +321,9 @@ export const deleteSupplierProduct = async ({
 
     const db = tx || prisma;
 
-    try {
-
-        return await db.supplierProduct.delete({
-            where: {
-                supplierId_productId: {productId, supplierId }
-            }
-        });
-
-    } catch (err) {
-
-        throw new SupplierProductDeleteDatabaseError();
-    }
+    return await db.supplierProduct.delete({
+        where: {
+            supplierId_productId: {productId, supplierId }
+        }
+    });
 }

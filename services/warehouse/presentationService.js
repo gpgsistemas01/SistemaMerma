@@ -43,19 +43,10 @@ export const findUniquePresentation = async ({
 }) => {
 
     const db = tx || prisma;
-    let presentation;
-
-    try {
-
-        presentation = await db.presentation.findUnique({
-            where: { id },
-            select: { id: true }
-        });
-
-    } catch (err) {
-
-        throw new PresentationFindDatabaseError();
-    }
+    const presentation = await db.presentation.findUnique({
+        where: { id },
+        select: { id: true }
+    });
 
     if (!presentation) throw new PresentationNotFound();
 
