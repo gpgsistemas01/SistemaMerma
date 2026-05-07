@@ -188,7 +188,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             }
         });
 
-        const impactedProductIds = await applyInventoryMovement({
+        await applyInventoryMovement({
             tx,
             reference: { goodsReceiptId: goodsReceipt.id },
             details: goodsReceipt.details.map(detail => ({
@@ -202,7 +202,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             supplierProducts
         });
 
-        return { goodsReceipt, impactedProductIds };
+        return goodsReceipt;
     });
 
     await updateProductUnitCostIfHigher({

@@ -37,7 +37,7 @@ export const registerGoodsReceipt = async (req, res) => {
     const goodsReceiptDto = createGoodsReceiptDtoForRegister(req.body);
     const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
 
-    const { goodsReceipt, impactedProductIds } = await createGoodsReceipt({
+    const goodsReceipt = await createGoodsReceipt({
         goodsReceiptDto: sanitizedGoodsReceiptDto
     });
 

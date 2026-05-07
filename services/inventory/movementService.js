@@ -56,8 +56,5 @@ export const applyInventoryMovement = async ({
         supplierProducts
     });
 
-    return movement.details.map(detail => ({
-        productId: detail.productId,
-        supplierId: detail.supplierId
-    }));
+    return movement;
 };
