@@ -57,7 +57,7 @@ export const useForm = async ({
                     return;
 
                 default:
-                    notifications.showError(err);
+                    notifications.showError(message);
                     throw err;
             }
         }
