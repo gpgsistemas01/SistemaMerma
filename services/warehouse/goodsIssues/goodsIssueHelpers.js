@@ -1,4 +1,5 @@
 import { ProductNotFound } from "../../../errors/warehouse/productError.js";
+import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
 import { buildStockKey, roundTo } from "../../../utils/formattersUtils.js";
 import { findSupplierProductsSnapshot } from "../products/supplierProductService.js";
 
@@ -42,6 +43,15 @@ export const buildGoodsIssueDetails = async ({
         const { name, base, height, presentation, unitMeasure, maxUnitCost } = sp;
         const hasDimensions = base !== null && height !== null && base > 0 && height > 0;
         const convertedQuantity = hasDimensions ? roundTo((base * height) * quantity) : quantity;
+
+        if (maxUnitCost === null || maxUnitCost === undefined) {
+            throw new GoodsIssueMissingMaxUnitCost({
+                productName: name,
+                height,
+                base,
+                supplierName: sp.supplier.tradeName
+            });
+        }
 
         return {
             productId,

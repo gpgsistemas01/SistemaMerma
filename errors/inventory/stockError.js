@@ -25,3 +25,16 @@ export class GoodsIssueInexistentStock extends AppError {
         this.meta = { productName, height, base, supplierName };
     }
 }
+
+export class GoodsIssueMissingMaxUnitCost extends AppError {
+
+    constructor ({ productName, height, base, supplierName }) {
+        super(
+            `No se puede realizar la salida porque el producto no tiene costo unitario máximo configurado: ${ productName } (${ base } x ${ height }) y proveedor: ${ supplierName }`,
+            'GOODS_ISSUE_MISSING_MAX_UNIT_COST',
+            409
+        );
+
+        this.meta = { productName, height, base, supplierName };
+    }
+}
