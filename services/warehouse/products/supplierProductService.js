@@ -217,12 +217,11 @@ export const createSupplierProduct = async ({
 }
 
 export const updateProductUnitCostIfHigher = async ({
-    tx,
     supplierId,
     details
 }) => {
 
-    const db = getDb(tx);
+    const db = getDb();
 
     const maxCostByProduct = {};
 
@@ -240,7 +239,7 @@ export const updateProductUnitCostIfHigher = async ({
 
     await Promise.all(
         Object.entries(maxCostByProduct).map(([productId, cost]) =>
-            prisma.supplierProduct.updateMany({
+            db.supplierProduct.updateMany({
                 where: {
                     supplierId,
                     productId,
