@@ -61,7 +61,22 @@ export const toggleInputSelectErrors = (form, errors) => {
 
             if (value) $(input).next('.select2-container').find('.select2-selection').addClass('is-invalid');
             else $(input).next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+        } else {
+
+            if (value) input.classList.add('is-invalid');
+            else input.classList.remove('is-invalid');
         }
+    });
+
+    form.querySelectorAll('input[type="checkbox"]').forEach(input => {
+
+        const key = input.name;
+        const value = errors[key];
+
+        setInputSelectError(form, key, value);
+
+        if (value) input.classList.add('is-invalid');
+        else input.classList.remove('is-invalid');
     });
 }
 
