@@ -20,14 +20,14 @@ export const useForm = async ({
 
         formData = normalizeData({ form, formData });
 
-        // const errors = getErrors({ form, formData });
+        const errors = getErrors({ form, formData });
 
-        // normalizeErrors({ form, errors });
-        // toggleErrorMessages(form, errors);
+        normalizeErrors({ form, errors });
+        toggleErrorMessages(form, errors);
 
-        // const hasErrors = Object.values(errors).some(error => error);
+        const hasErrors = Object.values(errors).some(error => error);
 
-        // if (hasErrors) return;
+        if (hasErrors) return;
 
         try {
 
