@@ -215,18 +215,37 @@ export const updateTotals = ({
     quantity = 0,
     net = 0,
     gross = 0,
-    operation
-}) => {
+    operation = 'none'
+} = {}) => {
 
     const totalQuantityEl = document.querySelector(TOTAL_FIELDS.quantity);
     const totalNetPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.net);
     const totalGrossPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.gross);
 
+    if (operation === 'none') {
+
+        [
+            TOTAL_FIELDS.quantity,
+            TOTAL_FIELDS.net,
+            TOTAL_FIELDS.gross
+        ].forEach(selector => {
+
+            const instance = initMdbWrapperInput({
+                selector,
+                value: ''
+            });
+
+            updateMdbWrapperInput(instance);
+        });
+
+        return;
+    }
+
     let totalQuantity = Number(totalQuantityEl.value) || 0;
     let totalNetPurchaseAmount = Number(totalNetPurchaseAmountEl.value) || 0;
     let totalGrossPurchaseAmount = Number(totalGrossPurchaseAmountEl.value) || 0;
 
-    const op = operation === 'add' ? 1 : -1;
+    const op = operation === 'add' ? 1 : operation === 'subtract' ? -1 : 0;
 
     totalQuantity += quantity * op;
     totalNetPurchaseAmount += net * op;

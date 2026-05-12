@@ -1,5 +1,6 @@
 import { openProductModal } from "../../../modules/products/productModal.js";
 import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
+import { updateTotals } from "../../../ui/formUI.js";
 import { toggleContainerElements, toggleDisabledElement } from "../../../utils/formUtils.js";
 import { refreshProductTable } from "../../datatable/baseDatatable.js";
 import { details } from "../../datatable/goodsReceiptDatatable.js";
@@ -31,6 +32,8 @@ export const initGoodsReceiptFormSelect2 = () => {
             details.length = 0;
 
             refreshProductTable(details);
+
+            updateTotals();
         }
     });
 

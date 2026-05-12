@@ -1,6 +1,8 @@
 import { handleApiError, normalizeJqAjaxError } from "../../api/errorHandler.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 
+const wrapperSelector = '#presentationDisplayInput';
+
 export const initbaseSelect2 = ({ 
     baseSelector, 
     modalSelector,
@@ -62,7 +64,13 @@ export const initbaseSelect2 = ({
     });
 
     if (clearOnOpen) $(baseSelector).on('select2:opening', () => {
+
         $(baseSelector).val(null).trigger('change');
+
+        setMdbWrapperInputValue({
+            selector: wrapperSelector,
+            value: ''
+        });
     });
 }
 
