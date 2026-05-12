@@ -12,7 +12,12 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
     if (mode === 'create') response = await create(formData);
     else {
 
-        if (!id) notifications.showError('No hay registro seleccionado.');
+        if (!id) {
+            
+            notifications.showError('No hay registro seleccionado.');
+            return;
+        }
+
         response = await update(formData, id);
     }
 
@@ -30,7 +35,11 @@ export const handleAction = async ({ action, formId }) => {
         const form = document.querySelector(formId);
         const id = form.dataset.id;
 
-        if (!id) notifications.showError('No hay registro seleccionado.');
+        if (!id) {
+            
+            notifications.showError('No hay registro seleccionado.');
+            return;
+        }
 
         const response = await action(id);
 
@@ -43,6 +52,37 @@ export const handleAction = async ({ action, formId }) => {
         notifications.showError(err.message);
     }
 }
+
+export const toggleDisabledElement = ({ element, isDisabled }) => {
+
+    if (!element) return;
+
+    element.classList.toggle('disabled', isDisabled);
+
+    if ('disabled' in element) {
+        element.disabled = isDisabled;
+    }
+};
+
+export const toggleContainerElements = ({
+    selector,
+    isDisabled = true
+}) => {
+
+    const container = document.querySelector(selector);
+
+    if (!container) return;
+
+    container
+        .querySelectorAll('input, select, textarea, button')
+        .forEach(element => {
+
+            toggleDisabledElement({
+                element,
+                isDisabled
+            });
+        });
+};
 
 export const cleanForm = (form) => {
 
@@ -85,10 +125,8 @@ export const validateDetailsFields = (validators, details) => {
     details.forEach(detail => {
 
         const detailErrors = validateFields(validators, detail);
-        const hasErrors = Object.values(detailErrors).some(Boolean);
-
         errors[detail.id] = detailErrors;
-    })
+    });
 
     return errors;
 }

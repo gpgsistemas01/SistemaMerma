@@ -96,10 +96,9 @@ export const setMdbWrapperInputValue = ({
     updateMdbWrapperInput(instance);
 }
 
-export const bindChangeResetSelect = ({
+export const bindDependency = ({
     sourceSelector,
-    targetSelector,
-    reset
+    onChange
 }) => {
 
     const $source = $(sourceSelector);
@@ -108,23 +107,15 @@ export const bindChangeResetSelect = ({
 
     const source = $source[0];
 
-    if (source.dataset.resetBound === 'true') return;
+    if (source.dataset.bound === 'true') return;
 
-    source.dataset.resetBound = 'true';
+    source.dataset.bound = 'true';
 
     $source.on('change', () => {
 
-        if (typeof reset === 'function') {
-            reset();
-        } else {
-
-            const $target = $(targetSelector);
-
-            if (!$target.length) return;
-
-            $target
-                .val(null)
-                .trigger('change');
-        }
+        onChange?.({
+            value: $source.val(),
+            source: $source
+        });
     });
 };

@@ -7,7 +7,7 @@ import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../..
 import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
-import { handleAction, handleSubmit, hasValidationErrors, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
+import { handleSubmit, hasValidationErrors, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
 import { openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
 

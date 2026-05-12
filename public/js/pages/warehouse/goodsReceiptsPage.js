@@ -7,7 +7,7 @@ import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setG
 import { setFormReadOnly, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
-import { handleSubmit, hasValidationErrors, validateFields } from "../../utils/formUtils.js";
+import { handleSubmit, hasValidationErrors, toggleContainerElements, validateFields } from "../../utils/formUtils.js";
 import { openModal } from "../../ui/modalUI.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../plugins/mdb/baseInstance.js";
 
@@ -16,7 +16,7 @@ const formId = '#goodsReceiptForm';
 
 createGoodsReceiptDatatable();
 
-document.addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
+document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
     details.length = 0;
     refreshProductTable(details);
     clearAddedProductInput();
@@ -80,6 +80,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     details.length = 0;
 
+    toggleContainerElements({ selector: '.add-product-container' });
     initGoodsReceiptFormSelect2();
     setGoodsReceiptFormSelectOptions(data);
 

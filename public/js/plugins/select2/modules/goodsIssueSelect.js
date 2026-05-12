@@ -1,5 +1,6 @@
+import { toggleDisabledElement } from "../../../utils/formUtils.js";
 import { notifications } from "../../swal/swalComponent.js";
-import { bindChangeResetSelect } from "../baseSelect.js";
+import { bindDependency } from "../baseSelect.js";
 import { initClientSelect, toggleClientOption } from "../domains/client.js";
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { setupProductSelect, toggleProductOption } from "../domains/product.js";
@@ -46,7 +47,6 @@ export const initGoodsIssueFormSelect2 = () => {
         modalSelector, 
         baseSelector: `${ modalSelector } ${ requesterSelector }`,
         placeholder: 'Buscar solicitante...',
-        clearOnOpen: false,
         data: (params) => {
 
             const select = document.querySelector(`${modalSelector} ${departmentSelector}`);
@@ -61,14 +61,17 @@ export const initGoodsIssueFormSelect2 = () => {
         allowCreate: false,
     });
 
-    $(`${ modalSelector } ${ requesterSelector }`).prop('disabled', true);
+    const requesterSelectElement = document.querySelector(`${ modalSelector } ${ requesterSelector }`);
 
-    bindChangeResetSelect({
+    toggleDisabledElement({ 
+        element: requesterSelectElement, 
+        isDisabled: true 
+    });
+
+    bindDependency({
         sourceSelector: `${ modalSelector } ${ departmentSelector }`,
-        targetSelector: `${ modalSelector } ${ requesterSelector }`,
-        reset: () => {
-
-            const departmentId = $(`${ modalSelector } ${ departmentSelector }`).val();
+        onChange: ({ value }) => {
+            const isDisabled = !value;
 
             toggleProfileOption({
                 selector: `${ modalSelector } ${ requesterSelector }`,
@@ -77,7 +80,11 @@ export const initGoodsIssueFormSelect2 = () => {
             });
 
             $(`${ modalSelector } ${ requesterSelector }`).val(null).trigger('change');
-            $(`${ modalSelector } ${ requesterSelector }`).prop('disabled', !departmentId);
+
+            toggleDisabledElement({ 
+                element: requesterSelectElement, 
+                isDisabled 
+            });
         }
     });
 
