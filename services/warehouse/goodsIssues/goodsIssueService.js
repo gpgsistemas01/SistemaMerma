@@ -47,10 +47,26 @@ export const findAllGoodsIssues = async ({
 
     const where = {
         ...(search && {
-            referenceNumber: {
-                contains: search,
-                mode: 'insensitive'
-            }
+            OR: [
+                {
+                    referenceNumber: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    projectNumber: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    clientName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            ]
         }),
         ...(onlyPending && {
             fulfillmentStatus: {

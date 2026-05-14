@@ -19,12 +19,15 @@ export const getAllGoodsIssues = async (req, res) => {
     const orderColumnIndex = req.query.order?.[0]?.column || 0;
     const orderDir = req.query.order?.[0]?.dir || 'desc';
 
+    const onlyPending = req.query.onlyPending === 'true';
+
     const result = await findAllGoodsIssues({
         skip: start,
         take: length,
         search,
         orderBy: columns[orderColumnIndex],
         orderDir,
+        onlyPending,
         accesses: req.user?.accesses
     });
 
