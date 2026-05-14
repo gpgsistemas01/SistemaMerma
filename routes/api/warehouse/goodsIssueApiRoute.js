@@ -2,6 +2,7 @@ import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import {
+    editGoodsIssue,
     editGoodsIssueDetails,
     getAllGoodsIssues,
     registerGoodsIssue,
@@ -47,6 +48,15 @@ router.post(
     validate,
     authorizeUserApi(goodsIssuePermissions),
     registerGoodsIssue
+);
+
+router.patch(
+    '/:id',
+    verifyApiTokenRequired,
+    goodsIssueValidation,
+    validate,
+    authorizeUserApi(goodsIssuePermissions),
+    editGoodsIssue
 );
 
 router.patch(

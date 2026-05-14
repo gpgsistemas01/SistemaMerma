@@ -230,6 +230,145 @@ export const createGoodsIssue = async ({
     }
 };
 
+export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
+
+    try {
+
+        const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
+
+        const goodsIssue = await getDb().goodsIssue.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                fulfillmentStatus: true,
+                details: {
+                    select: {
+                        id: true,
+                        productId: true,
+                        supplierId: true,
+                        quantity: true,
+                        suppliedQuantity: true,
+                        isSupplied: true
+                    }
+                }
+            }
+        });
+
+        if (!goodsIssue) throw new GoodsIssueNotFound();
+
+        if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) throw new GoodsIssueFulfillmentCompleteConflict();
+
+        const requester = await findProfileById({ id: requesterId });
+
+        if (!requester) throw new GoodsIssueRequesterProfileNotFound();
+
+        const advisor = await findProfileById({ id: advisorId });
+
+        if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
+
+        const client = await findClientById({ id: clientId });
+        const department = await findDepartmentById({ id: departmentId });
+        const processedDetails = await buildGoodsIssueDetails({ details });
+        const currentById = new Map(goodsIssue.details.map(detail => [detail.id, detail]));
+        const incomingDetailIds = new Set(details.map(detail => detail.id).filter(Boolean));
+        const hasSuppliedQuantity = (detail) => Number(detail.suppliedQuantity ?? 0) > FLOAT_EPSILON || detail.isSupplied;
+
+        return await getDb().$transaction(async (tx) => {
+
+            for (let index = 0; index < details.length; index += 1) {
+
+                const detail = details[index];
+                const processedDetail = processedDetails[index];
+                const current = detail.id ? currentById.get(detail.id) : null;
+
+                if (current && hasSuppliedQuantity(current)) continue;
+
+                if (current) {
+                    await tx.goodsIssueDetail.update({
+                        where: { id: current.id },
+                        data: processedDetail
+                    });
+                    continue;
+                }
+
+                await tx.goodsIssueDetail.create({
+                    data: {
+                        ...processedDetail,
+                        goodsIssue: {
+                            connect: { id }
+                        }
+                    }
+                });
+            }
+
+            const removableDetailIds = goodsIssue.details
+                .filter(detail => !incomingDetailIds.has(detail.id) && !hasSuppliedQuantity(detail))
+                .map(detail => detail.id);
+
+            if (removableDetailIds.length) {
+                await tx.goodsIssueDetail.deleteMany({
+                    where: {
+                        id: {
+                            in: removableDetailIds
+                        }
+                    }
+                });
+            }
+
+            const refreshed = await tx.goodsIssueDetail.findMany({
+                where: { goodsIssueId: id },
+                select: {
+                    isSupplied: true,
+                    quantity: true,
+                    suppliedQuantity: true
+                }
+            });
+
+            const fulfillmentName = resolveFulfillmentStatus(refreshed);
+
+            return await tx.goodsIssue.update({
+                where: { id },
+                data: {
+                    ...goodsIssueData,
+                    departmentName: department.name,
+                    requesterName: requester.fullName,
+                    advisorName: advisor.fullName,
+                    clientName: client.name,
+                    department: {
+                        connect: { id: departmentId }
+                    },
+                    requester: {
+                        connect: { id: requesterId }
+                    },
+                    advisor: {
+                        connect: { id: advisorId }
+                    },
+                    client: {
+                        connect: { id: clientId }
+                    },
+                    status: {
+                        connect: { name: STATUS_APPROVED }
+                    },
+                    fulfillmentStatus: {
+                        connect: { name: fulfillmentName }
+                    }
+                },
+                include: {
+                    details: true,
+                    fulfillmentStatus: true,
+                    status: true
+                }
+            });
+        });
+
+    } catch (err) {
+
+        if (err instanceof AppError) throw err;
+
+        throw new GoodsIssueUpdateDatabaseError();
+    }
+};
+
 export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
     const { details = [] } = goodsIssueDto;
