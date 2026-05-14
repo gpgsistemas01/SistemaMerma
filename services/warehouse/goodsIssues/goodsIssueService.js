@@ -65,6 +65,12 @@ export const findAllGoodsIssues = async ({
                         contains: search,
                         mode: 'insensitive'
                     }
+                },
+                {
+                    departmentName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
                 }
             ]
         }),
