@@ -137,9 +137,6 @@ export const updateProduct = async (productDto, id) => {
                 where: { id },
                 data: {
                     ...rest,
-                    supplier: {
-                        connect: { id: relations.supplierId }
-                    },
                     presentation: {
                         connect: { id: relations.presentationId }
                     },
@@ -172,7 +169,7 @@ export const updateProduct = async (productDto, id) => {
         }
 
         if (err instanceof AppError) throw err;
-
+console.log(err)
         throw new ProductUpdateDatabaseError();
     };
 };
