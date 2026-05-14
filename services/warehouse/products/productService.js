@@ -169,7 +169,7 @@ export const updateProduct = async (productDto, id) => {
         }
 
         if (err instanceof AppError) throw err;
-console.log(err)
+
         throw new ProductUpdateDatabaseError();
     };
 };

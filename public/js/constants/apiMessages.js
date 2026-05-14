@@ -55,6 +55,7 @@ export const errorMessages = {
 
     CLIENT_NOT_FOUND: 'Cliente no encontrado.',
     CLIENT_FIND_DB_ERROR: 'Error de la base de datos al buscar el cliente.',
+    CLIENT_CREATE_DB_ERROR: 'Error de la base de datos al crear el cliente.',
 
     REQUEST_DATE_REQUIRED: 'La fecha de solicitud es requerida.',
     REQUEST_DATE_INVALID_FORMAT: 'La fecha de solicitud no es válida.',
@@ -221,7 +222,8 @@ const successMessages = {
     CREATED_PURCHASE_REQUISITION: '¡Requisición de compra creada exitosamente!',
     UPDATED_PURCHASE_REQUISITION: '¡Requisición de compra actualizada exitosamente!',
     CONFIRMED_PURCHASE_REQUISITION: '¡Requisición de compra confirmada exitosamente!',
-    CANCELED_PURCHASE_REQUISITION: '¡Requisición de compra cancelada exitosamente!'
+    CANCELED_PURCHASE_REQUISITION: '¡Requisición de compra cancelada exitosamente!',
+    CREATED_CLIENT: '¡Cliente creado exitosamente!',
 };
 
 export const getErrorMessage = (data = {}) => {
