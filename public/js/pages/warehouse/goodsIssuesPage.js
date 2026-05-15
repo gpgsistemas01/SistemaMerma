@@ -147,11 +147,11 @@ const addProduct = () => {
 
     const option = document.querySelector('#productInput option:checked');
 
-    let { productBase, productHeight, presentationName, unitMeasureName, productName, supplierName, supplierId, maxUnitCost } = option?.dataset;
+    let { productBase, productHeight, presentationName, unitMeasureName, productName, supplierName, supplierId, maxUnitCost } = option?.dataset || {};
     productHeight = Number(productHeight);
     productBase = Number(productBase);
 
-    const productId = option.value;
+    const productId = option?.value;
     const quantity = Number(document.querySelector('#quantityInput').value);
 
     const errors = validateFields(validateAddProductValidators, {
