@@ -290,20 +290,49 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 
         const client = await findClientById({ id: clientId });
         const department = await findDepartmentById({ id: departmentId });
-        const processedDetails = await buildGoodsIssueDetails({ details });
         const currentById = new Map(goodsIssue.details.map(detail => [detail.id, detail]));
         const incomingDetailIds = new Set(details.map(detail => detail.id).filter(Boolean));
         const hasSuppliedQuantity = (detail) => Number(detail.suppliedQuantity ?? 0) > FLOAT_EPSILON || detail.isSupplied;
+        const hasSameSuppliedDetailValues = (current, detail) => (
+            current.productId === detail.productId &&
+            current.supplierId === detail.supplierId &&
+            Number(current.quantity) === Number(detail.quantity)
+        );
+
+        for (const detail of details) {
+
+            if (!detail.id) continue;
+
+            const current = currentById.get(detail.id);
+
+            if (!current) throw new GoodsIssueDetailNotFound();
+
+            if (hasSuppliedQuantity(current) && !hasSameSuppliedDetailValues(current, detail)) {
+                throw new GoodsIssueSuppliedDetailConflict();
+            }
+        }
+
+        const removedSuppliedDetail = goodsIssue.details.some(
+            detail => hasSuppliedQuantity(detail) && !incomingDetailIds.has(detail.id)
+        );
+
+        if (removedSuppliedDetail) throw new GoodsIssueSuppliedDetailConflict();
+
+        const editableDetails = details.filter(detail => {
+            const current = detail.id ? currentById.get(detail.id) : null;
+            return !current || !hasSuppliedQuantity(current);
+        });
+        const processedDetails = editableDetails.length
+            ? await buildGoodsIssueDetails({ details: editableDetails })
+            : [];
 
         return await getDb().$transaction(async (tx) => {
 
-            for (let index = 0; index < details.length; index += 1) {
+            for (let index = 0; index < editableDetails.length; index += 1) {
 
-                const detail = details[index];
+                const detail = editableDetails[index];
                 const processedDetail = processedDetails[index];
                 const current = detail.id ? currentById.get(detail.id) : null;
-
-                if (current && hasSuppliedQuantity(current)) continue;
 
                 if (current) {
                     await tx.goodsIssueDetail.update({

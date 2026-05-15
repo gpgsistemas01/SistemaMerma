@@ -28,6 +28,20 @@ export class GoodsIssueAdvisorProfileNotFound extends AppError {
     }
 }
 
+export class GoodsIssueDetailNotFound extends AppError {
+
+    constructor () {
+        super('Detalle de salida de almacén no encontrado', 'GOODS_ISSUE_DETAIL_NOT_FOUND', 404);
+    }
+}
+
+export class GoodsIssueSuppliedDetailConflict extends AppError {
+
+    constructor () {
+        super('No se pueden editar o eliminar detalles que ya fueron surtidos', 'GOODS_ISSUE_SUPPLIED_DETAIL_CONFLICT', 409);
+    }
+}
+
 export class GoodsIssueCreateDatabaseError extends AppError {
 
     constructor () {
