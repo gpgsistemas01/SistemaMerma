@@ -17,8 +17,34 @@ export const exportWarehouseReportExcel = async (req, res) => {
 
     const rows = await findWarehouseReportRows();
 
+    const data = [
+        [
+            'Material',
+            'Base',
+            'Altura',
+            'Existencia',
+            'Stock mínimo',
+            'Presentación',
+            'Conversión',
+            'Unidad',
+            'Costo unitario'
+        ],
+
+        ...rows.map(row => [
+            row.name,
+            row.base,
+            row.height,
+            row.currentStock,
+            row.minStock,
+            row.presentation,
+            row.convertedQuantity,
+            row.unitMeasure,
+            row.maxUnitCost
+        ])
+    ];
+
     const workbook = xlsx.utils.book_new();
-    const worksheet = xlsx.utils.json_to_sheet(rows);
+    const worksheet = xlsx.utils.aoa_to_sheet(data);
 
     xlsx.utils.book_append_sheet(workbook, worksheet, SHEET_NAME);
 

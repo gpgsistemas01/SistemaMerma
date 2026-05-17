@@ -1,15 +1,16 @@
+import { toNumber } from "../../utils/formattersUtils.js";
 import { findAllSupplierProducts } from "./products/supplierProductService.js";
 
 const mapProductRows = (products = []) => products.map((item) => ({
-    material: item.name,
-    base: item.base,
-    altura: item.height,
-    existencia: item.currentStock,
-    stockMinimo: item.minStock,
-    presentacion: item.presentation?.name,
-    cantidadConversion: item.convertedQuantity,
-    unidad: item.unitMeasure?.name,
-    costoUnitarioConversion: item.maxUnitCost
+    name: item.name,
+    base: toNumber(item.base),
+    height: toNumber(item.height),
+    currentStock: toNumber(item.currentStock),
+    minStock: toNumber(item.minStock),
+    presentation: item.presentation?.name,
+    convertedQuantity: toNumber(item.convertedQuantity),
+    unitMeasure: item.unitMeasure?.name,
+    maxUnitCost: toNumber(item.maxUnitCost)
 }));
 
 export const findWarehouseReportRows = async () => {

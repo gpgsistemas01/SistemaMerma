@@ -6,6 +6,7 @@ import { getAllProductsRequest } from "../../services/warehouse/productService.j
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { buildExcelButton } from "../../ui/excelUI.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
+import { formatInventoryFileName as formatFileName } from "../../utils/formatters.js";
 
 const selectorTable = '#table';
 let lastLowStockNotification = '';
@@ -114,7 +115,7 @@ export const createProductDatatable = (context) => {
             },
             buttons: [
                 buildExcelButton({
-                    filename: 'reporte_inventario_productos.xlsx',
+                    filename: formatFileName('reporte_inventario_productos'),
                     request: exportWarehouseReport
                 })
             ]

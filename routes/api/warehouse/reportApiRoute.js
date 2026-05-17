@@ -9,6 +9,11 @@ const reportPermissions = {
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
-router.get('/inventory/excel', verifyApiTokenRequired, authorizeUserApi(reportPermissions), exportWarehouseReportExcel);
+router.get(
+    '/inventory/excel', 
+    verifyApiTokenRequired, 
+    authorizeUserApi(reportPermissions), 
+    exportWarehouseReportExcel
+);
 
 export default router;
