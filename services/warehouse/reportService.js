@@ -1,31 +1,27 @@
-import { getDb } from "../../repository/baseRepository.js";
+import { findAllSupplierProducts } from "./products/supplierProductService.js";
 
 const mapProductRows = (products = []) => products.map((item) => ({
-    material: item.product?.name,
-    base: item.product?.base,
-    altura: item.product?.height,
+    material: item.name,
+    base: item.base,
+    altura: item.height,
     existencia: item.currentStock,
-    stockMinimo: item.product?.minStock,
-    presentacion: item.product?.presentation?.name,
+    stockMinimo: item.minStock,
+    presentacion: item.presentation?.name,
     cantidadConversion: item.convertedQuantity,
-    unidad: item.product?.unitMeasure?.name,
+    unidad: item.unitMeasure?.name,
     costoUnitarioConversion: item.maxUnitCost
 }));
 
 export const findWarehouseReportRows = async () => {
 
-    const rows = await getDb().supplierProduct.findMany({
-        where: { product: { isActive: true } },
-        include: {
-            product: {
-                include: {
-                    presentation: true,
-                    unitMeasure: true
-                }
-            }
-        },
-        orderBy: { product: { name: 'asc' } }
+    const productsResult = await findAllSupplierProducts({
+        skip: 0,
+        take: 100000,
+        search: '',
+        supplierId: null,
+        orderBy: 'name',
+        orderDir: 'asc'
     });
 
-    return mapProductRows(rows);
+    return mapProductRows(productsResult.data);
 };
