@@ -1,9 +1,11 @@
 import { openProductModal } from "../../modules/products/productModal.js";
-import { buildExcelButton, createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { getAllProductsRequest } from "../../services/warehouse/productService.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
+import { buildExcelButton } from "../../ui/excelUI.js";
+import { exportWarehouseReport } from "../../application/warehouse/report.js";
 
 const selectorTable = '#table';
 let lastLowStockNotification = '';
@@ -112,7 +114,8 @@ export const createProductDatatable = (context) => {
             },
             buttons: [
                 buildExcelButton({
-                    filename: 'reporte_inventario_productos.xlsx'
+                    filename: 'reporte_inventario_productos.xlsx',
+                    request: exportWarehouseReport
                 })
             ]
         }
