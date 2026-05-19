@@ -280,7 +280,7 @@ model PurchaseRequisitionDetail {
 
 model GoodsIssue {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  referenceNumber String    @unique @db.VarChar(50)
+  referenceNumber String    @db.VarChar(50)
   approvedDate    DateTime?
   requestDate     DateTime
   deliveryDate    DateTime?
