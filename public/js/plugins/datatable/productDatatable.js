@@ -7,6 +7,7 @@ import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { buildExcelButton } from "../../ui/excelUI.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatInventoryFileName as formatFileName } from "../../utils/formatters.js";
+import { openStockAdjustmentModal } from "../../pages/warehouse/productsPage.js";
 
 const selectorTable = '#table';
 let lastLowStockNotification = '';
@@ -129,5 +130,12 @@ export const createProductDatatable = (context) => {
         const data = table.row($(this).closest('tr')).data();
 
         await openProductModal({ mode: 'edit', data });
+    });
+
+    $(`${ selectorTable } tbody`).on('click', '.btn-adjust-stock', async function() {
+
+        const data = table.row($(this).closest('tr')).data();
+
+        await openStockAdjustmentModal({ mode: 'edit-stock', data });
     });
 }

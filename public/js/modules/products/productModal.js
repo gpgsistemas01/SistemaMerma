@@ -14,7 +14,7 @@ export const openProductModal = ({
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(productModalId);
 
-    initForm(form, data?.id);
+    initForm({ form, mode, id: data?.id });
 
     clearFormErrors(form);
     initProductFormSelect2();
