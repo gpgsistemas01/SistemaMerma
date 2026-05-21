@@ -60,6 +60,9 @@ export const errorMessages = {
     REQUEST_DATE_REQUIRED: 'La fecha de solicitud es requerida.',
     REQUEST_DATE_INVALID_FORMAT: 'La fecha de solicitud no es válida.',
 
+    REASON_ID_REQUIRED: 'La razón es requerida.',
+    REASON_ID_INVALID_UUID: 'La razón no es válida.',
+
     // 👤 USERNAME
     USERNAME_REQUIRED: 'El nombre de usuario es requerido.',
     USERNAME_INVALID_TYPE: 'El nombre de usuario debe ser texto.',
@@ -91,6 +94,10 @@ export const errorMessages = {
     MIN_STOCK_REQUIRED: 'El stock mínimo es requerido.',
     MIN_STOCK_INVALID_NUMBER: 'Debe ser un número.',
     MIN_STOCK_GREATER_THAN_MAX: 'El stock mínimo no puede ser mayor al máximo.',
+
+    // 📈 NEW STOCK
+    NEW_STOCK_REQUIRED: 'El stock nuevo es requerido.',
+    NEW_STOCK_INVALID_NUMBER: 'El stock nuevo debe ser un número.',
 
     REQUIRED_QUANTITY: 'La cantidad es requerido.',
     INVALID_FORMAT_QUANTITY: 'La cantidad debe ser un número mayor a cero.',

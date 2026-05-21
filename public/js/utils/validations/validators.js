@@ -16,6 +16,12 @@ export const productValidators = {
     height: (value) => validateNumberOptional(value, 'La altura'),
 }
 
+export const productStockValidators = {
+    newStock: (value) => validateNumber(value, 'El nuevo stock'),
+    reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
+    observations: (value) => validateTextOptional(value, 'Las observaciones'),
+}
+
 export const loginValidators = {
     name: validateUsername,
     password: validatePassword,

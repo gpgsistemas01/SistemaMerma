@@ -403,12 +403,14 @@ model MovementDetail {
   supplierId           String  @db.Uuid
   goodsReceiptDetailId String? @db.Uuid
   goodsIssueDetailId   String? @db.Uuid
+  stockAdjustmentDetailId String? @db.Uuid
   movementId           String  @db.Uuid
 
   product            Product             @relation(fields: [productId], references: [id])
   supplier           Supplier            @relation(fields: [supplierId], references: [id])
   goodsReceiptDetail GoodsReceiptDetail? @relation(fields: [goodsReceiptDetailId], references: [id])
   goodsIssueDetail   GoodsIssueDetail?   @relation(fields: [goodsIssueDetailId], references: [id])
+  stockAdjustmentDetail StockAdjustmentDetail? @relation(fields: [stockAdjustmentDetailId], references: [id])
   movement           InventoryMovement   @relation(fields: [movementId], references: [id])
 
   createdAt DateTime @default(now())
@@ -477,6 +479,8 @@ model StockAdjustmentDetail {
 
   product  Product  @relation(fields: [productId], references: [id])
   supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  movementDetails MovementDetail[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -92,6 +92,23 @@ export const findProductsSnapshot = async ({
     return products;
 }
 
+export const existsProduct = async ({
+    tx,
+    id
+}) => {
+
+    const db = getDb(tx);
+
+    const productExists = await db.product.findUnique({
+        where: { id },
+        select: { id: true }
+    });
+
+    if (!productExists) throw new ProductNotFound();
+
+    return productExists;
+}
+
 export const createProduct = async (productDto) => {
 
     try {
@@ -117,12 +134,7 @@ export const updateProduct = async (productDto, id) => {
 
         return await getDb().$transaction(async (tx) => {
 
-            const productExists = await tx.product.findUnique({
-                where: { id },
-                select: { id: true }
-            });
-
-            if (!productExists) throw new ProductNotFound();
+            await existsProduct({ tx, id });
 
             const currentSupplierProduct = await findCurrentSupplierProductByProductId({
                 tx,
@@ -180,4 +192,33 @@ export const updateProduct = async (productDto, id) => {
 
         throw new ProductUpdateDatabaseError();
     };
+};
+
+export const updateProductStock = async (productDto, id) => {
+
+    try {
+
+        return await getDb().$transaction(async (tx) => {
+
+            await existsProduct({ tx, id });
+
+            const updatedProduct = await tx.product.update({
+                where: { id },
+                data: {
+                    currentStock: productDto.newStock
+                }
+            });
+
+        });
+
+    } catch (err) {
+
+        if (err.code === PRISMA_RECORD_NOT_FOUND) {
+            throw new ProductNotFound();
+        }
+
+        if (err instanceof AppError) throw err;
+
+        throw new ProductUpdateDatabaseError();
+    }
 };

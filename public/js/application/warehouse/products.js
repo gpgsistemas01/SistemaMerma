@@ -1,5 +1,5 @@
 import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
-import { editProductRequest, registerProductRequest } from "../../services/warehouse/productService.js";
+import { editProductRequest, editProductStockRequest, registerProductRequest } from "../../services/warehouse/productService.js";
 
 export const registerProduct = async (formData) => {
 
@@ -18,6 +18,19 @@ export const registerProduct = async (formData) => {
 export const editProduct = async (formData, id) => {
 
     const response = await editProductRequest(formData, id);
+
+    const { data } = response;
+    const { code } = data;
+    let message = getSuccessMessage(code);
+
+    return {
+        message
+    };
+}
+
+export const editProductStock = async (formData, id) => {
+
+    const response = await editProductStockRequest(formData, id);
 
     const { data } = response;
     const { code } = data;

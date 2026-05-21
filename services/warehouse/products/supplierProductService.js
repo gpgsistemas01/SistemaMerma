@@ -1,5 +1,5 @@
 import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
-import { ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
+import { ProductNotFound, ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 
@@ -31,7 +31,6 @@ export const findCurrentSupplierProductByProductId = async ({
         select: { supplierId: true, maxUnitCost: true }
     });
 };
-
 
 const mapSupplierProduct = (sp) => {
 
@@ -169,6 +168,8 @@ export const findSupplierProductByIds = async ({
             }
         }
     });
+
+    if (!suppierProduct) return ProductNotFound();
 
     return mapSupplierProduct(supplierProduct);
 };

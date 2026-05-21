@@ -44,6 +44,10 @@ export const errorMap = {
         REQUIRED: 'UNIT_MEASURE_ID_REQUIRED',
         INVALID_UUID: 'UNIT_MEASURE_ID_INVALID_UUID'
     },
+    reasonId: {
+        REQUIRED: 'REASON_ID_REQUIRED',
+        INVALID_UUID: 'REASON_ID_INVALID_UUID'
+    },
     username: {
         REQUIRED: 'USERNAME_REQUIRED',
         INVALID_TYPE: 'USERNAME_INVALID_TYPE',
@@ -77,6 +81,10 @@ export const errorMap = {
             meta: { value }
         }),
         INVALID_FORMAT: 'INVOICE_INVALID_FORMAT'
+    },
+    newStock: {
+        REQUIRED: 'NEW_STOCK_REQUIRED',
+        INVALID_NUMBER: 'NEW_STOCK_INVALID_NUMBER'
     },
     minStock: {
         REQUIRED: 'MIN_STOCK_REQUIRED',
