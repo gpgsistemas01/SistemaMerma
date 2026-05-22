@@ -70,7 +70,8 @@ export const createStockAdjustmentMovement = async ({
     previousConvertedQuantity,
     newStock,
     newConvertedQuantity,
-    difference
+    difference,
+    convertedDifference
 }) => {
 
     const db = getDb(tx);
@@ -89,7 +90,7 @@ export const createStockAdjustmentMovement = async ({
                     quantity: difference,
                     newStock,
                     newConvertedQuantity,
-                    convertedQuantity: newConvertedQuantity,
+                    convertedQuantity: convertedDifference,
                     previousStock,
                     previousConvertedQuantity,
                     product: {

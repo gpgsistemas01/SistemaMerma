@@ -98,7 +98,8 @@ export const createStockAdjustment = async ({
             previousConvertedQuantity,
             newStock,
             newConvertedQuantity,
-            difference
+            difference,
+            convertedDifference
         });
 
         const updatedProduct = await adjustSupplierProductStock({
