@@ -57,7 +57,11 @@ export const editProductStock = async (req, res) => {
     const productDto = createProductDtoForStockUpdate(req.body);
     const sanitizedProductDto = sanitizeEmptyStrings(productDto);
 
-    const product = await updateProductStock(sanitizedProductDto, req.params.id, true);
+    const product = await updateProductStock({
+        productDto: sanitizedProductDto,
+        userId: req.user.id,
+        id: req.params.id
+    });
 
     return res.status(200).json({
         product,

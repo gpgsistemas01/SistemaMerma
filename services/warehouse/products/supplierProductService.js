@@ -2,6 +2,7 @@ import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../..
 import { ProductNotFound, ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
+import { createStockAdjustment } from "../adjustmentService.js";
 
 const MOVEMENT_TYPE_IN = 'IN';
 
@@ -360,6 +361,23 @@ export const updateSupplierProductStock = async ({
         }
     }
 }
+
+export const adjustSupplierProductStock = async ({
+    tx,
+    productId,
+    supplierId,
+    newStock,
+}) => {
+    
+    const db = getDb(tx);
+
+    return await createStockAdjustment({
+        tx: db,
+        productId,
+        supplierId,
+        newStock
+    });
+};
 
 export const deleteSupplierProduct = async ({
     tx,

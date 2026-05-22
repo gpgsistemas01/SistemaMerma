@@ -58,3 +58,60 @@ export const applyInventoryMovement = async ({
 
     return movement;
 };
+
+export const createStockAdjustmentMovement = async ({
+    tx,
+    productId,
+    supplierId,
+    reasonId,
+    previousStock,
+    previousConvertedQuantity,
+    newStock,
+    newConvertedQuantity,
+    difference
+}) => {
+
+    const db = getDb(tx);
+
+    return await db.inventoryMovement.create({
+        data: {
+            type: InventoryMovementType.ADJUSTMENT,
+            connect: {
+                stockAdjustment: {
+                    id: adjustment.id
+                }
+            },
+
+            details: {
+                create: {
+                    quantity: Math.abs(difference),
+                    newStock,
+                    newConvertedQuantity,
+                    convertedQuantity: newConvertedQuantity,
+                    previousStock,
+                    previousConvertedQuantity,
+                    connect: {
+                        product: {
+                            id: productId
+                        }
+                    },
+                    connect: {
+                        supplier: {
+                            id: supplierId
+                        }
+                    },
+                    connect: {
+                        reason: {
+                            id: reasonId
+                        }
+                    },
+                    connect: {
+                        stockAdjustmentDetail: {
+                            id: adjustment.details[0].id
+                        }
+                    }
+                }
+            }
+        }
+    });
+}

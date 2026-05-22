@@ -1,9 +1,10 @@
-import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
+import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError, ProductStockAdjustmentDatabaseError } from "../../../errors/warehouse/productError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { findAllSupplierProducts, findCurrentSupplierProductByProductId, findSupplierProductByIds } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 import { AppError } from "../../../errors/AppError.js";
+import { createStockAdjustment } from "../adjustmentService.js";
 
 const REFERENCE_MOVEMENT_IN = 'IN';
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
@@ -194,21 +195,21 @@ export const updateProduct = async (productDto, id) => {
     };
 };
 
-export const updateProductStock = async (productDto, id) => {
+export const updateProductStock = async ({ 
+    productDto, 
+    userId,
+    id 
+}) => {
 
     try {
 
-        return await getDb().$transaction(async (tx) => {
-
-            await existsProduct({ tx, id });
-
-            const updatedProduct = await tx.product.update({
-                where: { id },
-                data: {
-                    currentStock: productDto.newStock
-                }
-            });
-
+        return await createStockAdjustment({
+            productId: id,
+            supplierId: productDto.supplierId,
+            reasonId: productDto.reasonId,
+            observations: productDto.observations,
+            newStock: productDto.newStock,
+            userId
         });
 
     } catch (err) {
@@ -219,6 +220,6 @@ export const updateProductStock = async (productDto, id) => {
 
         if (err instanceof AppError) throw err;
 
-        throw new ProductUpdateDatabaseError();
+        throw new ProductStockAdjustmentDatabaseError();
     }
 };
