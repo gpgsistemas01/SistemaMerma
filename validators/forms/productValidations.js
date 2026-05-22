@@ -14,6 +14,6 @@ export const productValidation = [
 export const productStockValidation = [
     validateUUID('supplierId'),
     validateNumber('newStock'),
-    validateTextOptional({ fieldName: 'observations', maxLength: 255, regex: /^[^<>\\{}[\]]+$/u }),
+    validateTextOptional({ fieldName: 'observations', maxLength: 500, regex: /^[^<>\\{}[\]]+$/u }),
     validateUUID('reasonId'),
 ]

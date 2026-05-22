@@ -251,7 +251,7 @@ export const createGoodsIssue = async ({
         return result.goodsIssue;
 
     } catch (err) {
-
+console.log(err);
         if (err instanceof AppError) throw err;
 
         throw new GoodsIssueCreateDatabaseError();

@@ -201,7 +201,7 @@ model GoodsReceipt {
   receivedByName           String               @db.VarChar(255)
   referenceNumber          String               @unique @db.VarChar(50)
   receptionDate            DateTime
-  observations             String?              @db.VarChar(50)
+  observations             String?              @db.VarChar(500)
   totalQuantity            Decimal              @db.Decimal(10, 2)
   totalNetPurchaseAmount   Decimal              @db.Decimal(10, 2)
   totalGrossPurchaseAmount Decimal              @db.Decimal(10, 2)
@@ -247,7 +247,7 @@ model PurchaseRequisition {
   approveDate     DateTime?
   requestDate     DateTime
   deliveryDate    DateTime?
-  observations    String?   @db.VarChar(50)
+  observations    String?   @db.VarChar(500)
 
   statusId      String  @db.Uuid
   departmentId  String  @db.Uuid
@@ -288,7 +288,7 @@ model GoodsIssue {
   approvedDate    DateTime?
   requestDate     DateTime
   deliveryDate    DateTime?
-  observations    String?   @db.VarChar(50)
+  observations    String?   @db.VarChar(500)
   projectNumber   String    @db.VarChar(10)
   departmentName  String    @db.VarChar(50)
   requesterName   String    @db.VarChar(255)
@@ -424,7 +424,7 @@ model StockAdjustment {
 
   type         StockAdjustmentType
   reasonId     String              @db.Uuid
-  observations String?             @db.VarChar(255)
+  observations String?             @db.VarChar(500)
 
   status AdjustmentStatus @default(PENDING)
 

@@ -24,7 +24,7 @@ createGoodsIssueDatatable(context);
 const normalizeGoodsIssueData = ({ form, formData }) => {
 
     const { mode } = form.dataset;
-console.log(mode)
+
     if (mode === MODE_EDIT_DETAIL) {
         return {
             id: form.dataset.id,

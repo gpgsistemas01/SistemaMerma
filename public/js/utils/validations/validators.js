@@ -19,7 +19,7 @@ export const productValidators = {
 export const productStockValidators = {
     newStock: (value) => validateNumber(value, 'El nuevo stock'),
     reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
-    observations: (value) => validateTextOptional(value, 225, 'Las observaciones'),
+    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
 }
 
 export const loginValidators = {
