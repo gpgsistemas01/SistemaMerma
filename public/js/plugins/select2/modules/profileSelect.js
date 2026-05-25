@@ -8,6 +8,8 @@ export const initProfileFormSelect2 = ({ modalSelector }) => {
 
     initDepartmentSelect({
         modalSelector,
+        clearOnOpen: false,
+        multiple: true,
         baseSelector: departmentSelectorScoped,
         allowCreate: false
     });

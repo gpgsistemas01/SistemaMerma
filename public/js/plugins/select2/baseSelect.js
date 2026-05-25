@@ -6,6 +6,7 @@ const wrapperSelector = '#presentationDisplayInput';
 export const initbaseSelect2 = ({ 
     baseSelector, 
     modalSelector,
+    multiple = false,
     get, 
     clearOnOpen = true,
     searchDelay = 1000,
@@ -31,6 +32,7 @@ export const initbaseSelect2 = ({
 
     $(baseSelector).select2({ 
         language: 'es',
+        multiple,
         placeholder: placeholder, 
         dropdownParent: $(modalSelector),
         minimumInputLength: 0, 
