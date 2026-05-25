@@ -1,6 +1,7 @@
 import express from 'express';
 import { editProfile, getAllProfiles, registerProfile } from "../../../controllers/api/admin/profileController.js";
 import { authorizeUserApi, verifyApiTokenRequired } from "../../../middleware/authMiddleware.js";
+import { profileValidation } from '../../../validators/forms/profileValidations.js';
 
 const router = express.Router();
 const profileReadPermissions = {
@@ -36,6 +37,7 @@ router.get(
 router.post(
     '/',
     verifyApiTokenRequired,
+    profileValidation,
     authorizeUserApi(registerProfilePermissions),
     registerProfile
 );
@@ -43,6 +45,7 @@ router.post(
 router.put(
     '/:id',
     verifyApiTokenRequired,
+    profileValidation,
     authorizeUserApi(registerProfilePermissions),
     editProfile
 );
