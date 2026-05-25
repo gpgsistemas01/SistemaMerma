@@ -38,6 +38,8 @@ export const findAllGoodsIssues = async ({
     accesses = []
 }) => {
 
+    const db = getDb();
+
     const isAdmin = accesses.some(access => access.role === ROLE_SYSTEM_ADMIN);
     const isWarehouseCoordinator = accesses.some(access => 
         access.role === ROLE_COORDINATOR && 
@@ -87,7 +89,7 @@ export const findAllGoodsIssues = async ({
         })
     };
 
-    const goodsIssues = await getDb().goodsIssue.findMany({
+    const goodsIssues = await db.goodsIssue.findMany({
         skip,
         take,
         where,
@@ -137,7 +139,7 @@ export const findAllGoodsIssues = async ({
         }
     });
 
-    const total = await getDb().goodsIssue.count({ where });
+    const total = await db.goodsIssue.count({ where });
     const filtered = total;
 
     return {

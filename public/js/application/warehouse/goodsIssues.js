@@ -1,6 +1,13 @@
 import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
 import { editGoodsIssueDetailsRequest, editGoodsIssueRequest, getAllGoodsIssuesRequest, registerGoodsIssueRequest } from "../../services/warehouse/goodsIssueService.js";
 
+export const getAllGoodsIssues = async (params = {}) => {
+
+    const response = await getAllGoodsIssuesRequest(params);
+
+    return response;
+};
+
 export const registerGoodsIssue = async (formData) => {
 
     const response = await registerGoodsIssueRequest(formData);
@@ -38,11 +45,4 @@ export const editGoodsIssueDetails = async (formData, id) => {
     return {
         message
     };
-};
-
-export const getAllGoodsIssues = async (params = {}) => {
-
-    const response = await getAllGoodsIssuesRequest(params);
-
-    return response.data;
 };
