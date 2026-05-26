@@ -1,19 +1,20 @@
-import { getAllClients } from "../../application/sales/clients.js";
-import { openClientModal } from "../../modules/clients/clientModal.js";
+import { getAllSuppliers } from "../../application/warehouse/suppliers.js";
+import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 
 const selector = '#table';
 
-export const createClientDatatable = () => {
+export const createSupplierDatatable = () => {
 
     const table = createDataTable({
         options: {
             ajax: {
-                get: getAllClients
+                get: getAllSuppliers
             },
             columns: [
-                { data: 'name', title: 'Nombre' },
+                { data: 'tradeName', title: 'Nombre comercial' },
+                { data: 'legalName', title: 'Razón social' },
                 {
                     data: null,
                     title: 'Acciones',
@@ -23,7 +24,7 @@ export const createClientDatatable = () => {
             buttons: [
                 {
                     text: 'Nuevo cliente',
-                    action: () => openClientModal({ mode: 'create' })
+                    action: () => openSupplierModal({ mode: 'create' })
                 }
             ]
         }
@@ -33,6 +34,6 @@ export const createClientDatatable = () => {
 
         const data = getResponsiveRowData(table, this);
 
-        openClientModal({ mode: 'edit', data });
+        openSupplierModal({ mode: 'edit', data });
     });
 }

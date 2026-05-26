@@ -92,7 +92,8 @@ app.use('/requisiciones', purchaseRequisitionWebRoutes);
 app.use('/compras', goodsReceiptWebRoutes);
 app.use('/salidas-almacen', goodsIssueWebRoutes);
 app.use('/perfiles', profileWebRoutes);
-app.use('/clientes', clientWebRoutes); // Ruta para la página de clientes, puede ser ajustada según la estructura de rutas web
+app.use('/clientes', clientWebRoutes);
+app.use('/proveedores', supplierWebRoutes);
 
 // api routes
 app.use(apiRoute + authRoute, authApiRoutes);

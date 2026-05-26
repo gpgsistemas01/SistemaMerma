@@ -74,9 +74,7 @@ export const createClient = async ({
     try {
 
         const createdClient = await db.client.create({
-            data: {
-                name: clientDto.name,
-            }
+            data: { ...clientDto }
         });
 
         return createdClient;
@@ -99,9 +97,7 @@ export const updateClient = async ({
 
         return await db.client.update({
             where: { id },
-            data: {
-                name: clientDto.name,
-            }
+            data: { ...clientDto }
         });
 
     } catch (err) {
