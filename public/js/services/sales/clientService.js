@@ -14,7 +14,7 @@ export const createClientRequest = (data) => apiRequest({
     data
 });
 
-export const editClientRequest = (id, data) => apiRequest({
+export const editClientRequest = (data, id) => apiRequest({
     method: 'put',
     url: `${ CLIENTS_API_ROUTE }/${ id }`,
     data

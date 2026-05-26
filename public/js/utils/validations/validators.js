@@ -70,7 +70,7 @@ export const validatePurchaseRequisitionValidators = {
 };
 
 export const validateClientValidators = {
-    name: (value) => validateText({ name: value, length: 100, fieldName: 'El nombre' }),
+    name: (value) => validateText({ name: value, length: 100, fieldName: 'El nombre', regex: /^[^<>\\{}[\]]+$/u }),
 }
 
 export const profileValidators = {
