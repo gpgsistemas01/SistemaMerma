@@ -110,11 +110,12 @@ app.use(apiRoute + warehouse + '/notifications', notificationApiRoutes);
 app.use(apiRoute + warehouse + '/reports', reportApiRoutes);
 app.use(apiRoute + warehouse + '/unit-measures', unitMeasuresApiRoutes);
 app.use(apiRoute + warehouse + '/presentations', presentationApiRoutes);
-app.use(apiRoute + admin + '/departments', departmentApiRoutes);
-app.use(apiRoute + admin + '/profiles', profileApiRoutes);
 app.use(apiRoute + warehouse + '/reasons', reasonApiRoutes);
 app.use(apiRoute + warehouse + '/fulfillment-statuses', fulfillmentStatusApiRoutes);
-app.use(apiRoute + warehouse + '/movements', movementApiRoutes);
+
+app.use(apiRoute + admin + '/departments', departmentApiRoutes);
+app.use(apiRoute + admin + '/profiles', profileApiRoutes);
+app.use(apiRoute + admin + '/movements', movementApiRoutes);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada.' });
