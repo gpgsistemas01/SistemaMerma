@@ -93,7 +93,7 @@ export const findAllMovements = async ({
             }
         });
 
-        return movements.map(detail => ({
+        const movementsMapper = movements.map(detail => ({
             id: detail.id,
 
             date: detail.movement.date,
@@ -117,9 +117,18 @@ export const findAllMovements = async ({
                 detail.movement.goodsReceipt?.referenceNumber ||
                 detail.movement.referenceNumber
         }));
+        
+        const total = await db.movementDetail.count();
+        const filtered = await db.movementDetail.count({ where });
+
+        return {
+            data: movementsMapper,
+            recordsTotal: total,
+            recordsFiltered: filtered
+        };
 
     } catch (err) {
-console.log(err)
+
         throw new MovementFindDatabaseError();
     }
 }
