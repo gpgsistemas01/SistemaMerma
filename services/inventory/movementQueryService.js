@@ -17,67 +17,75 @@ export const findAllMovements = async ({
 
     const db = getDb();
 
+    const movementFilters = {
+        ...(type && { type }),
+
+        ...(goodsIssueId && { goodsIssueId }),
+
+        ...(goodsReceiptId && { goodsReceiptId }),
+
+        ...(stockAdjustmentId && { stockAdjustmentId })
+    };
+
     const where = {
+
         ...(productId && {
-            details: {
-                some: {
-                    productId
-                }
-            }
+            productId
         }),
+
         ...(supplierId && {
-            details: {
-                some: {
-                    supplierId
-                }
-            }
+            supplierId
         }),
-        ...(goodsIssueId && {
-            goodsIssueId
-        }),
-        ...(goodsReceiptId && {
-            goodsReceiptId
-        }),
-        ...(stockAdjustmentId && {
-            stockAdjustmentId
-        }),
-        ...(type && {
-            type
+
+        ...(Object.keys(movementFilters).length > 0 && {
+            movement: movementFilters
         })
-    }
+    };
 
     try {
 
-        return await db.inventoryMovement.findMany({
+        const movements = await db.movementDetail.findMany({
             skip,
             take,
+
             where,
-            orderBy: {
-                [orderBy]: orderDir
-            },
+
             include: {
-                goodsIssue: {
+
+                product: {
                     select: {
-                        referenceNumber: true
+                        name: true
                     }
                 },
-                goodsReceipt: {
+
+                supplier: {
                     select: {
-                        referenceNumber: true
+                        tradeName: true
                     }
                 },
-                details: {
-                    include: {
-                        product: {
+
+                movement: {
+                    select: {
+                        id: true,
+                        type: true,
+                        date: true,
+                        referenceNumber: true,
+
+                        goodsIssue: {
                             select: {
-                                name: true,
-                                base: true,
-                                height: true
+                                referenceNumber: true
                             }
                         },
-                        supplier: {
+
+                        goodsReceipt: {
                             select: {
-                                tradeName: true
+                                referenceNumber: true
+                            }
+                        },
+
+                        stockAdjustment: {
+                            select: {
+                                referenceNumber: true
                             }
                         }
                     }
@@ -85,8 +93,33 @@ export const findAllMovements = async ({
             }
         });
 
-    } catch (err) {
+        return movements.map(detail => ({
+            id: detail.id,
 
+            date: detail.movement.date,
+
+            type: detail.movement.type,
+
+            productName: detail.product.name,
+
+            supplierName: detail.supplier?.tradeName,
+
+            quantity: detail.quantity,
+
+            convertedQuantity: detail.convertedQuantity,
+
+            previousStock: detail.previousStock,
+
+            newStock: detail.newStock,
+
+            referenceNumber:
+                detail.movement.goodsIssue?.referenceNumber ||
+                detail.movement.goodsReceipt?.referenceNumber ||
+                detail.movement.referenceNumber
+        }));
+
+    } catch (err) {
+console.log(err)
         throw new MovementFindDatabaseError();
     }
 }

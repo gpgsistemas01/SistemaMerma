@@ -13,7 +13,9 @@ export const createMovementDatatable = () => {
                 })
             },
             columns: [
-                { data: 'quantity', title: 'Cantidad' }
+                { data: 'date', title: 'Fecha' },
+                { data: 'productName', title: 'Material' },
+                { data: 'quantity', title: 'Movimiento' }
             ]
         }
     });
