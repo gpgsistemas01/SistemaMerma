@@ -400,6 +400,8 @@ model MovementDetail {
   previousConvertedQuantity Decimal? @db.Decimal(10, 2)
 
   productId            String  @db.Uuid
+  productBase Decimal @default(0) @db.Decimal(10, 2)
+  productHeight Decimal @default(0) @db.Decimal(10, 2)
   supplierId           String  @db.Uuid
   goodsReceiptDetailId String? @db.Uuid
   goodsIssueDetailId   String? @db.Uuid

@@ -5,13 +5,12 @@ import { formatDateLongWithTime } from "../../utils/formattersUtils.js";
 export const findAllMovements = async ({
     skip = 0,
     take = 10,
-    type = '',
+    startDate = '',
+    endDate = '',
+    movementType = '',
     search = '',
     productId = '',
     supplierId = '',
-    goodsIssueId = '',
-    goodsReceiptId = '',
-    stockAdjustmentId = '',
     orderBy = 'date',
     orderDir = 'asc',
 }) => {
@@ -19,13 +18,26 @@ export const findAllMovements = async ({
     const db = getDb();
 
     const movementFilters = {
-        ...(type && { type }),
+        ...(movementType && { type: movementType }),
 
-        ...(goodsIssueId && { goodsIssueId }),
+        ...((startDate || endDate) && {
+            date: {
 
-        ...(goodsReceiptId && { goodsReceiptId }),
+                ...(startDate && {
+                    gte: new Date(startDate)
+                }),
 
-        ...(stockAdjustmentId && { stockAdjustmentId })
+                ...(endDate && (() => {
+
+                    const nextDay = new Date(endDate);
+                    nextDay.setDate(nextDay.getDate() + 1);
+
+                    return {
+                        lt: nextDay
+                    };
+                })())
+            }
+        })
     };
 
     const where = {
