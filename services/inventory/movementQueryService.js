@@ -120,6 +120,7 @@ export const findAllMovements = async ({
             referenceNumber:
                 detail.movement.goodsIssue?.referenceNumber ||
                 detail.movement.goodsReceipt?.referenceNumber ||
+                detail.movement.stockAdjustment?.referenceNumber ||
                 detail.movement.referenceNumber
         }));
         

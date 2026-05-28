@@ -22,11 +22,11 @@ export const createMovementDatatable = () => {
                     title: 'Tipo', 
                     render: (data) => {
 
-                        if (data === 'IN') return 'Entrada';
+                        if (data === 'ENTRY') return 'Entrada';
 
                         if (data === 'ADJUSTMENT') return 'Ajuste';
                         
-                        if (data === 'OUT') return 'Salida';
+                        if (data === 'ISSUE') return 'Salida';
 
                         return data;
                     }
