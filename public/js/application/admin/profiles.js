@@ -22,9 +22,9 @@ export const registerProfile = async (formData) => {
     };
 }
 
-export const updateProfile = async (formData, id) => {
+export const updateProfile = async ({ formData, id }) => {
 
-    const response = await updateProfileRequest(formData, id);
+    const response = await updateProfileRequest({ data: formData, id });
 
     const { data } = response;
     const { code, profile } = data;

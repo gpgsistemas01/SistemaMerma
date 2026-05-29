@@ -3,7 +3,7 @@ import { editProductRequest, editProductStockRequest, getAllProductsRequest, reg
 
 export const getProductOptions = async (params = {}) => {
 
-    const response = await getAllProductsRequest(params);
+    const response = await getAllProductsRequest({ params });
 
     const list = response.data?.data || [];
 
@@ -24,14 +24,14 @@ export const getProductOptions = async (params = {}) => {
 
 export const getAllProducts = async (params = {}) => {
 
-    const response = await getAllProductsRequest(params);
+    const response = await getAllProductsRequest({ params });
 
     return response;
 };
 
 export const registerProduct = async (formData) => {
 
-    const response = await registerProductRequest(formData);
+    const response = await registerProductRequest({ data: formData });
 
     const { data } = response;
     const { code, product } = data;
@@ -43,9 +43,9 @@ export const registerProduct = async (formData) => {
     };
 }
 
-export const editProduct = async (formData, id) => {
+export const editProduct = async ({ formData, id }) => {
 
-    const response = await editProductRequest(formData, id);
+    const response = await editProductRequest({ data: formData, id });
 
     const { data } = response;
     const { code } = data;
@@ -56,9 +56,9 @@ export const editProduct = async (formData, id) => {
     };
 }
 
-export const editProductStock = async (formData, id) => {
+export const editProductStock = async ({ formData, id }) => {
 
-    const response = await editProductStockRequest(formData, id);
+    const response = await editProductStockRequest({ data: formData, id });
 
     const { data } = response;
     const { code } = data;

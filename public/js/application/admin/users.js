@@ -22,9 +22,9 @@ export const registerUser = async (formData) => {
     };
 };
 
-export const editUser = async (formData, id) => {
+export const editUser = async ({ formData, id }) => {
 
-    const response = await editUserRequest(formData, id);
+    const response = await editUserRequest({ formData, id });
 
     const { data } = response;
     const { code, user } = data;
@@ -36,9 +36,9 @@ export const editUser = async (formData, id) => {
     };
 };
 
-export const editUserPassword = async (formData, id) => {
+export const editUserPassword = async ({ formData, id }) => {
 
-    const response = await editUserPasswordRequest(formData, id);
+    const response = await editUserPasswordRequest({ data: formData, id });
 
     const { data } = response;
     const { code } = data;

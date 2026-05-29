@@ -18,7 +18,7 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
             return;
         }
 
-        response = await update(formData, id);
+        response = await update({ formData, id });
     }
 
     notifications.showSuccess(response.message);

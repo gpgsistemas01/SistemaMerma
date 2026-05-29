@@ -14,13 +14,13 @@ export const registerUserRequest = (data) => apiRequest({
     data
 });
 
-export const editUserRequest = (data, id) => apiRequest({
+export const editUserRequest = ({ data, id }) => apiRequest({
     method: 'patch',
     url: `${ USERS_API_ROUTE }/${ id }`,
     data
 });
 
-export const editUserPasswordRequest = (data, id) => apiRequest({
+export const editUserPasswordRequest = ({ data, id }) => apiRequest({
     method: 'patch',
     url: `${ USERS_API_ROUTE }/${ id }/password`,
     data
