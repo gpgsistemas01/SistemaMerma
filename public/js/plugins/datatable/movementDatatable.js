@@ -2,10 +2,13 @@ import { getAllMovements } from "../../application/admin/movements.js";
 import { exportMovementReport } from "../../application/admin/report.js";
 import { getProductOptions } from "../../application/warehouse/products.js";
 import { getSupplierOptions } from "../../application/warehouse/suppliers.js";
-import { buildExcelButton } from "../../ui/excelUI.js";
+import { buildExcelButton, clearTableFilters, isClearingFilters } from "../../ui/tableUI.js";
+import { on } from "../../utils/domUtils.js";
 import { formatFileName } from "../../utils/formatters.js";
+import { toggleDisabledElement } from "../../utils/formUtils.js";
+import { bindDependency } from "../select2/baseSelect.js";
 import { getMovementTypeSelectApi, getMovementTypeData, attachMovementTypeFilterHandler, initMovementTypeFilterSelect } from "../select2/domains/movementType.js";
-import { attachProductFilterHandler, getProductSelectApi, initProductFilterSelect } from "../select2/domains/product.js";
+import { attachProductFilterHandler, getProductSelectApi, initProductFilterSelect, toggleProductOption } from "../select2/domains/product.js";
 import { attachSupplierFilterHandler, getSupplierSelectApi, initSupplierFilterSelect } from "../select2/domains/supplier.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { attachDateFilterHandler, setupTableFilters } from "./utils/tableFilter.js";
@@ -17,6 +20,40 @@ let filters = {
 
 export const createMovementDatatable = async () => {
 
+    const productFilterSelector = '#productFilter';
+    const supplierFilterSelector = '#supplierFilter';
+    const productFilterElement = document.querySelector(productFilterSelector);
+
+    bindDependency({
+        sourceSelector: supplierFilterSelector,
+        onChange: ({ value }) => {
+
+            const isDisabled = !value;
+
+            toggleProductOption({
+                selector: productFilterSelector,
+                data: {
+                    id: null,
+                    text: null
+                }
+            });
+
+            $(productFilterSelector).val(null).trigger('change');
+
+            toggleDisabledElement({
+                element: productFilterElement,
+                isDisabled
+            });
+        }
+    });
+
+    const updateTable = () => {
+
+        if (isClearingFilters) return;
+
+        table.ajax.reload();
+    };
+
     filters = await setupTableFilters({
         filters: [
             {
@@ -25,26 +62,17 @@ export const createMovementDatatable = async () => {
                     endDate: document.querySelector('#endDateInput')?.value || ''
                 }),
                 attachHandler: () => attachDateFilterHandler({
-                    onChange: () => table.ajax.reload()
+                    onChange: updateTable
                 })
             },
             {
                 key: 'movementType',
+                isSelected: false,
                 getSelectApi: getMovementTypeSelectApi,
                 getOptions: getMovementTypeData,
                 initSelect: initMovementTypeFilterSelect,
                 attachHandler: () => attachMovementTypeFilterHandler({
-                    onChange: () => table.ajax.reload()
-                })
-            },
-            {
-                key: 'productId',
-                isSelected: false,
-                getSelectApi: getProductSelectApi,
-                getOptions: getProductOptions,
-                initSelect: initProductFilterSelect,
-                attachHandler: () => attachProductFilterHandler({
-                    onChange: () => table.ajax.reload()
+                    onChange: () => updateTable()
                 })
             },
             {
@@ -54,7 +82,17 @@ export const createMovementDatatable = async () => {
                 getOptions: getSupplierOptions,
                 initSelect: initSupplierFilterSelect,
                 attachHandler: () => attachSupplierFilterHandler({
-                    onChange: () => table.ajax.reload()
+                    onChange: () => updateTable()
+                })
+            },
+            {
+                key: 'productId',
+                isSelected: false,
+                getSelectApi: getProductSelectApi,
+                getOptions: getProductOptions,
+                initSelect: ({ selectedId }) => initProductFilterSelect({ selectedId, supplierFilterSelector }),
+                attachHandler: () => attachProductFilterHandler({
+                    onChange: () => updateTable()
                 })
             }
         ]
@@ -99,9 +137,16 @@ export const createMovementDatatable = async () => {
             buttons: [
                 buildExcelButton({
                     filename: formatFileName('reporte_movimientos'),
-                    request: exportMovementReport
+                    request: () => exportMovementReport(filters.getValues())
                 })
             ]
         }
+    });
+
+    on('click', '#clearFiltersButton', (e) => {
+        
+        clearTableFilters(table);
+
+        e.target.blur();
     });
 }

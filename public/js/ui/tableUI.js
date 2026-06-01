@@ -1,6 +1,8 @@
 import { downloadBlob } from "../utils/downloadBlob.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 
+export let isClearingFilters = false;
+
 export const buildExcelButton = ({
     filename = 'reporte.xlsx',
     request
@@ -24,3 +26,25 @@ export const buildExcelButton = ({
         }
     }
 });
+
+export const clearTableFilters = (table) => {
+
+    isClearingFilters = true;
+
+    const filterElements = document.querySelectorAll(
+        '.table-filters select, .table-filters input'
+    );
+
+    filterElements.forEach(element => {
+        if (element.classList.contains('select2-hidden-accessible')) {
+            $(element).val(null).trigger('change');
+        } else {
+            element.value = '';
+            element.dispatchEvent(new Event('change'));
+        }
+    });
+
+    isClearingFilters = false;
+
+    table.ajax.reload();
+}

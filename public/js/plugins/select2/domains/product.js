@@ -1,17 +1,9 @@
 import { openProductModal } from "../../../modules/products/productModal.js";
-import { hasPermission } from "../../../utils/permissions.js";
 import { getAllProducts, getProductOptions } from "../../../application/warehouse/products.js";
 import { initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 
 const wrapperSelector = '#presentationDisplayInput';
 const productSelector = '#productFilter';
-const canCreateProducts = () => {
-
-    const { hasRole, isAdmin, isWarehouse } = hasPermission(window.meta || {});
-    const isWarehouseProductManager = isWarehouse && (hasRole('Almacenista') || hasRole('Coordinador') || hasRole('Auxiliar'));
-
-    return isAdmin || isWarehouseProductManager;
-};
 
 export const getProductSelectApi = () => ({
     getSelect: () => document.querySelector(productSelector),
@@ -19,22 +11,36 @@ export const getProductSelectApi = () => ({
 });
 
 export const initProductFilterSelect = ({
-    selectedId = null
+    selectedId = null,
+    supplierFilterSelector = null
 }) => {
+
+    const baseSelector = 'body';
 
     initbaseSelect2({
         baseSelector: productSelector,
-        modalSelector: 'body',
+        containerSelector: baseSelector,
         get: async (params) => ({
             data: await getProductOptions(params)
         }),
         clearOnOpen: false,
         placeholder: 'Filtrar por producto',
-        data: (params) => ({
-            search: params.term
-        }),
+        data: (params) => {
+
+            let supplierId;
+
+            if (supplierFilterSelector) supplierId = $(`${ baseSelector } ${ supplierFilterSelector }`).val();
+            else supplierId = ''
+
+            return {
+                search: params.term,
+                supplierId
+            };
+        },
         processResults: (data) => {
+
             const list = data.data || data;
+            
             return {
                 results: list.map(p => ({
                     ...p
@@ -47,9 +53,7 @@ export const initProductFilterSelect = ({
 
     const currentOption = $(`${ productSelector } option[value=\"${ selectedId }\"]`);
 
-    if (currentOption.length) {
-        $(productSelector).val(selectedId).trigger('change');
-    }
+    if (currentOption.length) $(productSelector).val(selectedId).trigger('change');
 };
 
 export const attachProductFilterHandler = ({
@@ -74,7 +78,7 @@ const initProductSelect = ({
 
     initbaseSelect2({
         baseSelector,
-        modalSelector,
+        containerSelector: modalSelector,
         get: getAllProducts,
         placeholder: 'Buscar producto...',
         data: (params) => {
@@ -198,6 +202,7 @@ const attachProductHandler = ({
         });
 
         const value = data.presentationName || '';
+
         setMdbWrapperInputValue({
             selector: `${ modalSelector } ${ wrapperSelector }`,
             value
@@ -220,13 +225,11 @@ export const setupProductSelect = ({
     allowCreate = true
 }) => {
 
-    const canCreate = allowCreate && canCreateProducts();
-
     initProductSelect({
         modalSelector,
         supplierSelector,
         baseSelector: `${ modalSelector } ${ productSelector }`,
-        allowCreate: canCreate
+        allowCreate
     });
 
     attachProductHandler({
