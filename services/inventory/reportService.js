@@ -36,6 +36,8 @@ export const findMovementReportRows = async ({
         previousStock: toNumber(movement.previousStock),
         quantity: toNumber(movement.quantity),
         newStock: toNumber(movement.newStock),
+        productBase: toNumber(movement.productBase),
+        productHeight: toNumber(movement.productHeight),
         previousConvertedQuantity: toNumber(movement.previousConvertedQuantity),
         convertedQuantity: toNumber(movement.convertedQuantity),
         newConvertedQuantity: toNumber(movement.newConvertedQuantity),
