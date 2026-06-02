@@ -40,9 +40,12 @@ export const exportMovementReport = async (req, res) => {
     const data = [
         [
             'Fecha',
+            'Fecha Creación',
             'Tipo',
             'Folio',
             'Material',
+            'Base',
+            'Altura',
             'Proveedor',
             'Stock Anterior',
             'Movimiento',
@@ -54,9 +57,12 @@ export const exportMovementReport = async (req, res) => {
 
         ...rows.map(row => [
             row.date,
+            row.createdAt,
             row.type === 'ENTRY' ? 'Entrada' : row.type === 'ISSUE' ? 'Salida' : row.type === 'ADJUSTMENT' ? 'Ajuste' : row.type,
             row.referenceNumber,
             row.productName,
+            row.productBase,
+            row.productHeight,
             row.supplierName,
             row.previousStock,
             row.quantity,
