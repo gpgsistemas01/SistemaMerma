@@ -31,6 +31,7 @@ const MOVEMENT_DETAIL_SELECT = {
             id: true,
             type: true,
             date: true,
+            createdAt: true,
             referenceNumber: true,
             goodsIssue: {
                 select: REFERENCE_NUMBER_SELECT
@@ -135,6 +136,8 @@ const mapMovementDetail = (detail) => ({
     id: detail.id,
 
     date: formatDateLongWithTime(detail.movement.date),
+
+    createdAt: formatDateLongWithTime(detail.movement.createdAt),
 
     type: detail.movement.type,
 

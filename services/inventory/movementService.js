@@ -187,6 +187,8 @@ export const createStockAdjustmentMovement = async ({
 
     const db = getDb(tx);
 
+    const [adjustmentDetail] = adjustment.details;
+
     return await db.inventoryMovement.create({
         data: {
             type: InventoryMovementType.ADJUSTMENT,
@@ -204,6 +206,8 @@ export const createStockAdjustmentMovement = async ({
                     convertedQuantity: convertedDifference,
                     previousStock,
                     previousConvertedQuantity,
+                    productBase: adjustmentDetail.productBase,
+                    productHeight: adjustmentDetail.productHeight,
                     product: {
                         connect: {
                             id: productId
@@ -216,7 +220,7 @@ export const createStockAdjustmentMovement = async ({
                     },
                     stockAdjustmentDetail: {
                         connect: {
-                            id: adjustment.details[0].id
+                            id: adjustmentDetail.id
                         }
                     }
                 }
