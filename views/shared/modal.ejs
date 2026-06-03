@@ -99,24 +99,59 @@ const buttons = {
                     </div>
                 <% } %>
 
-                <% if (form.stockAdjustment) { %>
-                    <%- include('./selectList', { inputs: form.stockAdjustment.selects }) %>
+                <% if (form.sections) { %>
+                    <% form.sections.forEach(section => { %>
+                        <section class="col-12 <%= section.class || '' %>">
+                            <div class="border-bottom pb-2 mb-3">
+                                <h5 class="mb-1"><%= section.title %></h5>
+                                <% if (section.description) { %>
+                                    <p class="text-muted mb-0"><%= section.description %></p>
+                                <% } %>
+                            </div>
 
-                    <%- include('./outlineInputList', { inputs: form.stockAdjustment.inputs }) %>
-                <% } %>
+                            <div class="row g-3">
+                                <% section.groups.forEach(group => { %>
+                                    <% if (group.type === 'selects') { %>
+                                        <%- include('./selectList', { inputs: group.items }) %>
+                                    <% } %>
 
-                <% if (form.selects) { %>
-                    <%- include('./selectList', { inputs: form.selects }) %>
-                <% } %>
+                                    <% if (group.type === 'inputs') { %>
+                                        <%- include('./outlineInputList', { inputs: group.items }) %>
+                                    <% } %>
 
-                <%- include('./outlineInputList', { inputs: form.inputs }) %>
+                                    <% if (group.type === 'textarea') { %>
+                                        <div class="col-12">
+                                            <%- include('./textarea', { input: group.input }) %>
+                                        </div>
+                                    <% } %>
 
-                <% if (form.textArea) { %>
-                    <%- include('./textArea', { input: form.textArea }) %>
-                <% } %>
+                                    <% if (group.type === 'checkboxes') { %>
+                                        <%- include('./checkboxList', { inputs: group.items }) %>
+                                    <% } %>
+                                <% }); %>
+                            </div>
+                        </section>
+                    <% }); %>
+                <% } else { %>
+                    <% if (form.stockAdjustment) { %>
+                        <%- include('./selectList', { inputs: form.stockAdjustment.selects }) %>
 
-                <% if (form.checkboxes) { %>
-                    <%- include('./checkboxList', { inputs: form.checkboxes }) %>
+                        <%- include('./outlineInputList', { inputs: form.stockAdjustment.inputs }) %>
+                    <% } %>
+
+                    <% if (form.selects) { %>
+                        <%- include('./selectList', { inputs: form.selects }) %>
+                    <% } %>
+
+                    <%- include('./outlineInputList', { inputs: form.inputs }) %>
+
+                    <% if (form.textArea) { %>
+                        <%- include('./textarea', { input: form.textArea }) %>
+                    <% } %>
+
+                    <% if (form.checkboxes) { %>
+                        <%- include('./checkboxList', { inputs: form.checkboxes }) %>
+                    <% } %>
                 <% } %>
 
                 <% if (form.table) { %>

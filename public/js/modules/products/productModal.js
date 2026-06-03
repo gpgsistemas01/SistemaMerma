@@ -6,6 +6,7 @@ const productModalId = '#productModal';
 const formId = '#productForm';
 const productFields = ['name', 'minStock', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
 const stockFields = ['newStock', 'reasonId', 'observations'];
+const stockSectionSelector = '.stock-data-section';
 
 const shouldShowStockFields = ({ mode, includeStockAdjustmentOnCreate, isStockAdjustment }) =>
     isStockAdjustment || (mode === 'create' && includeStockAdjustmentOnCreate);
@@ -24,7 +25,7 @@ const prepareProductModal = ({
     mode,
     data,
     isStockAdjustment,
-    includeStockAdjustmentOnCreate = false
+    includeStockAdjustmentOnCreate = mode === 'create'
 }) => {
 
     const form = document.querySelector(formId);
@@ -41,6 +42,7 @@ const prepareProductModal = ({
     form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
     toggleFormFields({ form, fields: productFields, isVisible: true });
     toggleFormFields({ form, fields: stockFields, isVisible: showStockFields });
+    form.querySelector(stockSectionSelector)?.classList.toggle('d-none', !showStockFields);
     setFormReadOnly({ form, fields: productFields, isReadOnly: isStockAdjustment });
 
     initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment: showStockFields });
@@ -53,7 +55,7 @@ export const openProductModal = ({
     mode = 'create',
     data = null,
     onSave = null,
-    includeStockAdjustmentOnCreate = false
+    includeStockAdjustmentOnCreate = mode === 'create'
 }) => {
 
     const { form, modalElement } = prepareProductModal({

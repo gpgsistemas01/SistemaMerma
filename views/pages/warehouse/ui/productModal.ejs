@@ -2,99 +2,134 @@
     id: 'productForm',
     canApprove: false,
     invoice: false,
-    stockAdjustment: {
-        selects: [
-            {
-                id: 'reasonInput',
-                name: 'reasonId',
-                class: 'reason-select',
-                col: '6'
-            }
-        ],
-        inputs: [
-            {
-                id: 'quantityInput',
-                type: 'number',
-                name: 'newStock',
-                label: 'Nueva cantidad',
-                attrs: {
-                    'min': '0'
+    sections: [
+        {
+            title: 'Datos del producto',
+            class: 'product-data-section',
+            groups: [
+                {
+                    type: 'inputs',
+                    items: [
+                        {
+                            id: 'nameInput',
+                            type: 'text',
+                            name: 'name',
+                            label: 'Nombre',
+                            col: '6'
+                        }
+                    ]
                 },
-                col: '6'
-            },
-        ],
-    },
-    selects: [
-        {
-            id: 'productSupplierInput',
-            name: 'supplierId',
-            class: 'supplier-select',
-            col: '12'
+                {
+                    type: 'selects',
+                    items: [
+                        {
+                            id: 'productSupplierInput',
+                            name: 'supplierId',
+                            class: 'supplier-select',
+                            col: '6'
+                        },
+                        {
+                            id: 'presentationInput',
+                            name: 'presentationId',
+                            class: 'presentation-select',
+                            col: '6'
+                        },
+                        {
+                            id: 'unitMeasureInput',
+                            name: 'unitMeasureId',
+                            class: 'unit-measure-select',
+                            col: '6'
+                        }
+                    ]
+                },
+                {
+                    type: 'inputs',
+                    items: [
+                        {
+                            id: 'minStockInput',
+                            type: 'number',
+                            name: 'minStock',
+                            label: 'Stock Mínimo',
+                            attrs: {
+                                'min': '0'
+                            },
+                            col: '4'
+                        },
+                        {
+                            id: 'baseInput',
+                            type: 'number',
+                            name: 'base',
+                            label: 'Base',
+                            attrs: {
+                                'min': '0'
+                            },
+                            col: '4'
+                        },
+                        {
+                            id: 'heightInput',
+                            type: 'number',
+                            name: 'height',
+                            label: 'Altura',
+                            attrs: {
+                                'min': '0'
+                            },
+                            col: '4'
+                        }
+                    ]
+                },
+                {
+                    type: 'checkboxes',
+                    items: [
+                        {
+                            id: 'isActiveInput',
+                            type: 'checkbox',
+                            name: 'isActive',
+                            label: 'Activo',
+                            isChecked: true
+                        }
+                    ]
+                }
+            ]
         },
         {
-            id: 'presentationInput',
-            name: 'presentationId',
-            class: 'presentation-select',
-            col: '6'
-        },
-        {
-            id: 'unitMeasureInput',
-            name: 'unitMeasureId',
-            class: 'unit-measure-select',
-            col: '6'
-        }
-    ],
-    inputs: [
-        {
-            id: 'nameInput',
-            type: 'text',
-            name: 'name',
-            label: 'Nombre',
-            col: '6'
-        },
-        {
-            id: 'minStockInput',
-            type: 'number',
-            name: 'minStock',
-            label: 'Stock Mínimo',
-            attrs: {
-                'min': '0'
-            },
-            col: '6'
-        },
-        {
-            id: 'baseInput',
-            type: 'number',
-            name: 'base',
-            label: 'Base',
-            attrs: {
-                'min': '0'
-            },
-            col: '6'
-        },
-        {
-            id: 'heightInput',
-            type: 'number',
-            name: 'height',
-            label: 'Altura',
-            attrs: {
-                'min': '0'
-            },
-            col: '6'
-        },
-    ],
-    textArea: {
-        id: 'observationsInput',
-        name: 'observations',
-        label: 'Observaciones',
-    },
-    checkboxes: [
-        {
-            id: 'isActiveInput',
-            type: 'checkbox',
-            name: 'isActive',
-            label: 'Activo',
-            isChecked: true
+            title: 'Datos de stock',
+            class: 'stock-data-section',
+            groups: [
+                {
+                    type: 'inputs',
+                    items: [
+                        {
+                            id: 'quantityInput',
+                            type: 'number',
+                            name: 'newStock',
+                            label: 'Nueva cantidad',
+                            attrs: {
+                                'min': '0'
+                            },
+                            col: '6'
+                        }
+                    ]
+                },
+                {
+                    type: 'selects',
+                    items: [
+                        {
+                            id: 'reasonInput',
+                            name: 'reasonId',
+                            class: 'reason-select',
+                            col: '6'
+                        }
+                    ]
+                },
+                {
+                    type: 'textarea',
+                    input: {
+                        id: 'observationsInput',
+                        name: 'observations',
+                        label: 'Observaciones'
+                    }
+                }
+            ]
         }
     ]
 } %>
