@@ -12,6 +12,9 @@ export const errorMessages = {
     SUPPLIER_ID_INVALID_UUID: 'El proveedor no es válido.',
     PRODUCT_ID_REQUIRED: 'El producto es requerido.',
     PRODUCT_ID_INVALID_UUID: 'El producto no es válido.',
+    SUPPLIER_PRODUCT_ID_REQUIRED: 'El producto es requerido.',
+    SUPPLIER_PRODUCT_ID_INVALID_UUID: 'El producto no es válido.',
+    WASTE_ALREADY_EXISTS: 'La merma ya existe para el producto, base y altura seleccionados.',
     QUANTITY_REQUIRED: 'La cantidad es requerida.',
     QUANTITY_INVALID_NUMBER: 'La cantidad debe ser un número.',
     QUANTITY_TOO_LONG: 'La cantidad es demasiado grande.',
@@ -271,6 +274,7 @@ const successMessages = {
     UPDATED_USER_PASSWORD: '¡Contraseña actualizada exitosamente!',
     UPDATED_CLIENT: '¡Cliente actualizado exitosamente!',
     CREATED_WASTE: '¡Merma registrada exitosamente!',
+    UPDATED_WASTE: '¡Merma actualizada exitosamente!',
 };
 
 export const getErrorMessage = (data = {}) => {

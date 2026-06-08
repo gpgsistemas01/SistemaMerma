@@ -8,7 +8,6 @@ import { getResponsiveRowData } from "./utils/responsive.js";
 const selectorTable = '#table';
 const tableElement = document.querySelector(selectorTable);
 
-
 const renderWasteTableHeader = ({ canSeeCost, canManageWastes }) => {
 
     tableElement.innerHTML = `
@@ -42,8 +41,8 @@ export const createWasteDatatable = (context) => {
     renderWasteTableHeader({ canSeeCost, canManageWastes });
 
     const columns = [
-        { 
-            data: null, 
+        {
+            data: null,
             title: 'Material',
             render: (data, type, row) => renderMaterialName(row)
         },
@@ -51,9 +50,9 @@ export const createWasteDatatable = (context) => {
         { data: 'height', title: 'Altura' },
         { data: 'currentStock', title: 'Existencia' },
         { data: 'minStock', title: 'Stock Mínimo' },
-        { data: 'presentation.name', title: 'Presentación' },
+        { data: 'product.presentation.name', title: 'Presentación' },
         { data: 'convertedQuantity', title: 'Cantidad' },
-        { data: 'unitMeasure.name', title: 'Unidad' }
+        { data: 'product.unitMeasure.name', title: 'Unidad' }
     ];
 
     if (canSeeCost) {

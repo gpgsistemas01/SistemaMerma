@@ -21,3 +21,22 @@ export const mapProductToSelectData = (product = {}) => ({
     supplierName: product.supplier?.tradeName,
     supplierId: product.supplier?.id
 });
+
+
+export const mapSupplierProductToSelectData = (supplierProduct = {}) => {
+
+    const product = supplierProduct.product || supplierProduct;
+
+    return {
+        id: supplierProduct.supplierProductId,
+        text: buildProductSelectText({
+            ...product,
+            base: supplierProduct.productBase ?? product.base ?? supplierProduct.base,
+            height: supplierProduct.productHeight ?? product.height ?? supplierProduct.height,
+            supplier: supplierProduct.supplier || product.supplier,
+            supplierName: supplierProduct.supplierName
+        }),
+        presentationName: product.presentation?.name,
+        unitMeasureName: product.unitMeasure?.name
+    };
+};

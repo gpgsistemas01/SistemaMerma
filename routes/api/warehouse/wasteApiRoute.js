@@ -1,7 +1,7 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { getAllWastes, registerWaste } from '../../../controllers/api/warehouse/wasteController.js';
-import { wasteValidation } from '../../../validators/forms/wasteValidations.js';
+import { editWaste, getAllWastes, registerWaste } from '../../../controllers/api/warehouse/wasteController.js';
+import { wasteUpdateValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
 const router = express.Router();
@@ -30,6 +30,15 @@ router.post(
     validate,
     authorizeUserApi(wasteWritePermissions),
     registerWaste
+);
+
+router.put(
+    '/:id',
+    verifyApiTokenRequired,
+    wasteUpdateValidation,
+    validate,
+    authorizeUserApi(wasteWritePermissions),
+    editWaste
 );
 
 export default router;

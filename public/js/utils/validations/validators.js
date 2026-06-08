@@ -30,12 +30,15 @@ export const productStockValidators = {
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
 }
 
-export const wasteValidators = {
-    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
-    productId: (value) => isEmptyOrNull(value, 'El producto'),
+export const wasteDataValidators = {
+    supplierProductId: (value) => isEmptyOrNull(value, 'El producto'),
     quantity: (value) => validateNumber(value, 'La cantidad de merma'),
     base: (value) => validateNumber(value, 'La base de la merma'),
     height: (value) => validateNumber(value, 'La altura de la merma'),
+}
+
+export const wasteValidators = {
+    ...wasteDataValidators,
     reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
 }
@@ -47,15 +50,13 @@ export const loginValidators = {
 
 export const validateAddGoodsReceiptProductValidators = {
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
-    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
-    productId: (value) => isEmptyOrNull(value, 'El producto'),
+    supplierProductId: (value) => isEmptyOrNull(value, 'El producto'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
     costPerUnitType: (value) => validatePositiveNumber(value, 'El costo por presentación'),
 }
 
 export const validateAddProductValidators = {
-    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
-    productId: (value) => isEmptyOrNull(value, 'El producto'),
+    supplierProductId: (value) => isEmptyOrNull(value, 'El producto'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
 }
 
