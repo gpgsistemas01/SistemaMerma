@@ -1,6 +1,5 @@
 export const createWasteDto = (body = {}) => ({
-    supplierId: body.supplierId,
-    productId: body.productId,
+    supplierProductId: body.supplierProductId,
     quantity: Number(body.quantity),
     base: Number(body.base),
     height: Number(body.height),

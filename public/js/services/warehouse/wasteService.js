@@ -13,3 +13,10 @@ export const registerWasteRequest = ({ data }) => apiRequest({
     url: WASTES_API_ROUTE,
     data
 });
+
+
+export const editWasteRequest = ({ data, id }) => apiRequest({
+    method: 'put',
+    url: `${ WASTES_API_ROUTE }/${ id }`,
+    data
+});

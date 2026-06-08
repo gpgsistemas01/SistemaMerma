@@ -87,10 +87,11 @@ export const findCurrentSupplierProductByProductId = async ({
 
 const mapSupplierProduct = (sp) => {
 
-    const { product, supplier, maxUnitCost, currentStock, convertedQuantity } = sp;
+    const { id, product, supplier, maxUnitCost, currentStock, convertedQuantity } = sp;
 
     return {
         ...product,
+        supplierProductId: id,
         maxUnitCost,
         currentStock,
         convertedQuantity,
@@ -196,6 +197,48 @@ export const findSupplierProductByIds = async ({
             } 
         },
         select: {
+            id: true,
+            currentStock: true,
+            convertedQuantity: true,
+            maxUnitCost: true,
+            product: {
+                select: {
+                    id: true,
+                    name: true,
+                    minStock: true,
+                    isActive: true,
+                    base: true,
+                    height: true,
+                    presentation: true,
+                    unitMeasure: true
+                }
+            },
+            supplier: {
+                select: {
+                    id: true,
+                    tradeName: true
+                }
+            }
+        }
+    });
+
+    if (!supplierProduct) throw new ProductNotFound();
+
+    return mapSupplierProduct(supplierProduct);
+};
+
+
+export const findSupplierProductById = async ({
+    tx,
+    id
+}) => {
+
+    const db = getDb(tx);
+
+    const supplierProduct = await db.supplierProduct.findUnique({
+        where: { id },
+        select: {
+            id: true,
             currentStock: true,
             convertedQuantity: true,
             maxUnitCost: true,

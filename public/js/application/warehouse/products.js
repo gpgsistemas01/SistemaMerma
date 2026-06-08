@@ -1,5 +1,5 @@
 import { getSuccessMessage } from "../../constants/apiMessages.js";
-import { buildProductSelectText } from "../../utils/productSelectUtils.js";
+import { buildProductSelectText, mapSupplierProductToSelectData } from "../../utils/productSelectUtils.js";
 import { editProductRequest, editProductStockRequest, getAllProductsRequest, registerProductRequest } from "../../services/warehouse/productService.js";
 
 export const getProductOptions = async (params = {}) => {
@@ -13,6 +13,18 @@ export const getProductOptions = async (params = {}) => {
             id: p.id,
             text: buildProductSelectText(p)
         }));
+}
+
+
+export const getSupplierProductOptions = async (params = {}) => {
+
+    const response = await getAllProductsRequest({ params });
+
+    const list = response.data?.data || [];
+
+    return list
+        .filter(product => product?.supplierProductId && product?.name)
+        .map(mapSupplierProductToSelectData);
 }
 
 export const getAllProducts = async (params = {}) => {
