@@ -33,7 +33,7 @@ export const registerClient = async (req, res) => {
     const clientDto = createClientDto(req.body);
     const sanitizedClientDto = sanitizeEmptyStrings(clientDto);
 
-    const client = await createClient(sanitizedClientDto);
+    const client = await createClient({ clientDto: sanitizedClientDto });
 
     res.status(200).json({
         client,
