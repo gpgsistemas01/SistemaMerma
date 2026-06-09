@@ -1,4 +1,4 @@
-import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
+import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { editSupplierRequest, getAllSuppliersRequest, registerSupplierRequest } from "../../services/warehouse/supplierService.js";
 
 export const getSupplierOptions = async (params = {}) => {
@@ -25,25 +25,12 @@ export const registerSupplier = async ({ formData }) => {
 
     const response = await registerSupplierRequest({ data: formData });
 
-    const { data } = response;
-    const { code, supplier } = data;
-    let message = getSuccessMessage(code);
-
-    return {
-        data: supplier,
-        message
-    };
+    return createSuccessResponseFromRequest({ response, dataKey: 'supplier' });
 }
 
 export const editSupplier = async ({ formData, id }) => {
 
     const response = await editSupplierRequest({ data: formData, id });
 
-    const { data } = response;
-    const { code } = data;
-    let message = getSuccessMessage(code);
-
-    return {
-        message
-    };
+    return createSuccessResponseFromRequest({ response });
 }

@@ -1,4 +1,4 @@
-import { getSuccessMessage } from "../../constants/apiMessages.js";
+import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { editUserPasswordRequest, editUserRequest, getAllUsersRequest, registerUserRequest } from "../../services/admin/userService.js";
 
 export const getAllUsers = async (params = {}) => {
@@ -12,37 +12,19 @@ export const registerUser = async ({ formData }) => {
 
     const response = await registerUserRequest({ data: formData });
 
-    const { data } = response;
-    const { code, user } = data;
-    const message = getSuccessMessage(code);
-
-    return {
-        message,
-        data: user
-    };
+    return createSuccessResponseFromRequest({ response, dataKey: 'user' });
 };
 
 export const editUser = async ({ formData, id }) => {
 
     const response = await editUserRequest({ data: formData, id });
 
-    const { data } = response;
-    const { code, user } = data;
-    const message = getSuccessMessage(code);
-
-    return {
-        message,
-        data: user
-    };
+    return createSuccessResponseFromRequest({ response, dataKey: 'user' });
 };
 
 export const editUserPassword = async ({ formData, id }) => {
 
     const response = await editUserPasswordRequest({ data: formData, id });
 
-    const { data } = response;
-    const { code } = data;
-    const message = getSuccessMessage(code);
-
-    return { message };
+    return createSuccessResponseFromRequest({ response });
 };
