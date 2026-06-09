@@ -1,4 +1,4 @@
-import { getSuccessMessage } from "../../constants/apiMessages.js";
+import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { editWasteRequest, editWasteStockRequest, getAllWastesRequest, registerWasteRequest } from "../../services/warehouse/wasteService.js";
 
 export const getAllWastes = async (params = {}) => {
@@ -12,13 +12,7 @@ export const registerWaste = async ({ formData }) => {
 
     const response = await registerWasteRequest({ data: formData });
 
-    const { data } = response;
-    const { code, waste } = data;
-
-    return {
-        message: getSuccessMessage(code),
-        data: waste
-    };
+    return createSuccessResponseFromRequest({ response, dataKey: 'waste' });
 };
 
 
@@ -26,13 +20,7 @@ export const editWaste = async ({ formData, id }) => {
 
     const response = await editWasteRequest({ data: formData, id });
 
-    const { data } = response;
-    const { code, waste } = data;
-
-    return {
-        message: getSuccessMessage(code),
-        data: waste
-    };
+    return createSuccessResponseFromRequest({ response, dataKey: 'waste' });
 };
 
 
@@ -40,11 +28,5 @@ export const editWasteStock = async ({ formData, id }) => {
 
     const response = await editWasteStockRequest({ data: formData, id });
 
-    const { data } = response;
-    const { code, waste } = data;
-
-    return {
-        message: getSuccessMessage(code),
-        data: waste
-    };
+    return createSuccessResponseFromRequest({ response, dataKey: 'waste' });
 };

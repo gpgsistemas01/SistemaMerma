@@ -1,4 +1,4 @@
-import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
+import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import {
     cancelPurchaseRequisitionRequest,
     confirmPurchaseRequisitionRequest,
@@ -10,44 +10,26 @@ export const registerPurchaseRequisition = async ({ formData }) => {
 
     const response = await registerPurchaseRequisitionRequest({ data: formData });
 
-    const { data } = response;
-    const { code } = data;
-    const message = getSuccessMessage(code);
-
-    return {
-        message
-    };
+    return createSuccessResponseFromRequest({ response });
 };
 
 export const editPurchaseRequisition = async ({ formData, id }) => {
 
     const response = await editPurchaseRequisitionRequest({ data: formData, id });
 
-    const { data } = response;
-    const { code } = data;
-    const message = getSuccessMessage(code);
-
-    return {
-        message
-    };
+    return createSuccessResponseFromRequest({ response });
 };
 
 export const confirmPurchaseRequisition = async (id) => {
 
     const response = await confirmPurchaseRequisitionRequest({ id });
-    const { code } = response.data;
 
-    return {
-        message: getSuccessMessage(code)
-    };
+    return createSuccessResponseFromRequest({ response });
 };
 
 export const cancelPurchaseRequisition = async (id) => {
 
     const response = await cancelPurchaseRequisitionRequest({ id });
-    const { code } = response.data;
 
-    return {
-        message: getSuccessMessage(code)
-    };
+    return createSuccessResponseFromRequest({ response });
 };

@@ -1,4 +1,4 @@
-import { getSuccessMessage } from "../../constants/apiMessages.js";
+import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { buildProductSelectText, mapSupplierProductToSelectData } from "../../utils/productSelectUtils.js";
 import { editProductRequest, editProductStockRequest, getAllProductsRequest, registerProductRequest } from "../../services/warehouse/productService.js";
 
@@ -65,41 +65,27 @@ export const registerProduct = async ({
     };
 
     const response = await registerProductRequest({ data: payload });
-
-    const { data } = response;
-    const { code, product } = data;
-    let message = withInitialStockAdjustment
+    const message = withInitialStockAdjustment
         ? '¡Producto creado y stock registrado exitosamente!'
-        : getSuccessMessage(code);
+        : null;
 
-    return {
-        message,
-        data: product
-    };
+    return createSuccessResponseFromRequest({
+        response,
+        dataKey: 'product',
+        message
+    });
 }
 
 export const editProduct = async ({ formData, id }) => {
 
     const response = await editProductRequest({ data: formData, id });
 
-    const { data } = response;
-    const { code } = data;
-    let message = getSuccessMessage(code);
-
-    return {
-        message
-    };
+    return createSuccessResponseFromRequest({ response });
 }
 
 export const editProductStock = async ({ formData, id }) => {
 
     const response = await editProductStockRequest({ data: formData, id });
 
-    const { data } = response;
-    const { code } = data;
-    let message = getSuccessMessage(code);
-
-    return {
-        message
-    };
+    return createSuccessResponseFromRequest({ response });
 }

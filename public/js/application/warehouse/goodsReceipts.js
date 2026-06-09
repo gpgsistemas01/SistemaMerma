@@ -1,4 +1,4 @@
-import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
+import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { getAllGoodsReceiptsRequest, registerGoodsReceiptRequest } from "../../services/warehouse/goodsReceiptService.js";
 
 export const getAllGoodsReceipts = async (params = {}) => {
@@ -12,11 +12,5 @@ export const registerGoodsReceipt = async ({ formData }) => {
 
     const response = await registerGoodsReceiptRequest({ data: formData });
 
-    const { data } = response;
-    const { code } = data;
-    let message = getSuccessMessage(code);
-
-    return {
-        message
-    };
+    return createSuccessResponseFromRequest({ response });
 }
