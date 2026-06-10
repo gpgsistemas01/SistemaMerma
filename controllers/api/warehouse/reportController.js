@@ -116,8 +116,8 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
             'Presentación',
             'Cantidad convertida',
             'Unidad de conversión',
-            'Cantidad surtida',
-            'Unidad surtida',
+            'Cantidad de proyecto',
+            'Diferencia',
             'Estado del detalle'
         ],
 
@@ -137,8 +137,8 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
             row.presentationName,
             row.convertedQuantity,
             row.convertedUnitMeasureName,
-            row.suppliedQuantity,
-            row.suppliedUnitMeasureName,
+            row.projectConvertedQuantity,
+            row.convertedQuantityDifference,
             row.detailFulfillmentStatusName
         ])
     ];
