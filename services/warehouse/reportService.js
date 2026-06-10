@@ -36,8 +36,8 @@ const mapGoodsIssueDetailRows = (goodsIssues = []) => goodsIssues.flatMap((goods
         presentationName: detail.presentationName,
         convertedQuantity: toNumber(detail.convertedQuantity),
         convertedUnitMeasureName: detail.unitMeasureSymbol || detail.unitMeasureName,
-        suppliedQuantity: toNumber(detail.suppliedQuantity),
-        suppliedUnitMeasureName: detail.unitMeasureSymbol || detail.unitMeasureName,
+        projectConvertedQuantity: toNumber(detail.projectConvertedQuantity),
+        convertedQuantityDifference: toNumber(detail.convertedQuantityDifference),
         detailFulfillmentStatusName: detail.fulfillmentStatus?.name
     }));
 });
