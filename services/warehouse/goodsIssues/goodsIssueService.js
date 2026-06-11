@@ -16,14 +16,16 @@ import { generateYearlyReferenceNumber } from "../../document/referenceNumberSer
 import { findClientById } from "../../sales/clientService.js";
 import { buildGoodsIssueDetails, isValidInternalClientAdvisor, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
-import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
+import { buildStockKey, normalizeDecimal, parseStockKey } from "../../../utils/formattersUtils.js";
 import { findSupplierProductsForStockMovement } from "../products/supplierProductService.js";
 import { AppError } from "../../../errors/AppError.js";
+import { GoodsIssueInexistentStock } from "../../../errors/inventory/stockError.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
 const DEPARTMENT_WAREHOUSE = 'ALMACÉN Y PROVEDURÍA';
 const FULFILLMENT_PENDING = 'Pendiente';
+const FULFILLMENT_PARTIAL = 'Surtido parcial';
 const STATUS_APPROVED = 'Aprobada';
 const REFERENCE_NUMBER_TYPE = 'SAL';
 const MOVEMENT_TYPE_OUT = 'ISSUE';
@@ -123,8 +125,7 @@ export const findAllGoodsIssues = async ({
                     supplierId: true,
                     supplierName: true
                 }
-            },
-            movements: true
+            }
         }
     });
 
@@ -411,96 +412,145 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
         if (!goodsIssue) throw new GoodsIssueNotFound();
 
-        if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_PENDING) {
+        if (![FULFILLMENT_PENDING, FULFILLMENT_PARTIAL].includes(goodsIssue.fulfillmentStatus?.name)) {
             throw new GoodsIssueNotPendingConflict();
         }
-        const detailIds = details.map(d => d.id).filter(Boolean);
-        const currentDetails = goodsIssue.details.filter(d => detailIds.includes(d.id));
-        const currentById = new Map(currentDetails.map(d => [d.id, d]));
+        const currentById = new Map(goodsIssue.details.map(d => [d.id, d]));
+        const updates = [];
+        const supplyRequests = [];
+        const stockKeys = new Set();
+
+        for (const detail of details) {
+
+            const current = currentById.get(detail.id);
+            if (!current) continue;
+
+            const currentQuantity = normalizeDecimal(current.quantity ?? 0);
+            const currentSupplied = normalizeDecimal(current.suppliedQuantity ?? 0);
+            const pending = normalizeDecimal(currentQuantity - currentSupplied);
+            const projectConvertedQuantity = detail.projectConvertedQuantity;
+            const convertedQuantityDifference = normalizeDecimal(
+                normalizeDecimal(current.convertedQuantity ?? 0) - normalizeDecimal(projectConvertedQuantity ?? 0)
+            );
+
+            const baseUpdate = {
+                projectConvertedQuantity,
+                convertedQuantityDifference
+            };
+
+            if (!detail.isSupplied || pending <= FLOAT_EPSILON) {
+                updates.push({
+                    id: current.id,
+                    data: baseUpdate
+                });
+                continue;
+            }
+
+            const stockKey = buildStockKey(current.productId, current.supplierId);
+
+            stockKeys.add(stockKey);
+            supplyRequests.push({
+                current,
+                currentQuantity,
+                pending,
+                baseUpdate,
+                stockKey
+            });
+        }
+
+        const stockFilters = Array.from(stockKeys).map(parseStockKey);
 
         return await getDb().$transaction(async (tx) => {
 
-            const movementDetails = [];
-            const updates = [];
-
-            for (const detail of details) {
-
-                const current = currentById.get(detail.id);
-                if (!current) continue;
-
-                const pending = current.quantity - (current.suppliedQuantity ?? 0);
-                const convertedQuantityDifference = current.convertedQuantity - detail.projectConvertedQuantity;
-
-                if (!detail.isSupplied) {
-                    updates.push({
-                        id: current.id,
-                        data: {
-                            projectConvertedQuantity: detail.projectConvertedQuantity,
-                            convertedQuantityDifference
-                        }
-                    });
-                    continue;
-                }
-
-                const quantityToSupply = pending;
-
-                if (quantityToSupply <= FLOAT_EPSILON) continue;
-
-                movementDetails.push({
-                    productId: current.productId,
-                    supplierId: current.supplierId,
-                    goodsIssueDetailId: current.id,
-                    quantity: quantityToSupply
-                });
-
-                const newSupplied = (current.suppliedQuantity ?? 0) + quantityToSupply;
-
-                updates.push({
-                    id: current.id,
-                    data: {
-                        suppliedQuantity: newSupplied,
-                        isSupplied: newSupplied >= current.quantity,
-                        projectConvertedQuantity: detail.projectConvertedQuantity,
-                        convertedQuantityDifference
-                    }
-                });
-            }
-
-            for (const u of updates) {
-                await tx.goodsIssueDetail.update({
-                    where: { id: u.id },
-                    data: u.data
-                });
-            }
-
-            if (movementDetails.length) {
-
-                const grouped = new Map();
-
-                for (const d of movementDetails) {
-                    const key = buildStockKey(d.productId, d.supplierId);
-                    grouped.set(
-                        key,
-                        Number((grouped.get(key) || 0)) + Number(d.quantity)
-                    );
-                }
-
-                const filters = Array.from(grouped.keys()).map(parseStockKey);
+            if (supplyRequests.length) {
 
                 const supplierProducts = await findSupplierProductsForStockMovement({
                     tx,
-                    where: { OR: filters }
+                    where: { OR: stockFilters }
                 });
 
-                await applyInventoryMovement({
-                    tx,
-                    reference: { goodsIssueId: goodsIssue.id },
-                    details: movementDetails,
-                    movementType: MOVEMENT_TYPE_OUT,
-                    grouped,
-                    supplierProducts
-                });
+                const stockByKey = new Map(
+                    supplierProducts.map(sp => [
+                        buildStockKey(sp.productId, sp.supplierId),
+                        {
+                            supplierProduct: sp,
+                            availableStock: normalizeDecimal(Math.max(0, sp.currentStock ?? 0))
+                        }
+                    ])
+                );
+
+                const grouped = new Map();
+                const movementDetails = [];
+
+                for (const { current, currentQuantity, pending, baseUpdate, stockKey } of supplyRequests) {
+
+                    const stock = stockByKey.get(stockKey);
+
+                    if (!stock?.supplierProduct) {
+                        throw new GoodsIssueInexistentStock({
+                            productName: 'Producto desconocido',
+                            height: null,
+                            base: null,
+                            supplierName: 'Proveedor desconocido'
+                        });
+                    }
+
+                    const quantityToSupply = normalizeDecimal(Math.min(pending, stock.availableStock));
+
+                    if (quantityToSupply <= FLOAT_EPSILON) {
+                        updates.push({
+                            id: current.id,
+                            data: baseUpdate
+                        });
+                        continue;
+                    }
+
+                    stock.availableStock = normalizeDecimal(stock.availableStock - quantityToSupply);
+
+                    movementDetails.push({
+                        productId: current.productId,
+                        supplierId: current.supplierId,
+                        goodsIssueDetailId: current.id,
+                        quantity: quantityToSupply
+                    });
+
+                    grouped.set(
+                        stockKey,
+                        normalizeDecimal(normalizeDecimal(grouped.get(stockKey) || 0) + quantityToSupply)
+                    );
+
+                    const newSupplied = normalizeDecimal(
+                        normalizeDecimal(current.suppliedQuantity ?? 0) + quantityToSupply
+                    );
+
+                    updates.push({
+                        id: current.id,
+                        data: {
+                            ...baseUpdate,
+                            suppliedQuantity: newSupplied,
+                            isSupplied: newSupplied >= normalizeDecimal(currentQuantity - FLOAT_EPSILON)
+                        }
+                    });
+                }
+
+                if (movementDetails.length) {
+                    await applyInventoryMovement({
+                        tx,
+                        reference: { goodsIssueId: goodsIssue.id },
+                        details: movementDetails,
+                        movementType: MOVEMENT_TYPE_OUT,
+                        grouped,
+                        supplierProducts
+                    });
+                }
             }
+
+            await Promise.all(updates.map(u => (
+                tx.goodsIssueDetail.update({
+                    where: { id: u.id },
+                    data: u.data
+                })
+            )));
 
             const refreshed = await tx.goodsIssueDetail.findMany({
                 where: { goodsIssueId: id },

@@ -76,12 +76,13 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
 
     const actions = [];
     const canEditGoodsIssue = context === 'goodsIssue' && fulfillmentStatus === 'Pendiente';
+    const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
 
     if ((status === 'Abierta' || canEditGoodsIssue) || context === 'profile' || context === 'client' || context === 'supplier') actions.push('<button class="btn-edit"><i class="fa-solid fa-pencil"></i></button>');
 
     if ((context === 'product' || context === 'waste') && canAdjustStock) actions.push('<button class="btn-adjust-stock"><i class="fa-solid fa-boxes-stacked"></i></button>');
 
-    if (status === 'Aprobada' && context === 'goodsIssue' && canEditGoodsIssue) actions.push('<button class="btn-edit-detail"><i class="fa fa-edit"></i></button>');
+    if (status === 'Aprobada' && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push('<button class="btn-edit-detail"><i class="fa fa-edit"></i></button>');
 
     if (context !== 'product' && context !== 'waste' && context !== 'profile' && context !== 'client' && context !== 'supplier') actions.push('<button class="btn-view"><i class="fa fa-eye"></i></button>');
 
