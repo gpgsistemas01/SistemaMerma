@@ -113,6 +113,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             projectConvertedQuantity: detail.projectConvertedQuantity,
             convertedQuantityDifference: detail.convertedQuantityDifference,
             supplierName: detail.supplierName,
+            suppliedQuantity: detail.suppliedQuantity,
             isSupplied: detail.isSupplied,
         })));
 

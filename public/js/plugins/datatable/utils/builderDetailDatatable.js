@@ -8,6 +8,10 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
 
     let extraHeaders = '';
 
+    if (type === 'issue' && (mode === 'edit-detail' || mode === 'view')) {
+        extraHeaders += `<th rowspan="2">Surtido</th>`;
+    }
+
     if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {
         extraHeaders += `
             <th rowspan="2">Costo unitario de Conversión</th>
@@ -63,6 +67,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         { data: 'productBase' },
         { data: 'productHeight' },
         { data: 'quantity' },
+        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity' }] : []),
         { data: 'presentationName' },
         { data: 'convertedQuantity' },
         { data: 'unitMeasureName' },
