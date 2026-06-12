@@ -39,6 +39,12 @@ export const findAllGoodsReceipts = async ({
                         contains: search,
                         mode: 'insensitive'
                     }
+                },
+                {
+                    invoice: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
                 }
             ]
         })
