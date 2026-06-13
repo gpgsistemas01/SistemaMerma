@@ -33,22 +33,18 @@ export const attachDateFilterHandler = ({
     });
 };
 
-export const createTableFilterChangeHandler = ({
-    getTable
-}) => () => {
+const getDataTable = (selector = '#table') => {
 
-    if (isClearingFilters) return;
+    if (!$.fn.DataTable.isDataTable(selector)) return null;
 
-    getTable()?.ajax.reload();
+    return $(selector).DataTable();
 };
 
-export const attachClearFiltersHandler = ({
-    getTable
-}) => {
+const attachClearFiltersHandler = (selector = '#table') => {
 
     on('click', '#clearFiltersButton', (e) => {
 
-        clearTableFilters(getTable());
+        clearTableFilters(getDataTable(selector));
 
         e.target.blur();
     });
@@ -73,7 +69,7 @@ const bindSupplierProductFilterDependency = () => {
     });
 };
 
-export const buildDateFilterConfig = ({
+const buildDateFilterConfig = ({
     onChange
 }) => ({
     customGetValues: () => ({
@@ -85,7 +81,7 @@ export const buildDateFilterConfig = ({
     })
 });
 
-export const buildSupplierFilterConfig = ({
+const buildSupplierFilterConfig = ({
     onChange
 }) => ({
     key: 'supplierId',
@@ -98,7 +94,7 @@ export const buildSupplierFilterConfig = ({
     })
 });
 
-export const buildProductFilterConfig = ({
+const buildProductFilterConfig = ({
     onChange
 }) => ({
     key: 'productId',
@@ -111,7 +107,7 @@ export const buildProductFilterConfig = ({
     })
 });
 
-export const buildFulfillmentStatusFilterConfig = ({
+const buildFulfillmentStatusFilterConfig = ({
     onChange
 }) => ({
     key: 'fulfillmentStatusId',
@@ -123,49 +119,52 @@ export const buildFulfillmentStatusFilterConfig = ({
     })
 });
 
-const setupSupplierProductDateTableFilters = async ({
-    onChange,
-    filters = []
-} = {}) => {
-
-    bindSupplierProductFilterDependency();
-
-    return setupTableFilters({
-        filters: [
-            buildDateFilterConfig({ onChange }),
-            ...filters,
-            buildSupplierFilterConfig({ onChange }),
-            buildProductFilterConfig({ onChange })
-        ]
-    });
+const tableFilterConfigBuilders = {
+    date: buildDateFilterConfig,
+    supplier: buildSupplierFilterConfig,
+    product: buildProductFilterConfig,
+    fulfillmentStatus: buildFulfillmentStatusFilterConfig
 };
 
-export const setupGoodsReceiptTableFilters = async ({
+const resolveTableFilterConfig = ({
+    field,
     onChange
-} = {}) => setupSupplierProductDateTableFilters({
-    onChange
-});
+}) => {
 
-export const setupGoodsIssueTableFilters = async ({
-    onChange
-} = {}) => setupSupplierProductDateTableFilters({
-    onChange,
-    filters: [
-        buildFulfillmentStatusFilterConfig({ onChange })
-    ]
-});
+    if (typeof field !== 'string') return field;
 
-export const setupMovementStyleTableFilters = async ({
-    onChange,
-    filters = []
-} = {}) => setupSupplierProductDateTableFilters({
-    onChange,
-    filters
-});
+    return tableFilterConfigBuilders[field]?.({ onChange });
+};
+
+const buildTableFilterConfigs = ({
+    fields,
+    onChange
+}) => fields
+    .map((field) => resolveTableFilterConfig({ field, onChange }))
+    .filter(Boolean);
 
 export const setupTableFilters = async ({
-    filters = []
+    fields = [],
+    selector = '#table'
 } = {}) => {
+
+    const onChange = () => {
+
+        if (isClearingFilters) return;
+
+        getDataTable(selector)?.ajax.reload();
+    };
+
+    attachClearFiltersHandler(selector);
+
+    if (fields.includes('supplier') && fields.includes('product')) {
+        bindSupplierProductFilterDependency();
+    }
+
+    const filters = buildTableFilterConfigs({
+        fields,
+        onChange
+    });
 
     const values = {};
 
@@ -184,7 +183,7 @@ export const setupTableFilters = async ({
 
             values[key || crypto.randomUUID()] = filter.customGetValues;
 
-            if (attachHandler) attachHandler();
+            if (attachHandler) attachHandler({ onChange });
 
             continue;
         }
@@ -214,7 +213,7 @@ export const setupTableFilters = async ({
             selectedId: isSelected ? options[0]?.value : null
         });
 
-        if (attachHandler) attachHandler();
+        if (attachHandler) attachHandler({ onChange });
 
         values[key] = () => ({
             [key]: getValue?.() || ''

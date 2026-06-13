@@ -8,7 +8,7 @@ import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
-import { attachClearFiltersHandler, createTableFilterChangeHandler, setupGoodsReceiptTableFilters } from "./utils/tableFilter.js";
+import { setupTableFilters } from "./utils/tableFilter.js";
 
 export let details = [];
 let filters = {
@@ -44,12 +44,8 @@ export const createGoodsReceiptDatatable = async () => {
 
     let table;
 
-    const updateTable = createTableFilterChangeHandler({
-        getTable: () => table
-    });
-
-    filters = await setupGoodsReceiptTableFilters({
-        onChange: updateTable
+    filters = await setupTableFilters({
+        fields: ['date', 'supplier', 'product']
     });
 
     table = createDataTable({
@@ -97,10 +93,6 @@ export const createGoodsReceiptDatatable = async () => {
                 })
             ]
         }
-    });
-
-    attachClearFiltersHandler({
-        getTable: () => table
     });
 
     $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
