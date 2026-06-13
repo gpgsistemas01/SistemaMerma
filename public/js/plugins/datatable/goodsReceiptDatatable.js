@@ -8,8 +8,12 @@ import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
+import { attachClearFiltersHandler, createTableFilterChangeHandler, setupGoodsReceiptTableFilters } from "./utils/tableFilter.js";
 
 export let details = [];
+let filters = {
+    getValues: () => ({})
+};
 const selectorProductTable = '#productTable';
 const selectorTable = '#table';
 const table = document.querySelector(selectorProductTable);
@@ -36,17 +40,30 @@ table.innerHTML = `
     </thead>
 `;
 
-export const createGoodsReceiptDatatable = () => {
-    
-    const table = createDataTable({
+export const createGoodsReceiptDatatable = async () => {
+
+    let table;
+
+    const updateTable = createTableFilterChangeHandler({
+        getTable: () => table
+    });
+
+    filters = await setupGoodsReceiptTableFilters({
+        onChange: updateTable
+    });
+
+    table = createDataTable({
         options: {
             ajax: {
-                get: getAllGoodsReceipts
+                get: (params) => getAllGoodsReceipts({
+                    ...params,
+                    ...filters.getValues()
+                })
             },
             order: [[0, 'desc']],
             columns: [
                 { data: 'referenceNumber', title: 'Folio' },
-                { 
+                {
                     data: null,
                     title: 'Recepción',
                     render: (data, type, row) => {
@@ -76,10 +93,14 @@ export const createGoodsReceiptDatatable = () => {
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_compras'),
-                    request: () => exportGoodsReceiptReport(buildTableExportParams(table))
+                    request: () => exportGoodsReceiptReport(buildTableExportParams(table, filters.getValues()))
                 })
             ]
         }
+    });
+
+    attachClearFiltersHandler({
+        getTable: () => table
     });
 
     $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
@@ -112,7 +133,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
             const modal = document.querySelector('#goodsReceiptModal');
             const select = modal?.querySelector('.supplier-select');
             const supplier = select?.options[select.selectedIndex]?.text || '';
-            
+
             return renderMaterialName(row, supplier);
         }
     });
@@ -126,7 +147,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
 $(selectorProductTable).on('click', '.delete-btn', function () {
 
     const id = $(this).data('id');
-    
+
     handleDelete({
         id,
         details,

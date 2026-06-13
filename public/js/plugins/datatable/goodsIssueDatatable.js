@@ -8,9 +8,7 @@ import { createDataTable, refreshProductTable, renderActionButtons } from "./bas
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
 import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
-import { setupTableFilters } from "./utils/tableFilter.js";
-import { attachFulfillmentStatusFilterHandler, getFulfillmentStatusSelectApi, initFulfillmentStatusFilterSelect } from "../select2/domains/fulfillmentStatus.js";
-import { getFulfillmentStatusOptions } from "../../application/warehouse/fulfillmentStatuses.js";
+import { attachClearFiltersHandler, createTableFilterChangeHandler, setupGoodsIssueTableFilters } from "./utils/tableFilter.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -22,6 +20,12 @@ let filters = {
 let productTable;
 
 export const createGoodsIssueDatatable = async (context) => {
+
+    let table;
+
+    const updateTable = createTableFilterChangeHandler({
+        getTable: () => table
+    });
 
     const { isWarehouse, isSystem } = hasPermission(context);
 
@@ -62,21 +66,11 @@ export const createGoodsIssueDatatable = async (context) => {
         }
     );
 
-    filters = await setupTableFilters({
-        filters: [
-            {
-                key: 'fulfillmentStatusId',
-                getSelectApi: getFulfillmentStatusSelectApi,
-                getOptions: getFulfillmentStatusOptions,
-                initSelect: initFulfillmentStatusFilterSelect,
-                attachHandler: () => attachFulfillmentStatusFilterHandler({
-                    onChange: () => table.ajax.reload()
-                })
-            }
-        ]
+    filters = await setupGoodsIssueTableFilters({
+        onChange: updateTable
     });
 
-    const table = createDataTable({
+    table = createDataTable({
         options: {
             ajax: {
                 get: (params) => getAllGoodsIssues({
@@ -97,6 +91,10 @@ export const createGoodsIssueDatatable = async (context) => {
                 })
             ]
         }
+    });
+
+    attachClearFiltersHandler({
+        getTable: () => table
     });
 
     $(`${ tableSelector } tbody`).on('click', '.btn-edit', function () {

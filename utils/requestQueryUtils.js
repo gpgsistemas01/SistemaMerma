@@ -60,3 +60,30 @@ export const getDataTableOrder = ({
         orderDir
     };
 };
+
+
+export const buildDateRangeFilter = ({
+    field,
+    startDate = '',
+    endDate = ''
+} = {}) => {
+
+    if (!field || (!startDate && !endDate)) return {};
+
+    return {
+        [field]: {
+            ...(startDate && {
+                gte: new Date(startDate)
+            }),
+            ...(endDate && (() => {
+
+                const nextDay = new Date(endDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+
+                return {
+                    lt: nextDay
+                };
+            })())
+        }
+    };
+};

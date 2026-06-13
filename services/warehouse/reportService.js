@@ -16,9 +16,12 @@ const mapProductRows = (products = []) => products.map((item) => ({
     maxUnitCost: toNumber(item.maxUnitCost)
 }));
 
-const mapGoodsIssueDetailRows = (goodsIssues = []) => goodsIssues.flatMap((goodsIssue) => {
+const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', productId = '' } = {}) => goodsIssues.flatMap((goodsIssue) => {
 
-    const details = goodsIssue.details || [];
+    const details = (goodsIssue.details || []).filter((detail) => (
+        (!supplierId || detail.supplierId === supplierId) &&
+        (!productId || detail.productId === productId)
+    ));
 
     return details.map((detail) => ({
         referenceNumber: goodsIssue.referenceNumber,
@@ -42,9 +45,11 @@ const mapGoodsIssueDetailRows = (goodsIssues = []) => goodsIssues.flatMap((goods
     }));
 });
 
-const mapGoodsReceiptDetailRows = (goodsReceipts = []) => goodsReceipts.flatMap((goodsReceipt) => {
+const mapGoodsReceiptDetailRows = (goodsReceipts = [], { productId = '' } = {}) => goodsReceipts.flatMap((goodsReceipt) => {
 
-    const details = goodsReceipt.details || [];
+    const details = (goodsReceipt.details || []).filter((detail) => (
+        !productId || detail.productId === productId
+    ));
 
     return details.map((detail) => ({
         referenceNumber: goodsReceipt.referenceNumber,
@@ -86,6 +91,10 @@ export const findWarehouseReportRows = async ({
 
 export const findGoodsIssueReportRows = async ({
     search = '',
+    startDate = '',
+    endDate = '',
+    supplierId = '',
+    productId = '',
     fulfillmentStatusId = '',
     accesses = [],
     orderBy = 'referenceNumber',
@@ -96,17 +105,25 @@ export const findGoodsIssueReportRows = async ({
         skip: 0,
         take: 100000,
         search,
+        startDate,
+        endDate,
+        supplierId,
+        productId,
         fulfillmentStatusId,
         orderBy,
         orderDir,
         accesses
     });
 
-    return mapGoodsIssueDetailRows(goodsIssuesResult.data);
+    return mapGoodsIssueDetailRows(goodsIssuesResult.data, { supplierId, productId });
 };
 
 export const findGoodsReceiptReportRows = async ({
     search = '',
+    startDate = '',
+    endDate = '',
+    supplierId = '',
+    productId = '',
     orderBy = 'referenceNumber',
     orderDir = 'desc'
 } = {}) => {
@@ -115,9 +132,13 @@ export const findGoodsReceiptReportRows = async ({
         skip: 0,
         take: 100000,
         search,
+        startDate,
+        endDate,
+        supplierId,
+        productId,
         orderBy,
         orderDir
     });
 
-    return mapGoodsReceiptDetailRows(goodsReceiptsResult.data);
+    return mapGoodsReceiptDetailRows(goodsReceiptsResult.data, { productId });
 };

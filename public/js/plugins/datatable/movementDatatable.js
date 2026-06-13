@@ -1,16 +1,10 @@
 import { getAllMovements } from "../../application/admin/movements.js";
 import { exportMovementReport } from "../../application/admin/report.js";
-import { getProductOptions } from "../../application/warehouse/products.js";
-import { getSupplierOptions } from "../../application/warehouse/suppliers.js";
-import { buildExcelButton, buildTableExportParams, clearTableFilters, isClearingFilters } from "../../ui/tableUI.js";
-import { on } from "../../utils/domUtils.js";
+import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
-import { bindDisabledSelectDependency } from "../select2/baseSelect.js";
 import { getMovementTypeSelectApi, getMovementTypeData, attachMovementTypeFilterHandler, initMovementTypeFilterSelect } from "../select2/domains/movementType.js";
-import { attachProductFilterHandler, getProductSelectApi, initProductFilterSelect, toggleProductOption } from "../select2/domains/product.js";
-import { attachSupplierFilterHandler, getSupplierSelectApi, initSupplierFilterSelect } from "../select2/domains/supplier.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
-import { attachDateFilterHandler, setupTableFilters } from "./utils/tableFilter.js";
+import { attachClearFiltersHandler, createTableFilterChangeHandler, setupMovementStyleTableFilters } from "./utils/tableFilter.js";
 
 const selector = '#table';
 let filters = {
@@ -19,42 +13,15 @@ let filters = {
 
 export const createMovementDatatable = async () => {
 
-    const productFilterSelector = '#productFilter';
-    const supplierFilterSelector = '#supplierFilter';
-    bindDisabledSelectDependency({
-        sourceSelector: supplierFilterSelector,
-        targetSelector: productFilterSelector,
-        clearTarget: () => {
-            toggleProductOption({
-                selector: productFilterSelector,
-                data: {
-                    id: null,
-                    text: null
-                }
-            });
+    let table;
 
-            $(productFilterSelector).val(null).trigger('change');
-        }
+    const updateTable = createTableFilterChangeHandler({
+        getTable: () => table
     });
 
-    const updateTable = () => {
-
-        if (isClearingFilters) return;
-
-        table.ajax.reload();
-    };
-
-    filters = await setupTableFilters({
+    filters = await setupMovementStyleTableFilters({
+        onChange: updateTable,
         filters: [
-            {
-                customGetValues: () => ({
-                    startDate: document.querySelector('#startDateInput')?.value || '',
-                    endDate: document.querySelector('#endDateInput')?.value || ''
-                }),
-                attachHandler: () => attachDateFilterHandler({
-                    onChange: updateTable
-                })
-            },
             {
                 key: 'movementType',
                 isSelected: false,
@@ -62,33 +29,13 @@ export const createMovementDatatable = async () => {
                 getOptions: getMovementTypeData,
                 initSelect: initMovementTypeFilterSelect,
                 attachHandler: () => attachMovementTypeFilterHandler({
-                    onChange: () => updateTable()
-                })
-            },
-            {
-                key: 'supplierId',
-                isSelected: false,
-                getSelectApi: getSupplierSelectApi,
-                getOptions: getSupplierOptions,
-                initSelect: initSupplierFilterSelect,
-                attachHandler: () => attachSupplierFilterHandler({
-                    onChange: () => updateTable()
-                })
-            },
-            {
-                key: 'productId',
-                isSelected: false,
-                getSelectApi: getProductSelectApi,
-                getOptions: getProductOptions,
-                initSelect: ({ selectedId }) => initProductFilterSelect({ selectedId, supplierFilterSelector }),
-                attachHandler: () => attachProductFilterHandler({
-                    onChange: () => updateTable()
+                    onChange: updateTable
                 })
             }
         ]
     });
 
-    const table = createDataTable({
+    table = createDataTable({
         options: {
             ajax: {
                 get: (params) => getAllMovements({
@@ -99,15 +46,15 @@ export const createMovementDatatable = async () => {
             order: [[2, 'desc']],
             columns: [
                 { data: 'date', title: 'Fecha' },
-                { 
-                    data: 'type', 
-                    title: 'Tipo', 
+                {
+                    data: 'type',
+                    title: 'Tipo',
                     render: (data) => {
 
                         if (data === 'ENTRY') return 'Entrada';
 
                         if (data === 'ADJUSTMENT') return 'Ajuste';
-                        
+
                         if (data === 'ISSUE') return 'Salida';
 
                         return data;
@@ -131,10 +78,7 @@ export const createMovementDatatable = async () => {
         }
     });
 
-    on('click', '#clearFiltersButton', (e) => {
-        
-        clearTableFilters(table);
-
-        e.target.blur();
+    attachClearFiltersHandler({
+        getTable: () => table
     });
 }

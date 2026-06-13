@@ -12,6 +12,7 @@ import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
 import { findSupplierProductsForStockMovement, updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 import { AppError } from "../../../errors/AppError.js";
+import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
 const MOVEMENT_TYPE_IN = 'ENTRY';
@@ -21,11 +22,24 @@ export const findAllGoodsReceipts = async ({
     skip = 0,
     take = 10,
     search = '',
+    startDate = '',
+    endDate = '',
+    supplierId = '',
+    productId = '',
     orderBy = 'referenceNumber',
     orderDir = 'desc'
 }) => {
 
     const where = {
+        ...(supplierId && { supplierId }),
+        ...(productId && {
+            details: {
+                some: {
+                    productId
+                }
+            }
+        }),
+        ...buildDateRangeFilter({ field: 'receptionDate', startDate, endDate }),
         ...(search && {
             OR: [
                 {

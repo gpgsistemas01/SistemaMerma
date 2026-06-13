@@ -93,6 +93,10 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
 
     const rows = await findGoodsIssueReportRows({
         search: getDataTableSearch(req.query),
+        startDate: req.query.startDate || '',
+        endDate: req.query.endDate || '',
+        supplierId: req.query.supplierId || '',
+        productId: req.query.productId || '',
         fulfillmentStatusId: req.query.fulfillmentStatusId || '',
         accesses: req.user?.accesses || [],
         orderBy,
@@ -162,6 +166,10 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
 
     const rows = await findGoodsReceiptReportRows({
         search: getDataTableSearch(req.query),
+        startDate: req.query.startDate || '',
+        endDate: req.query.endDate || '',
+        supplierId: req.query.supplierId || '',
+        productId: req.query.productId || '',
         orderBy,
         orderDir
     });

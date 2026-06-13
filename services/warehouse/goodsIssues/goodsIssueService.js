@@ -20,6 +20,7 @@ import { buildStockKey, normalizeDecimal, parseStockKey } from "../../../utils/f
 import { findSupplierProductsForStockMovement } from "../products/supplierProductService.js";
 import { AppError } from "../../../errors/AppError.js";
 import { GoodsIssueInexistentStock } from "../../../errors/inventory/stockError.js";
+import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
@@ -35,6 +36,10 @@ export const findAllGoodsIssues = async ({
     skip = 0,
     take = 10,
     search = '',
+    startDate = '',
+    endDate = '',
+    supplierId = '',
+    productId = '',
     fulfillmentStatusId = '',
     orderBy = 'referenceNumber',
     orderDir = 'desc',
@@ -52,6 +57,15 @@ export const findAllGoodsIssues = async ({
     const userDepartments = accesses.map(a => a.department);
 
     const where = {
+        ...((supplierId || productId) && {
+            details: {
+                some: {
+                    ...(supplierId && { supplierId }),
+                    ...(productId && { productId })
+                }
+            }
+        }),
+        ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
         ...(search && {
             OR: [
                 {

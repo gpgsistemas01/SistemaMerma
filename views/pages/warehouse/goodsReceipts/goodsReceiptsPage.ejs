@@ -88,6 +88,21 @@
     }
 } %>
 
+<%- include('../../../shared/movementFilters', {
+    selectInputs: [
+        {
+            id: 'supplierFilter',
+            label: 'Proveedor:',
+            col: 'col-12 col-md-6'
+        },
+        {
+            id: 'productFilter',
+            label: 'Material:',
+            col: 'col-12 col-md-6'
+        }
+    ]
+}) %>
+
 <%- include('../../../shared/mainTable', { title: 'Registro de Compras' }) %>
 
 <%- include('../../../shared/modal', { modalId: 'goodsReceiptModal', form }) %>

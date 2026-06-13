@@ -70,13 +70,25 @@
     }
 } %>
 
-<div class="row mb-3">
-    <%- include('../../../shared/tableSelectFilter', { 
-        id: 'fulfillmentStatusFilter', 
-        label: 'Estado de surtido',
-        col: 'col-12'
-    }) %>
-</div>
+<%- include('../../../shared/movementFilters', {
+    selectInputs: [
+        {
+            id: 'fulfillmentStatusFilter',
+            label: 'Estado de surtido:',
+            col: 'col-12 col-md-4'
+        },
+        {
+            id: 'supplierFilter',
+            label: 'Proveedor:',
+            col: 'col-12 col-md-4'
+        },
+        {
+            id: 'productFilter',
+            label: 'Material:',
+            col: 'col-12 col-md-4'
+        }
+    ]
+}) %>
 
 <%- include('../../../shared/mainTable', { title: 'Salidas de almacén' }) %>
 

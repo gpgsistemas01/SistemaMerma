@@ -16,6 +16,10 @@ export const getAllGoodsIssues = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
     const fulfillmentStatusId = req.query.fulfillmentStatusId || '';
+    const startDate = req.query.startDate || '';
+    const endDate = req.query.endDate || '';
+    const supplierId = req.query.supplierId || '';
+    const productId = req.query.productId || '';
 
     const columns = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
     const { orderBy, orderDir } = getDataTableOrder({
@@ -28,6 +32,10 @@ export const getAllGoodsIssues = async (req, res) => {
         skip,
         take,
         search,
+        startDate,
+        endDate,
+        supplierId,
+        productId,
         fulfillmentStatusId,
         orderBy,
         orderDir,
