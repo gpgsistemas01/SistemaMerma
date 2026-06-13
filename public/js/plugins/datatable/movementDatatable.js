@@ -4,7 +4,7 @@ import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { getMovementTypeSelectApi, getMovementTypeData, attachMovementTypeFilterHandler, initMovementTypeFilterSelect } from "../select2/domains/movementType.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
-import { attachClearFiltersHandler, createTableFilterChangeHandler, setupMovementStyleTableFilters } from "./utils/tableFilter.js";
+import { setupTableFilters } from "./utils/tableFilter.js";
 
 const selector = '#table';
 let filters = {
@@ -15,23 +15,21 @@ export const createMovementDatatable = async () => {
 
     let table;
 
-    const updateTable = createTableFilterChangeHandler({
-        getTable: () => table
-    });
-
-    filters = await setupMovementStyleTableFilters({
-        onChange: updateTable,
-        filters: [
+    filters = await setupTableFilters({
+        fields: [
+            'date',
             {
                 key: 'movementType',
                 isSelected: false,
                 getSelectApi: getMovementTypeSelectApi,
                 getOptions: getMovementTypeData,
                 initSelect: initMovementTypeFilterSelect,
-                attachHandler: () => attachMovementTypeFilterHandler({
-                    onChange: updateTable
+                attachHandler: ({ onChange }) => attachMovementTypeFilterHandler({
+                    onChange
                 })
-            }
+            },
+            'supplier',
+            'product'
         ]
     });
 
@@ -76,9 +74,5 @@ export const createMovementDatatable = async () => {
                 })
             ]
         }
-    });
-
-    attachClearFiltersHandler({
-        getTable: () => table
     });
 }

@@ -8,7 +8,7 @@ import { createDataTable, refreshProductTable, renderActionButtons } from "./bas
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
 import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
-import { attachClearFiltersHandler, createTableFilterChangeHandler, setupGoodsIssueTableFilters } from "./utils/tableFilter.js";
+import { setupTableFilters } from "./utils/tableFilter.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -22,10 +22,6 @@ let productTable;
 export const createGoodsIssueDatatable = async (context) => {
 
     let table;
-
-    const updateTable = createTableFilterChangeHandler({
-        getTable: () => table
-    });
 
     const { isWarehouse, isSystem } = hasPermission(context);
 
@@ -66,8 +62,8 @@ export const createGoodsIssueDatatable = async (context) => {
         }
     );
 
-    filters = await setupGoodsIssueTableFilters({
-        onChange: updateTable
+    filters = await setupTableFilters({
+        fields: ['date', 'fulfillmentStatus', 'supplier', 'product']
     });
 
     table = createDataTable({
@@ -91,10 +87,6 @@ export const createGoodsIssueDatatable = async (context) => {
                 })
             ]
         }
-    });
-
-    attachClearFiltersHandler({
-        getTable: () => table
     });
 
     $(`${ tableSelector } tbody`).on('click', '.btn-edit', function () {
