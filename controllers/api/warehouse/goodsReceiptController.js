@@ -16,6 +16,10 @@ export const getAllGoodsReceipts = async (req, res) => {
 
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
+    const startDate = req.query.startDate || '';
+    const endDate = req.query.endDate || '';
+    const supplierId = req.query.supplierId || '';
+    const productId = req.query.productId || '';
 
     const columns = ['referenceNumber', 'receptionDate', 'supplierName', 'invoice', null];
     const { orderBy, orderDir } = getDataTableOrder({
@@ -28,6 +32,10 @@ export const getAllGoodsReceipts = async (req, res) => {
         skip,
         take,
         search,
+        startDate,
+        endDate,
+        supplierId,
+        productId,
         orderBy,
         orderDir
     });
