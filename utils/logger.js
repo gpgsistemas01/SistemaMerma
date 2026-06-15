@@ -3,26 +3,17 @@ import pinoHttp from 'pino-http';
 import { AppError } from '../errors/AppError.js';
 
 const DEFAULT_LOG_LEVEL = 'info';
-const SUPPORTED_LOG_LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'];
+const LOG_LEVELS = new Set(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
 
-const normalizeLogLevel = (level = DEFAULT_LOG_LEVEL) => {
+const normalizeLogLevel = (level, fallback = DEFAULT_LOG_LEVEL) => {
+    if (typeof level !== 'string') return fallback;
+
     const normalizedLevel = level.toLowerCase();
 
-    if (SUPPORTED_LOG_LEVELS.includes(normalizedLevel)) return normalizedLevel;
-
-    return DEFAULT_LOG_LEVEL;
+    return LOG_LEVELS.has(normalizedLevel) ? normalizedLevel : fallback;
 };
 
 const configuredLogLevel = normalizeLogLevel(process.env.LOG_LEVEL);
-const resolveLogLevel = (level, fallback = DEFAULT_LOG_LEVEL) => {
-    if (!level || typeof level !== 'string') return fallback;
-
-    const normalizedLevel = level.toLowerCase();
-
-    if (SUPPORTED_LOG_LEVELS.includes(normalizedLevel)) return normalizedLevel;
-
-    return fallback;
-};
 
 export const logger = pino({
     level: configuredLogLevel,
@@ -40,7 +31,7 @@ if (process.env.LOG_LEVEL && configuredLogLevel !== process.env.LOG_LEVEL.toLowe
         {
             configuredLevel: process.env.LOG_LEVEL,
             fallbackLevel: DEFAULT_LOG_LEVEL,
-            supportedLevels: SUPPORTED_LOG_LEVELS
+            supportedLevels: [...LOG_LEVELS]
         },
         'Nivel de log no soportado; se usará el nivel por defecto'
     );
@@ -56,20 +47,12 @@ export const logServiceError = (
     { level, ...context } = {},
     message = 'Error en servicio'
 ) => {
-    const logLevel = resolveLogLevel(level, getDefaultErrorLogLevel(err));
-
-    serviceLogger[logLevel](
-        {
-            err,
-            ...context
-        },
-        message
-    );
+    serviceLogger[normalizeLogLevel(level, getDefaultErrorLogLevel(err))]({ err, ...context }, message);
 };
 
 export const pinoLogger = pinoHttp({
     logger,
-    customLogLevel: (req, res, err) => {
+    customLogLevel: (_req, res, err) => {
         if (err || res.statusCode >= 500) return 'error';
         if (res.statusCode >= 400) return 'warn';
         if (res.statusCode >= 300) return 'silent';
