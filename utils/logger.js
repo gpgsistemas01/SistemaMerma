@@ -15,6 +15,19 @@ const normalizeLogLevel = (level, fallback = DEFAULT_LOG_LEVEL) => {
 
 const configuredLogLevel = normalizeLogLevel(process.env.LOG_LEVEL);
 
+const getObjectIfNotEmpty = (value) =>
+    value && Object.keys(value).length > 0 ? value : undefined;
+
+export const getRequestLogContext = (req) => ({
+    userId: req.userId ?? req.user?.id,
+    path: req.originalUrl ?? req.url,
+    route: req.route?.path,
+    params: getObjectIfNotEmpty(req.params),
+    query: getObjectIfNotEmpty(req.query),
+    ip: req.ip,
+    userAgent: req.get?.('user-agent')
+});
+
 export const logger = pino({
     level: configuredLogLevel,
     serializers: {
@@ -52,6 +65,7 @@ export const logServiceError = (
 
 export const pinoLogger = pinoHttp({
     logger,
+    customProps: (req) => getRequestLogContext(req),
     customLogLevel: (_req, res, err) => {
         if (err || res.statusCode >= 500) return 'error';
         if (res.statusCode >= 400) return 'warn';
