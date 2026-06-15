@@ -1,6 +1,10 @@
 import { ProfileCreateDatabaseError, ProfileUpdateDatabaseError } from "../../errors/admin/profileError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { normalizeText } from "../../utils/formattersUtils.js";
+import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('admin.profileService');
+
 
 export const findAllProfiles = async ({
     departments = [],
@@ -168,6 +172,7 @@ export const createProfile = async ({ profileDto }) => {
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'admin.profileService' });
 
         throw new ProfileCreateDatabaseError();
     }
@@ -213,6 +218,7 @@ export const updateProfile = async ({ profileDto, id }) => {
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'admin.profileService' });
 
         throw new ProfileUpdateDatabaseError();
     }

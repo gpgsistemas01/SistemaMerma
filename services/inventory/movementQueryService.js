@@ -1,6 +1,10 @@
 import { MovementFindDatabaseError } from "../../errors/inventory/movementError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { formatDateLongWithTime } from "../../utils/formattersUtils.js";
+import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('inventory.movementQueryService');
+
 
 const REFERENCE_NUMBER_SELECT = {
     referenceNumber: true
@@ -289,6 +293,7 @@ export const findAllMovements = async ({
         };
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'inventory.movementQueryService' });
 
         throw new MovementFindDatabaseError();
     }

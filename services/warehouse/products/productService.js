@@ -5,6 +5,10 @@ import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 import { AppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
+import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('warehouse.products.productService');
+
 
 const REFERENCE_MOVEMENT_IN = 'IN';
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
@@ -147,6 +151,7 @@ export const createProduct = async ({
         );
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.products.productService' });
 
         if (err instanceof AppError) throw err;
         
@@ -207,6 +212,7 @@ export const updateProduct = async (productDto, id) => {
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.products.productService' });
 
         if (err.code === PRISMA_RECORD_NOT_FOUND) {
             throw new ProductNotFound();
@@ -236,6 +242,7 @@ export const updateProductStock = async ({
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.products.productService' });
 
         if (err.code === PRISMA_RECORD_NOT_FOUND) {
             throw new ProductNotFound();

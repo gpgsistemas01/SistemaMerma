@@ -9,6 +9,10 @@ import {
     GoodsIssueInternalClientAdvisorDepartmentConflict,
     GoodsIssueInternalClientProjectNumberConflict
 } from "../../../errors/warehouse/goodsIssueError.js";
+import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
+
 import { getDb } from "../../../repository/baseRepository.js";
 import { findProfileById, findProfileWithDepartmentsById } from "../../admin/profileService.js";
 import { findDepartmentById } from "../../admin/departmentService.js";
@@ -234,6 +238,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
         return result.goodsIssue;
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.goodsIssues.goodsIssueService' });
 
         if (err instanceof AppError) throw err;
 
@@ -366,6 +371,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.goodsIssues.goodsIssueService' });
 
         if (err instanceof AppError) throw err;
 
@@ -580,6 +586,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.goodsIssues.goodsIssueService' });
 
         if (err instanceof AppError) throw err;
 

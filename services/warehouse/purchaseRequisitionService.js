@@ -7,6 +7,10 @@ import {
     RequesterProfileNotFound,
     PurchaseRequisitionApproverProfileNotFound
 } from "../../errors/warehouse/purchaseRequisitionError.js";
+import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('warehouse.purchaseRequisitionService');
+
 import { getDb } from "../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
 
@@ -265,6 +269,7 @@ export const updatePurchaseRequisition = async ({
         return result;
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.purchaseRequisitionService' });
 
         if (err.code === PRISMA_RECORD_NOT_FOUND) throw new PurchaseRequisitionNotFound();
 
@@ -358,6 +363,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             totalRequestedProducts: purchaseRequisition.details.length
         };
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.purchaseRequisitionService' });
 
         if (err.code === PRISMA_RECORD_NOT_FOUND) throw new PurchaseRequisitionStatusNotFound();
         throw new PurchaseRequisitionStatusUpdateDatabaseError();
