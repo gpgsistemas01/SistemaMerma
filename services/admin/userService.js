@@ -1,6 +1,10 @@
 import { UserCreateDatabaseError, UserFindDatabaseError, UserNotFound, UserUpdateDatabaseError } from "../../errors/admin/userError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { verifyPassword, encryptPassword } from "../../utils/encryptionUtils.js";
+import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('admin.userService');
+
 
 export const findAllUsers = async ({
     skip = 0,
@@ -73,7 +77,8 @@ export const findAllUsers = async ({
             recordsFiltered: filtered 
         };
 
-    } catch {
+    } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'admin.userService' });
         throw new UserFindDatabaseError();
     }
 };
@@ -160,7 +165,8 @@ export const createUser = async ({ userDto }) => {
             }
         });
 
-    } catch {
+    } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'admin.userService' });
 
         throw new UserCreateDatabaseError();
     }
@@ -215,6 +221,7 @@ export const updateUser = async ({ id, userDto }) => {
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'admin.userService' });
 
         if (err instanceof UserNotFound) throw err;
 
@@ -238,6 +245,7 @@ export const updateUserPassword = async ({ id, userDto }) => {
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'admin.userService' });
 
         if (err instanceof UserNotFound) throw err;
 

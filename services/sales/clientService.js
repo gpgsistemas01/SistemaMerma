@@ -1,5 +1,9 @@
 import { ClientCreateDatabaseError, ClientFindDatabaseError, ClientNotFound } from "../../errors/sales/clientError.js";
 import { getDb } from "../../repository/baseRepository.js";
+import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('sales.clientService');
+
 
 const CLIENT_SELECT = {
     id: true,
@@ -74,6 +78,7 @@ export const createClient = async ({
         return createdClient;
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'sales.clientService' });
 
         throw new ClientCreateDatabaseError();
     }
@@ -95,6 +100,7 @@ export const updateClient = async ({
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'sales.clientService' });
 
         if (err.code === 'P2025') throw new ClientNotFound();
         throw new ClientFindDatabaseError();

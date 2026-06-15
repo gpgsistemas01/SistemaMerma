@@ -3,6 +3,10 @@ import {
     ProfileReceivedByNotFound,
     SupplierNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
+import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('warehouse.goodsReceipts.goodsReceiptService');
+
 import { getDb } from "../../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
 import { findProfileById } from "../../admin/profileService.js";
@@ -217,6 +221,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
         return result;
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.goodsReceipts.goodsReceiptService' });
 
         if (err instanceof AppError) throw err;
 

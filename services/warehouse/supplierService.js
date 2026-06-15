@@ -2,6 +2,10 @@ import { AppError } from "../../errors/AppError.js";
 import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
+import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('warehouse.supplierService');
+
 
 const SUPPLIER_CODE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const SUPPLIER_REFERENCE_PREFIX = 'PRO';
@@ -132,6 +136,7 @@ export const createSupplier = async (supplierDto) => {
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.supplierService' });
 
         throw new SupplierCreateDatabaseError();
     }
@@ -156,6 +161,7 @@ export const updateSupplier = async (supplierDto, id) => {
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.supplierService' });
 
         if (err instanceof AppError) throw err;
 

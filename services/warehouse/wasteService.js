@@ -5,6 +5,10 @@ import { normalizeDecimal, toNumber } from '../../utils/formattersUtils.js';
 import { assertSufficientStock, calculateConvertedQuantity } from '../inventory/stockHelpers.js';
 import { createStockAdjustment } from './adjustmentService.js';
 import { findSupplierProductById } from './products/supplierProductService.js';
+import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('warehouse.wasteService');
+
 
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
 
@@ -276,6 +280,7 @@ export const updateWaste = async ({
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.wasteService' });
 
         handleWasteServiceError({
             err,
@@ -326,6 +331,7 @@ export const updateWasteStock = async ({
         });
 
     } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'warehouse.wasteService' });
 
         handleWasteServiceError({
             err,
