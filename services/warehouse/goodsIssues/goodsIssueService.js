@@ -9,7 +9,7 @@ import {
     GoodsIssueInternalClientAdvisorDepartmentConflict,
     GoodsIssueInternalClientProjectNumberConflict
 } from "../../../errors/warehouse/goodsIssueError.js";
-import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError } from "../../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
 
@@ -238,7 +238,10 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
         return result.goodsIssue;
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.goodsIssues.goodsIssueService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.createGoodsIssue',
+            ...getModelLogContext('goodsIssue', goodsIssueDto)
+        });
 
         if (err instanceof AppError) throw err;
 
@@ -371,7 +374,10 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.goodsIssues.goodsIssueService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssue',
+            ...getModelLogContext('goodsIssue', { id, ...goodsIssueDto })
+        });
 
         if (err instanceof AppError) throw err;
 
@@ -586,7 +592,10 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.goodsIssues.goodsIssueService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueDetails',
+            ...getModelLogContext('goodsIssue', { id, details })
+        });
 
         if (err instanceof AppError) throw err;
 

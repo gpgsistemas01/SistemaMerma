@@ -5,7 +5,7 @@ import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 import { AppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
-import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError } from "../../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.products.productService');
 
@@ -151,7 +151,10 @@ export const createProduct = async ({
         );
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.products.productService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.products.productService.createProduct',
+            ...getModelLogContext('product', { userId, ...productDto, ...stockDto })
+        });
 
         if (err instanceof AppError) throw err;
         
@@ -212,7 +215,10 @@ export const updateProduct = async (productDto, id) => {
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.products.productService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.products.productService.updateProduct',
+            ...getModelLogContext('product', { id, ...productDto })
+        });
 
         if (err.code === PRISMA_RECORD_NOT_FOUND) {
             throw new ProductNotFound();
@@ -242,7 +248,10 @@ export const updateProductStock = async ({
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.products.productService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.products.productService.updateProductStock',
+            ...getModelLogContext('productStock', { id, userId, ...productDto })
+        });
 
         if (err.code === PRISMA_RECORD_NOT_FOUND) {
             throw new ProductNotFound();

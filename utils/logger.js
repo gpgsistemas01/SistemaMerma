@@ -18,6 +18,62 @@ const configuredLogLevel = normalizeLogLevel(process.env.LOG_LEVEL);
 const getObjectIfNotEmpty = (value) =>
     value && Object.keys(value).length > 0 ? value : undefined;
 
+const MODEL_CONTEXT_FIELDS = new Set([
+    'id',
+    'userId',
+    'referenceNumber',
+    'folio',
+    'code',
+    'sku',
+    'name',
+    'fullName',
+    'lastName',
+    'tradeName',
+    'legalName',
+    'projectNumber',
+    'invoice',
+    'supplierId',
+    'supplierName',
+    'productId',
+    'productName',
+    'clientId',
+    'clientName',
+    'departmentId',
+    'departmentName',
+    'requesterId',
+    'advisorId',
+    'receivedById',
+    'reasonId',
+    'statusName',
+    'quantity',
+    'newStock',
+    'currentStock',
+    'base',
+    'height'
+]);
+
+const getModelContextDetails = (details) => Array.isArray(details)
+    ? {
+        detailsCount: details.length,
+        details: details.slice(0, 5).map(getModelLogContextData)
+    }
+    : {};
+
+const getModelLogContextData = (data = {}) => Object.entries(data).reduce((context, [key, value]) => {
+    if (key === 'details') return { ...context, ...getModelContextDetails(value) };
+
+    if (MODEL_CONTEXT_FIELDS.has(key) && value !== undefined && value !== null && value !== '') {
+        context[key] = value;
+    }
+
+    return context;
+}, {});
+
+export const getModelLogContext = (model, data = {}) => ({
+    model,
+    ...getModelLogContextData(data)
+});
+
 export const getRequestLogContext = (req) => ({
     userId: req.userId ?? req.user?.id,
     path: req.originalUrl ?? req.url,

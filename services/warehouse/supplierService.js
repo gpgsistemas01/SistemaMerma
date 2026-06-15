@@ -2,7 +2,7 @@ import { AppError } from "../../errors/AppError.js";
 import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
-import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.supplierService');
 
@@ -136,7 +136,10 @@ export const createSupplier = async (supplierDto) => {
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.supplierService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.supplierService.createSupplier',
+            ...getModelLogContext('supplier', supplierDto)
+        });
 
         throw new SupplierCreateDatabaseError();
     }
@@ -161,7 +164,10 @@ export const updateSupplier = async (supplierDto, id) => {
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.supplierService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.supplierService.updateSupplier',
+            ...getModelLogContext('supplier', { id, ...supplierDto })
+        });
 
         if (err instanceof AppError) throw err;
 
