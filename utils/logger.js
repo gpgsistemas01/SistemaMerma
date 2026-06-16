@@ -2,7 +2,7 @@ import pino from 'pino';
 import pinoHttp from 'pino-http';
 import { AppError } from '../errors/AppError.js';
 
-const DEFAULT_LOG_LEVEL = 'info';
+const DEFAULT_LOG_LEVEL = 'warn';
 const LOG_LEVELS = new Set(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
 
 const normalizeLogLevel = (level, fallback = DEFAULT_LOG_LEVEL) => {
