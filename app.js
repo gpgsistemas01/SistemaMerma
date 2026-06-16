@@ -142,7 +142,12 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-    
+
+    if (err instanceof AppError) return res.status(err.statusCode).json({
+        code: err.code,
+        meta: err.meta
+    });
+
     logger.error(
         {
             err,
@@ -152,27 +157,12 @@ app.use((err, req, res, next) => {
         'Error no controlado'
     );
 
-    if (err instanceof AppError) return res.status(err.statusCode).json({
-        code: err.code,
-        meta: err.meta
-    });
-    
     res.status(500).json({ code: errorMap.message.SERVER_ERROR });
-});
-
-io.on('connection', (socket) => {
-    logger.info({ socketId: socket.id }, 'Socket conectado');
-
-    socket.on('disconnect', () => {
-        logger.info({ socketId: socket.id }, 'Socket desconectado');
-    });
 });
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-    logger.info({ port: PORT }, `Server running on http://localhost:${PORT}`);
-});
+server.listen(PORT);
 
 process.on('warning', (warning) => {
     logger.warn({ warning }, 'Warning detectado');
