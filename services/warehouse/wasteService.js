@@ -5,7 +5,7 @@ import { normalizeDecimal, toNumber } from '../../utils/formattersUtils.js';
 import { assertSufficientStock, calculateConvertedQuantity } from '../inventory/stockHelpers.js';
 import { createStockAdjustment } from './adjustmentService.js';
 import { findSupplierProductById } from './products/supplierProductService.js';
-import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -280,7 +280,10 @@ export const updateWaste = async ({
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.wasteService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.wasteService.updateWaste',
+            ...getModelLogContext('waste', { id, ...wasteDto })
+        });
 
         handleWasteServiceError({
             err,
@@ -331,7 +334,10 @@ export const updateWasteStock = async ({
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.wasteService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.wasteService.updateWasteStock',
+            ...getModelLogContext('wasteStock', { id, userId, ...wasteStockDto })
+        });
 
         handleWasteServiceError({
             err,

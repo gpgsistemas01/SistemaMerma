@@ -1,5 +1,5 @@
 import 'dotenv/config.js';
-import { logger, pinoLogger } from './utils/logger.js';
+import { getRequestLogContext, logger, pinoLogger } from './utils/logger.js';
 
 import clientApiRoutes from './routes/api/sales/clientApiRoute.js';
 
@@ -146,7 +146,7 @@ app.use((err, req, res, next) => {
     logger.error(
         {
             err,
-            path: req.originalUrl,
+            ...getRequestLogContext(req),
             method: req.method
         },
         'Error no controlado'

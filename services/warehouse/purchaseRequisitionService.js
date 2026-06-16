@@ -7,7 +7,7 @@ import {
     RequesterProfileNotFound,
     PurchaseRequisitionApproverProfileNotFound
 } from "../../errors/warehouse/purchaseRequisitionError.js";
-import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.purchaseRequisitionService');
 
@@ -269,7 +269,10 @@ export const updatePurchaseRequisition = async ({
         return result;
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.purchaseRequisitionService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.purchaseRequisitionService.updatePurchaseRequisition',
+            ...getModelLogContext('purchaseRequisition', { id, userId, ...purchaseRequisitionDto })
+        });
 
         if (err.code === PRISMA_RECORD_NOT_FOUND) throw new PurchaseRequisitionNotFound();
 
@@ -363,7 +366,17 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             totalRequestedProducts: purchaseRequisition.details.length
         };
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'warehouse.purchaseRequisitionService' });
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.purchaseRequisitionService.updateStatus',
+            ...getModelLogContext('purchaseRequisition', {
+                id,
+                userId,
+                statusName,
+                referenceNumber: purchaseRequisition.referenceNumber,
+                departmentId: purchaseRequisition.department?.id,
+                departmentName: purchaseRequisition.department?.name
+            })
+        });
 
         if (err.code === PRISMA_RECORD_NOT_FOUND) throw new PurchaseRequisitionStatusNotFound();
         throw new PurchaseRequisitionStatusUpdateDatabaseError();
