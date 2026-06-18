@@ -12,12 +12,15 @@ La suite ya cubre helpers puros o parcialmente aislados en:
 - `src/services/warehouse/products/supplierProductService.js`
 - `src/services/sales/clientService.js` (operaciones submit de crear/actualizar/buscar por id)
 - `src/services/warehouse/supplierService.js` (operaciones submit de crear/actualizar)
+- `src/services/admin/userService.js` (operaciones submit de crear/actualizar/cambiar contraseña)
+- `src/services/admin/profileService.js` (operaciones submit de crear/actualizar)
+- `src/services/warehouse/products/productService.js` (submit de ajuste de stock)
 
 ## Servicios sin pruebas directas
 
 Todavía faltan pruebas directas para la mayor parte de servicios que consultan o modifican datos:
 
-- Administración: `departmentService`, `profileService`, `roleService`, `userService`.
+- Administración: `departmentService`, `roleService` y listados/búsquedas no-submit de `profileService` y `userService`.
 - Autenticación y seguridad: `authService`, `jwtService`, `roleService` raíz.
 - Documentos: `referenceNumberService`.
 - Inventario: `movementQueryService`, `movementService`, `reportService`.
@@ -29,8 +32,8 @@ Todavía faltan pruebas directas para la mayor parte de servicios que consultan 
 Los submits de formularios/API llaman principalmente servicios de creación o actualización. Al revisar los controladores `src/controllers/api`, faltan pruebas directas para estos servicios de submit:
 
 - Ventas: `clientService.createClient` y `clientService.updateClient` ya tienen pruebas unitarias; faltan pruebas de integración con BD si se requiere validar Prisma/migraciones.
-- Administración: `userService.createUser`, `userService.updateUser`, `userService.updateUserPassword`, `profileService.createProfile` y `profileService.updateProfile`.
-- Almacén/catálogos: `supplierService.createSupplier` y `supplierService.updateSupplier` ya tienen pruebas unitarias; faltan `productService.createProduct`, `productService.updateProduct` y `productService.updateProductStock`.
+- Administración: `userService.createUser`, `userService.updateUser`, `userService.updateUserPassword`, `profileService.createProfile` y `profileService.updateProfile` ya tienen pruebas unitarias.
+- Almacén/catálogos: `supplierService.createSupplier`, `supplierService.updateSupplier` y `productService.updateProductStock` ya tienen pruebas unitarias; faltan `productService.createProduct` y `productService.updateProduct`.
 - Almacén/documentos transaccionales: `purchaseRequisitionService.createPurchaseRequisition`, `purchaseRequisitionService.updatePurchaseRequisition`, `goodsIssueService.createGoodsIssue`, `goodsIssueService.updateGoodsIssue`, `goodsIssueService.updateGoodsIssueDetails` y `goodsReceiptService.createGoodsReceipt`.
 - Merma/ajustes: `wasteService.createWasteAdjustment`, `wasteService.updateWaste`, `wasteService.updateWasteStock` y `adjustmentService.createStockAdjustment`.
 
@@ -39,7 +42,7 @@ Estas pruebas deben validar casos exitosos, errores de dominio, duplicados, camb
 ## Prioridad sugerida
 
 1. **Servicios transaccionales de inventario y almacén**: `movementService`, `goodsIssueService`, `goodsReceiptService`, `purchaseRequisitionService`, `wasteService` y `adjustmentService`. Validan stock, estados y efectos colaterales; deben correr con `npm run test:db` y rollback por prueba.
-2. **Servicios CRUD con reglas de negocio**: `productService`, `clientService`, `userService`, `profileService`. Deben cubrir creación, actualización, duplicados y errores de dominio.
+2. **Servicios CRUD con reglas de negocio**: continuar con `productService` y pruebas de integración para `clientService`, `supplierService`, `userService` y `profileService` cuando se quiera validar Prisma/migraciones.
 3. **Servicios de soporte**: `referenceNumberService`, `notificationService`, `jwtService`, reportes y catálogos (`role`, `department`, `presentation`, `reason`, `unitMeasure`, `fulfillmentStatus`).
 
 ## Implicación para CI
