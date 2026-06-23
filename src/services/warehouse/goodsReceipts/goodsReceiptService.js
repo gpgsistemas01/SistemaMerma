@@ -13,8 +13,7 @@ import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
-import { findSupplierProductsForStockMovement, updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
-import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
+import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 import { AppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 
@@ -134,24 +133,6 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             totalGrossPurchaseAmount: 0
         });
 
-        const grouped = new Map();
-        
-        for (const detail of processedDetails) {
-            const key = buildStockKey(detail.productId, supplierId);
-            grouped.set(
-                key,
-                Number((grouped.get(key) || 0)) + Number(detail.quantity)
-            );
-        }
-
-        const filters = Array.from(grouped.keys()).map(key => parseStockKey(key));
-
-        const supplierProducts = await findSupplierProductsForStockMovement({
-            where: {
-                OR: filters
-            }
-        });
-
         const result = await getDb().$transaction(async (tx) => {
 
             const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
@@ -205,9 +186,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                     supplierId: goodsReceipt.supplierId,
                     quantity: detail.quantity
                 })),
-                movementType: MOVEMENT_TYPE_IN,
-                grouped,
-                supplierProducts
+                movementType: MOVEMENT_TYPE_IN
             });
 
             return goodsReceipt;

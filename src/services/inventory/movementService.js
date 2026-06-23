@@ -2,9 +2,10 @@ import { MovementDetailRelationConflict } from "../../errors/inventory/movementE
 import { GoodsIssueInexistentStock } from "../../errors/inventory/stockError.js";
 import { InventoryMovementType } from "../../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
-import { buildStockKey, hasProductDimensions, normalizeDecimal } from "../../utils/formattersUtils.js";
+import { buildStockKey, hasProductDimensions, normalizeDecimal, parseStockKey } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "./stockHelpers.js";
-import { updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
+import { buildStockUpdateSummary } from "./movementHelpers.js";
+import { findSupplierProductsForStockMovement, updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
 
 const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
 const REFERENCE_TYPE_GOODS_ISSUE = 'GOODS_ISSUE';
@@ -16,7 +17,6 @@ export const applyInventoryMovement = async ({
     reference = {},
     details,
     movementType,
-    grouped,
     supplierProducts
 }) => {
 
@@ -29,8 +29,17 @@ export const applyInventoryMovement = async ({
 
     const db = getDb(tx);
 
+    const stockUpdateSummary = buildStockUpdateSummary({ details });
+
+    const movementSupplierProducts = supplierProducts ?? await findSupplierProductsForStockMovement({
+        tx,
+        where: {
+            OR: Array.from(stockUpdateSummary.stockKeys).map(parseStockKey)
+        }
+    });
+
     const psMap = new Map(
-        supplierProducts.map(ps => [
+        movementSupplierProducts.map(ps => [
             buildStockKey(ps.productId, ps.supplierId),
             ps
         ])
@@ -158,9 +167,9 @@ export const applyInventoryMovement = async ({
 
     await updateSupplierProductStock({
         tx,
-        grouped,
+        grouped: stockUpdateSummary.grouped,
         movementType,
-        supplierProducts
+        supplierProducts: movementSupplierProducts
     });
 
     return movement;

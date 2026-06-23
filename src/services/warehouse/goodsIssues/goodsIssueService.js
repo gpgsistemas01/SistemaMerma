@@ -20,10 +20,8 @@ import { generateYearlyReferenceNumber } from "../../document/referenceNumberSer
 import { findClientById } from "../../sales/clientService.js";
 import { buildGoodsIssueDetails, isValidInternalClientAdvisor, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
-import { buildStockKey, normalizeDecimal, parseStockKey } from "../../../utils/formattersUtils.js";
-import { findSupplierProductsForStockMovement } from "../products/supplierProductService.js";
+import { normalizeDecimal } from "../../../utils/formattersUtils.js";
 import { AppError } from "../../../errors/AppError.js";
-import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
@@ -443,8 +441,6 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         const currentById = new Map(goodsIssue.details.map(d => [d.id, d]));
         const updates = [];
         const supplyRequests = [];
-        const stockKeys = new Set();
-
         for (const detail of details) {
 
             const current = currentById.get(detail.id);
@@ -471,84 +467,35 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 continue;
             }
 
-            const stockKey = buildStockKey(current.productId, current.supplierId);
+            const quantityToSupply = pending;
 
-            stockKeys.add(stockKey);
             supplyRequests.push({
                 current,
                 currentQuantity,
-                pending,
-                baseUpdate,
-                stockKey
+                quantityToSupply,
+                baseUpdate
             });
         }
-
-        const stockFilters = Array.from(stockKeys).map(parseStockKey);
 
         return await getDb().$transaction(async (tx) => {
 
             if (supplyRequests.length) {
 
-                const supplierProducts = await findSupplierProductsForStockMovement({
+                const detailSupplyMovements = supplyRequests.map(({ current, quantityToSupply }) => ({
+                    productId: current.productId,
+                    supplierId: current.supplierId,
+                    goodsIssueDetailId: current.id,
+                    quantity: quantityToSupply
+                }));
+
+                await applyInventoryMovement({
                     tx,
-                    where: { OR: stockFilters }
+                    reference: { goodsIssueId: goodsIssue.id },
+                    details: detailSupplyMovements,
+                    movementType: MOVEMENT_TYPE_OUT
                 });
 
-                const stockByKey = new Map(
-                    supplierProducts.map(sp => [
-                        buildStockKey(sp.productId, sp.supplierId),
-                        {
-                            supplierProduct: sp,
-                            availableStock: normalizeDecimal(Math.max(0, sp.currentStock ?? 0))
-                        }
-                    ])
-                );
-
-                const grouped = new Map();
-                const movementDetails = [];
-
-                for (const { current, currentQuantity, pending, baseUpdate, stockKey } of supplyRequests) {
-
-                    const stock = stockByKey.get(stockKey);
-
-                    if (!stock?.supplierProduct) {
-                        throw new GoodsIssueInexistentStock({
-                            productName: current.productName,
-                            productId: current.productId,
-                            supplierId: current.supplierId,
-                            height: current.productHeight,
-                            base: current.productBase,
-                            supplierName: current.supplierName
-                        });
-                    }
-
-                    if (stock.availableStock < pending) {
-                        throw new GoodsIssueInsufficientStock({
-                            productName: current.productName,
-                            productId: current.productId,
-                            supplierId: current.supplierId,
-                            height: current.productHeight,
-                            base: current.productBase,
-                            supplierName: current.supplierName,
-                            requestedQuantity: pending
-                        });
-                    }
-
-                    const quantityToSupply = pending;
-
-                    stock.availableStock = normalizeDecimal(stock.availableStock - quantityToSupply);
-
-                    movementDetails.push({
-                        productId: current.productId,
-                        supplierId: current.supplierId,
-                        goodsIssueDetailId: current.id,
-                        quantity: quantityToSupply
-                    });
-
-                    grouped.set(
-                        stockKey,
-                        normalizeDecimal(normalizeDecimal(grouped.get(stockKey) || 0) + quantityToSupply)
-                    );
+                for (const { current, currentQuantity, quantityToSupply, baseUpdate } of supplyRequests) {
 
                     const newSupplied = normalizeDecimal(
                         normalizeDecimal(current.suppliedQuantity ?? 0) + quantityToSupply
@@ -561,17 +508,6 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                             suppliedQuantity: newSupplied,
                             isSupplied: newSupplied >= normalizeDecimal(currentQuantity - FLOAT_EPSILON)
                         }
-                    });
-                }
-
-                if (movementDetails.length) {
-                    await applyInventoryMovement({
-                        tx,
-                        reference: { goodsIssueId: goodsIssue.id },
-                        details: movementDetails,
-                        movementType: MOVEMENT_TYPE_OUT,
-                        grouped,
-                        supplierProducts
                     });
                 }
             }
