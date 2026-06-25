@@ -39,6 +39,8 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         drawCallback,
         language = {},
         searchPlaceholder = 'Buscar en la tabla',
+        responsive = true,
+        autoWidth = false,
         ...dataTableOptions
     } = options;
     const resolvedSearchPlaceholder = language.searchPlaceholder || searchPlaceholder;
@@ -90,8 +92,8 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
 
             if (typeof drawCallback === 'function') drawCallback.call(this, settings);
         },
-        responsive: true,
-        autoWidth: false,
+        responsive,
+        autoWidth,
         serverSide: Boolean(ajax),
         processing: Boolean(ajax),
     });
