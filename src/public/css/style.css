@@ -251,18 +251,46 @@ table.dataTable.datatable-table .sorting_desc::after {
   padding: 1rem 1.5rem;
 }
 
+
 .dataTables_wrapper .dt-buttons .dt-button,
 .dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item),
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link {
-  background: linear-gradient(180deg, #ffffff 0%, #edf7ef 100%) !important;
+  align-items: center;
+  background: #ffffff !important;
   border: 1px solid #b7d7bf !important;
-  border-radius: 0.55rem !important;
+  border-radius: 999rem !important;
   box-shadow: 0 0.2rem 0.45rem rgba(var(--mdb-secondary-rgb), 0.08);
   color: var(--mdb-secondary) !important;
+  display: inline-flex;
   font-weight: 700;
-  margin-inline: 0.1rem;
-  padding: 0.45rem 0.8rem;
+  justify-content: center;
+  line-height: 1.15;
+  margin-inline: 0.12rem;
+  min-height: 2.35rem;
+  min-width: 2.35rem;
+  padding: 0.45rem 0.75rem;
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  justify-content: flex-end;
+  padding-block-start: 0.85rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .pagination {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+.dataTables_wrapper .dataTables_paginate .page-item:first-child .page-link,
+.dataTables_wrapper .dataTables_paginate .page-item:last-child .page-link {
+  padding-inline: 0.95rem;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:not(.page-item),
@@ -271,28 +299,27 @@ table.dataTable.datatable-table .sorting_desc::after {
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.active:hover .page-link {
   background: linear-gradient(180deg, #21a366 0%, var(--mdb-primary) 100%) !important;
   border-color: #0f6b32 !important;
+  box-shadow: 0 0.35rem 0.75rem rgba(var(--mdb-primary-rgb), 0.24);
   color: var(--mdb-light) !important;
 }
 
 .dataTables_wrapper .dt-buttons .dt-button:hover,
 .dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):hover,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:hover {
-  background: linear-gradient(180deg, #f8fff9 0%, #dff3e4 100%) !important;
+  background: #f8fff9 !important;
   border-color: var(--mdb-primary) !important;
   color: var(--mdb-primary) !important;
+  text-decoration: none;
   transform: translateY(-1px);
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):focus,
-.dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):active,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:focus,
-.dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:active,
 .dataTables_wrapper .dt-buttons .dt-button:focus,
-.dataTables_wrapper .dt-buttons .dt-button:active,
 .table.datatable-table .table-action-btn:focus,
 table.dataTable.datatable-table .table-action-btn:focus {
-  box-shadow: none !important;
-  outline: none !important;
+  box-shadow: 0 0 0 0.18rem rgba(var(--mdb-primary-rgb), 0.18) !important;
+  outline: 0 !important;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):focus-visible,
@@ -300,29 +327,7 @@ table.dataTable.datatable-table .table-action-btn:focus {
 .dataTables_wrapper .dt-buttons .dt-button:focus-visible,
 .table.datatable-table .table-action-btn:focus-visible,
 table.dataTable.datatable-table .table-action-btn:focus-visible {
-  box-shadow: 0 0 0 0.2rem rgba(var(--mdb-primary-rgb), 0.22) !important;
-  outline: 2px solid var(--mdb-primary) !important;
-  outline-offset: 2px;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):focus,
-.dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):active,
-.dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:focus,
-.dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:active,
-.dataTables_wrapper .dt-buttons .dt-button:focus,
-.dataTables_wrapper .dt-buttons .dt-button:active,
-.table.datatable-table .table-action-btn:focus,
-table.dataTable.datatable-table .table-action-btn:focus {
-  box-shadow: none !important;
-  outline: none !important;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):focus-visible,
-.dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:focus-visible,
-.dataTables_wrapper .dt-buttons .dt-button:focus-visible,
-.table.datatable-table .table-action-btn:focus-visible,
-table.dataTable.datatable-table .table-action-btn:focus-visible {
-  box-shadow: 0 0 0 0.2rem rgba(var(--mdb-primary-rgb), 0.22) !important;
+  box-shadow: 0 0 0 0.22rem rgba(var(--mdb-primary-rgb), 0.24) !important;
   outline: 2px solid var(--mdb-primary) !important;
   outline-offset: 2px;
 }
@@ -331,8 +336,12 @@ table.dataTable.datatable-table .table-action-btn:focus-visible {
 .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:not(.page-item):hover,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.disabled .page-link,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.disabled:hover .page-link {
-  background: transparent !important;
+  background: #eef4f0 !important;
+  border-color: #d7e5da !important;
+  box-shadow: none;
   color: rgba(var(--mdb-secondary-rgb), 0.45) !important;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .table-action-btn {
