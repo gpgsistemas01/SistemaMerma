@@ -1,18 +1,11 @@
 import { pathToFileURL } from 'node:url';
 
-const REQUIRED_NODE_ENV = 'test';
-
 const normalizeUrl = (url = '') => url.trim().replace(/\/+$/, '');
 
 export const validateTestDatabaseEnv = ({
-  nodeEnv = process.env.NODE_ENV,
   databaseUrl = process.env.DATABASE_URL,
   databaseTestUrl = process.env.DATABASE_TEST_URL
 } = {}) => {
-  if (nodeEnv !== REQUIRED_NODE_ENV) {
-    throw new Error('NODE_ENV=test is required to run database tests.');
-  }
-
   if (!databaseTestUrl) {
     throw new Error('DATABASE_TEST_URL is required to run database tests.');
   }

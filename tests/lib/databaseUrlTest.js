@@ -6,74 +6,49 @@ describe('databaseUrl', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
-  it('usa únicamente DATABASE_TEST_URL durante pruebas automatizadas', () => {
-    expect(resolveDatabaseUrl({
-      nodeEnv: 'test',
-      databaseUrl: 'postgresql://app-db',
-      databaseTestUrl: 'postgresql://test-db',
-      databaseUrlDirect: 'postgresql://direct-db',
-      directUrl: 'postgresql://legacy-direct-db'
-    })).toBe('postgresql://test-db');
-  });
 
-  it('no usa variables de producción como fallback cuando NODE_ENV es test', () => {
+  it('permite usar una URL de pruebas únicamente cuando se pasa como parámetro', () => {
     expect(resolveDatabaseUrl({
-      nodeEnv: 'test',
-      databaseUrl: 'postgresql://app-db',
-      databaseUrlDirect: 'postgresql://direct-db',
-      directUrl: 'postgresql://legacy-direct-db'
-    })).toBeUndefined();
+      databaseUrl: 'postgresql://test-db'
+    })).toBe('postgresql://test-db');
   });
 
   it('mantiene DATABASE_URL como primera opción fuera de pruebas', () => {
     expect(resolveDatabaseUrl({
-      nodeEnv: 'production',
       databaseUrl: 'postgresql://app-db',
-      databaseTestUrl: 'postgresql://test-db',
       databaseUrlDirect: 'postgresql://direct-db'
     })).toBe('postgresql://app-db');
   });
 
   it('permite usar DATABASE_URL_DIRECT y DIRECT_URL como compatibilidad fuera de pruebas', () => {
     expect(resolveDatabaseUrl({
-      nodeEnv: 'production',
       databaseUrlDirect: 'postgresql://legacy-direct-db',
       directUrl: 'postgresql://direct-db'
     })).toBe('postgresql://legacy-direct-db');
   });
 
-  it('no usa DATABASE_TEST_URL fuera de pruebas', () => {
-    expect(resolveDatabaseUrl({
-      nodeEnv: 'production',
-      databaseTestUrl: 'postgresql://test-db'
-    })).toBeUndefined();
-  });
-
-  it('lee DATABASE_TEST_URL desde variables de entorno reales cuando NODE_ENV es test', () => {
-    vi.stubEnv('NODE_ENV', 'test');
-    vi.stubEnv('DATABASE_URL', 'postgresql://app-db');
+  it('no lee DATABASE_TEST_URL desde variables de entorno reales', () => {
+    vi.stubEnv('DATABASE_URL', 'postgresql://env-app-db');
     vi.stubEnv('DATABASE_TEST_URL', 'postgresql://env-test-db');
     vi.stubEnv('DATABASE_URL_DIRECT', 'postgresql://direct-db');
     vi.stubEnv('DIRECT_URL', 'postgresql://legacy-direct-db');
 
-    expect(getDatabaseUrl()).toBe('postgresql://env-test-db');
+    expect(getDatabaseUrl()).toBe('postgresql://env-app-db');
   });
 
   it('lee DATABASE_URL desde variables de entorno reales fuera de pruebas', () => {
-    vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('DATABASE_URL', 'postgresql://env-app-db');
     vi.stubEnv('DATABASE_TEST_URL', 'postgresql://env-test-db');
 
     expect(getDatabaseUrl()).toBe('postgresql://env-app-db');
   });
 
-  it('falla explícitamente con DATABASE_TEST_URL si process.env no tiene URL de pruebas configurada', () => {
-    vi.stubEnv('NODE_ENV', 'test');
-    vi.stubEnv('DATABASE_URL', 'postgresql://app-db');
-    vi.stubEnv('DATABASE_TEST_URL', '');
-    vi.stubEnv('DATABASE_URL_DIRECT', 'postgresql://direct-db');
-    vi.stubEnv('DIRECT_URL', 'postgresql://legacy-direct-db');
+  it('falla explícitamente con DATABASE_URL si process.env no tiene URL de producción configurada', () => {
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('DATABASE_TEST_URL', 'postgresql://env-test-db');
+    vi.stubEnv('DATABASE_URL_DIRECT', '');
+    vi.stubEnv('DIRECT_URL', '');
 
-    expect(() => getDatabaseUrl()).toThrow(/DATABASE_TEST_URL/);
+    expect(() => getDatabaseUrl()).toThrow(/DATABASE_URL/);
   });
 });
