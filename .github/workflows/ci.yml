@@ -61,10 +61,10 @@ jobs:
       - name: Verify test database configuration
         run: |
           npm run test:db:verify
-          NODE_ENV=test node --input-type=module -e "import { getDatabaseUrl } from './src/lib/databaseUrl.js'; if (getDatabaseUrl() !== process.env.DATABASE_TEST_URL) { throw new Error('CI must use DATABASE_TEST_URL for tests.'); }"
+          DATABASE_URL="$DATABASE_TEST_URL" node --input-type=module -e "import { getDatabaseUrl } from './src/lib/databaseUrl.js'; if (getDatabaseUrl() !== process.env.DATABASE_TEST_URL) { throw new Error('CI must use DATABASE_TEST_URL for tests.'); }"
 
       - name: Generate Prisma client
-        run: NODE_ENV=test npx prisma generate
+        run: npx prisma generate
 
       # Para CI usamos test:db (no solo npm test) porque este script valida
       # DATABASE_TEST_URL, aplica migraciones y luego ejecuta Vitest.
