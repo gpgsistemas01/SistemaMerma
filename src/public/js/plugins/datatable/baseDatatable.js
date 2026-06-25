@@ -6,6 +6,16 @@ const SORT_DIRECTIONS = ['asc', 'desc'];
 
 const isActionColumn = (column = {}) => column.title === 'Acciones';
 
+const getLastAvailableDataTablePage = (pageInfo = {}) => {
+
+    const recordsDisplay = Number(pageInfo.recordsDisplay) || 0;
+    const pages = Number(pageInfo.pages) || 0;
+
+    if (recordsDisplay <= 0 || pages <= 0 || pageInfo.page < pages) return null;
+
+    return pages - 1;
+};
+
 const normalizeColumns = (columns) => {
 
     if (!Array.isArray(columns)) return columns;
@@ -26,6 +36,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         ajax,
         columns,
         initComplete,
+        drawCallback,
         language = {},
         searchPlaceholder = 'Buscar en la tabla',
         ...dataTableOptions
@@ -67,6 +78,17 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
                 .attr('placeholder', resolvedSearchPlaceholder);
 
             if (typeof initComplete === 'function') initComplete.call(this, settings, json);
+        },
+        drawCallback(settings) {
+            const table = this.api();
+            const lastAvailablePage = getLastAvailableDataTablePage(table.page.info());
+
+            if (lastAvailablePage !== null) {
+                table.page(lastAvailablePage).draw('page');
+                return;
+            }
+
+            if (typeof drawCallback === 'function') drawCallback.call(this, settings);
         },
         responsive: true,
         autoWidth: false,
