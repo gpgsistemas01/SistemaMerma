@@ -292,17 +292,22 @@ body {
   margin-bottom: 0.35rem;
 }
 
-.table-filters .form-control,
+.table-filters .form-control:not([type="date"]):not([type="datetime-local"]),
 .table-filters .form-select,
 .table-filters .select2-container--default .select2-selection--single {
   background-color: var(--mdb-light);
-  border: 1px solid var(--form-field-border);
-  border-radius: var(--form-field-border-radius);
   box-shadow: none;
   color: var(--mdb-body-color);
   min-height: 2.45rem;
   padding: var(--form-field-padding);
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.table-filters .form-control:not([type="date"]):not([type="datetime-local"]),
+.table-filters .form-select,
+.table-filters .select2-container--default .select2-selection--single {
+  border: 1px solid var(--form-field-border);
+  border-radius: var(--form-field-border-radius);
 }
 
 .table-filter-button {
@@ -324,6 +329,14 @@ body {
   box-shadow: 0 0.45rem 0.9rem rgba(var(--mdb-accent-rgb), 0.28);
   color: var(--mdb-dark) !important;
   transform: translateY(-1px);
+}
+
+.table-filter-button:focus,
+.table-filter-button:focus-visible {
+  background: linear-gradient(180deg, #21a366 0%, var(--mdb-primary) 100%) !important;
+  border-color: #0f6b32 !important;
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28), 0 0.45rem 0.9rem rgba(var(--mdb-primary-rgb), 0.24) !important;
+  color: var(--mdb-light) !important;
 }
 
 .table.datatable-table,
