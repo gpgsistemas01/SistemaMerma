@@ -159,22 +159,71 @@ body {
   --mdb-btn-disabled-border-color: var(--mdb-success-disabled);
 }
 
-.btn-secondary {
-  --btn-color-hover-secondary: #000000;
+
+.btn-info,
+.btn-danger {
   --mdb-btn-color: var(--mdb-light);
-  --mdb-btn-bg: var(--mdb-secondary);
-  --mdb-btn-border-color: var(--mdb-secondary);
+  --mdb-btn-bg: var(--mdb-primary);
+  --mdb-btn-border-color: var(--mdb-primary);
   --mdb-btn-hover-color: var(--mdb-light);
-  --mdb-btn-hover-bg: var(--btn-color-hover-secondary);
-  --mdb-btn-hover-border-color: var(--btn-color-hover-secondary);
+  --mdb-btn-hover-bg: var(--mdb-primary-hover);
+  --mdb-btn-hover-border-color: var(--mdb-primary-hover);
+  --mdb-btn-focus-shadow-rgb: var(--mdb-primary-hover-rgb);
+  --mdb-btn-active-color: var(--mdb-light);
+  --mdb-btn-active-bg: var(--mdb-primary-active);
+  --mdb-btn-active-border-color: var(--mdb-primary-active);
+  --mdb-btn-disabled-color: var(--mdb-light);
+  --mdb-btn-disabled-bg: var(--mdb-primary-disabled);
+  --mdb-btn-disabled-border-color: var(--mdb-primary-disabled);
+}
+
+.btn-primary:focus-visible,
+.btn-success:focus-visible,
+.btn-info:focus-visible,
+.btn-danger:focus-visible,
+.btn-warning:focus-visible,
+.btn-secondary:focus-visible,
+.btn-outline-primary:focus-visible,
+.btn-outline-success:focus-visible,
+.btn-outline-secondary:focus-visible,
+.table-filter-button:focus-visible {
+  background-color: var(--mdb-primary-active) !important;
+  border-color: var(--mdb-primary-active) !important;
+  box-shadow: 0 0 0 0.24rem rgba(var(--mdb-primary-rgb), 0.32) !important;
+  color: var(--mdb-light) !important;
+  outline: 2px solid var(--mdb-primary) !important;
+  outline-offset: 2px;
+}
+
+.btn-outline-primary:focus-visible,
+.btn-outline-success:focus-visible,
+.btn-outline-secondary:focus-visible {
+  --mdb-btn-color: var(--mdb-light);
+}
+
+.btn-secondary {
+  --mdb-btn-color: var(--mdb-light);
+  --mdb-btn-bg: var(--mdb-primary);
+  --mdb-btn-border-color: var(--mdb-primary);
+  --mdb-btn-hover-color: var(--mdb-light);
+  --mdb-btn-hover-bg: var(--mdb-primary-hover);
+  --mdb-btn-hover-border-color: var(--mdb-primary-hover);
+  --mdb-btn-focus-shadow-rgb: var(--mdb-primary-hover-rgb);
+  --mdb-btn-active-color: var(--mdb-light);
+  --mdb-btn-active-bg: var(--mdb-primary-active);
+  --mdb-btn-active-border-color: var(--mdb-primary-active);
 }
 
 .btn-outline-secondary {
-  --mdb-btn-color: var(--mdb-secondary);
-  --mdb-btn-border-color: var(--mdb-secondary);
+  --mdb-btn-color: var(--mdb-primary);
+  --mdb-btn-border-color: var(--mdb-primary);
   --mdb-btn-hover-color: var(--mdb-light);
-  --mdb-btn-hover-bg: var(--mdb-secondary);
-  --mdb-btn-hover-border-color: var(--mdb-secondary);
+  --mdb-btn-hover-bg: var(--mdb-primary-hover);
+  --mdb-btn-hover-border-color: var(--mdb-primary-hover);
+  --mdb-btn-focus-shadow-rgb: var(--mdb-primary-hover-rgb);
+  --mdb-btn-active-color: var(--mdb-light);
+  --mdb-btn-active-bg: var(--mdb-primary-active);
+  --mdb-btn-active-border-color: var(--mdb-primary-active);
 }
 
 /* list styles */
