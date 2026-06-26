@@ -143,4 +143,46 @@ describe('baseDatatable', () => {
     expect(on).toHaveBeenCalledWith('responsive-resize.dt column-visibility.dt draw.dt', expect.any(Function));
   });
 
+  it('oculta encabezados con colspan aunque no tengan data-responsive-group', () => {
+    const on = vi.fn();
+    vi.stubGlobal('$', () => ({ on }));
+
+    const groupHeader = {
+      hidden: false,
+      colSpan: 2,
+      getAttribute: (name) => ({ colspan: '2' })[name]
+    };
+    const childHeaders = [
+      { hidden: false, getAttribute: () => undefined },
+      { hidden: false, getAttribute: () => undefined }
+    ];
+    const rows = [
+      { children: [groupHeader] },
+      { children: childHeaders }
+    ];
+    const tableNode = {
+      querySelector: vi.fn(() => null),
+      querySelectorAll: vi.fn((selector) => {
+        if (selector === 'thead tr') return rows;
+        if (selector === 'thead th[colspan]') return [groupHeader];
+        return [];
+      })
+    };
+    const columns = {
+      0: { visible: vi.fn(() => true), responsiveHidden: vi.fn(() => false) },
+      1: { visible: vi.fn(() => true), responsiveHidden: vi.fn(() => false) }
+    };
+    const table = {
+      table: () => ({ node: () => tableNode }),
+      column: (index) => columns[index]
+    };
+
+    configureResponsiveHeaderGroups(table);
+
+    expect(groupHeader.hidden).toBe(true);
+    expect(groupHeader.colSpan).toBe(1);
+    expect(childHeaders[0].hidden).toBe(true);
+    expect(childHeaders[1].hidden).toBe(true);
+  });
+
 });
