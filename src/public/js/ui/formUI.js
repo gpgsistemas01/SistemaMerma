@@ -329,9 +329,11 @@ export const setFormReadOnly = ({
 
     elements.forEach(el => {
         if (isReadOnly) {
+            if (!el.disabled) el.dataset.readOnlyDisabled = 'true';
             el.setAttribute('disabled', 'disabled');
-        } else {
+        } else if (el.dataset.readOnlyDisabled === 'true') {
             el.removeAttribute('disabled');
+            delete el.dataset.readOnlyDisabled;
         }
     });
 
