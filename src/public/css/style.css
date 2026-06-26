@@ -30,9 +30,9 @@
   --datatable-excel-row-alt: #f3fbf6;
   --datatable-excel-row-hover: #e2f0d9;
   --datatable-excel-selection: #c6e0b4;
-  --product-detail-header: #128a5a;
-  --product-detail-header-rgb: 18, 138, 90;
-  --product-detail-header-light: #34c986;
+  --product-detail-header: #16875b;
+  --product-detail-header-rgb: 22, 135, 91;
+  --product-detail-header-light: #e7f7ef;
   --product-detail-header-hover: #0b6843;
   --product-detail-border: #91d5b4;
   --product-detail-border-soft: #cfeee0;
@@ -133,6 +133,15 @@ body {
   color: var(--mdb-btn-hover-color);
 }
 
+.btn-primary:focus,
+.btn-primary:focus-visible {
+  background-color: var(--mdb-btn-focus-bg);
+  border-color: var(--mdb-primary-hover);
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28), var(--mdb-btn-focus-box-shadow) !important;
+  color: var(--mdb-btn-hover-color);
+  outline: none;
+}
+
 .btn-primary:active,
 .btn-primary.active,
 .btn-primary.show {
@@ -161,6 +170,7 @@ body {
   --mdb-btn-focus-box-shadow: var(--mdb-btn-hover-box-shadow);
   --mdb-btn-active-box-shadow: var(--mdb-btn-focus-box-shadow);
   --mdb-btn-focus-shadow-rgb: var(--mdb-success-hover-rgb);
+  --bs-btn-focus-shadow-rgb: var(--mdb-success-hover-rgb);
   --mdb-btn-active-color: var(--mdb-light);
   --mdb-btn-active-bg: var(--mdb-success-active);
   --mdb-btn-active-border-color: var(--mdb-success-active);
@@ -231,6 +241,7 @@ body {
   --mdb-btn-focus-box-shadow: var(--mdb-btn-hover-box-shadow);
   --mdb-btn-active-box-shadow: var(--mdb-btn-focus-box-shadow);
   --mdb-btn-focus-shadow-rgb: var(--mdb-success-hover-rgb);
+  --bs-btn-focus-shadow-rgb: var(--mdb-success-hover-rgb);
   --mdb-btn-active-color: var(--mdb-light);
   --mdb-btn-active-bg: var(--mdb-success-active);
   --mdb-btn-active-border-color: var(--mdb-success-active);
@@ -354,18 +365,26 @@ body {
 .table-filters .form-select,
 .table-filters .select2-container--default .select2-selection--single {
   background-color: var(--mdb-light);
+  border: 1px solid var(--form-field-border);
+  border-radius: var(--form-field-border-radius);
   box-shadow: none;
   color: var(--mdb-body-color);
   min-height: 2.45rem;
-  padding: var(--form-field-padding);
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .table-filters .form-control:not([type="date"]):not([type="datetime-local"]),
-.table-filters .form-select,
+.table-filters .form-select {
+  padding: var(--form-field-padding);
+}
+
+.table-filters .form-select {
+  background-position: right 0.8rem center;
+  padding-right: 2.25rem;
+}
+
 .table-filters .select2-container--default .select2-selection--single {
-  border: 1px solid var(--form-field-border);
-  border-radius: var(--form-field-border-radius);
+  padding: 0;
 }
 
 .table-filter-button {
@@ -749,7 +768,7 @@ table.dataTable#productTable.product-detail-table {
 
 #productTable.product-detail-table thead th,
 table.dataTable#productTable.product-detail-table thead th {
-  background: linear-gradient(180deg, var(--product-detail-header-light) 0%, var(--product-detail-header) 100%);
+  background: var(--product-detail-header);
   border-bottom: 2px solid var(--product-detail-header-hover) !important;
   border-inline-end: 1px solid rgba(255, 255, 255, 0.28);
   color: var(--mdb-light);
@@ -970,8 +989,19 @@ a:hover {
 
 :where(.form-control, .form-select, input, select, textarea, [tabindex]):focus,
 :where(.form-control, .form-select, input, select, textarea, [tabindex]):focus-visible {
+  border-color: var(--mdb-focus) !important;
   box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
   outline: none !important;
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"] {
+  border-color: rgba(var(--mdb-primary-rgb), 0.55);
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:focus,
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:focus-visible {
+  border-color: var(--mdb-primary) !important;
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28) !important;
 }
 
 
@@ -989,6 +1019,20 @@ a:hover {
 .form-check:not(.form-switch) .form-check-input[type="checkbox"]:indeterminate {
   background-color: var(--mdb-primary) !important;
   border-color: var(--mdb-primary) !important;
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked:focus,
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked:focus-visible,
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:indeterminate:focus,
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:indeterminate:focus-visible {
+  background-color: var(--mdb-primary) !important;
+  border-color: var(--mdb-primary) !important;
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28) !important;
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked::before,
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:indeterminate::before {
+  background-color: var(--mdb-primary) !important;
 }
 
 .select2-container--default.select2-container--focus .select2-selection--single,
