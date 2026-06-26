@@ -924,6 +924,53 @@ a:hover {
   outline: none !important;
 }
 
+.btn:focus,
+.btn:focus-visible,
+button:focus,
+button:focus-visible,
+.btn-check:focus + .btn,
+.btn-check:focus-visible + .btn {
+  border-color: var(--mdb-primary) !important;
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.32) !important;
+  outline: none !important;
+}
+
+.btn-check:checked + .btn,
+.btn-check:active + .btn,
+.btn.show,
+.btn:first-child:active,
+:not(.btn-check) + .btn:active {
+  background-color: var(--mdb-primary-active) !important;
+  border-color: var(--mdb-primary-active) !important;
+}
+
+.form-check-input {
+  accent-color: var(--mdb-primary);
+}
+
+.form-check-input:focus,
+.form-check-input:focus-visible {
+  border-color: var(--mdb-primary) !important;
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28) !important;
+  outline: none !important;
+}
+
+.form-check-input:checked,
+.form-check-input[type="checkbox"]:indeterminate {
+  background-color: var(--mdb-primary) !important;
+  border-color: var(--mdb-primary) !important;
+}
+
+.form-switch .form-check-input:focus {
+  --mdb-form-switch-focus-bg-image: none;
+  background-color: var(--mdb-primary-soft);
+}
+
+.form-switch .form-check-input:checked {
+  background-color: var(--mdb-primary) !important;
+  border-color: var(--mdb-primary) !important;
+}
+
 .select2-container--default.select2-container--focus .select2-selection--single,
 .select2-container--default.select2-container--open .select2-selection--single {
   box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
