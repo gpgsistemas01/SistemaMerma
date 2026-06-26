@@ -18,10 +18,34 @@
   --mdb-success-active-rgb: 14, 102, 55;
   --mdb-success-disabled: #a5d8b8;
   --mdb-success-disabled-rgb: 165, 216, 184;
+  --mdb-info: #2e7d32;
+  --mdb-info-rgb: 46, 125, 50;
+  --mdb-info-hover: #256428;
+  --mdb-info-hover-rgb: 37, 100, 40;
+  --mdb-info-active: #1b4d1e;
+  --mdb-info-disabled: #a8d5aa;
+  --mdb-secondary-button: #4f8f3a;
+  --mdb-secondary-button-rgb: 79, 143, 58;
+  --mdb-secondary-button-hover: #3f732f;
+  --mdb-secondary-button-hover-rgb: 63, 115, 47;
+  --mdb-secondary-button-active: #315923;
+  --mdb-secondary-button-disabled: #b9d8ad;
+  --mdb-danger: #dc3545;
+  --mdb-danger-rgb: 220, 53, 69;
+  --mdb-danger-hover: #bb2d3b;
+  --mdb-danger-hover-rgb: 187, 45, 59;
+  --mdb-danger-active: #9f2430;
+  --mdb-danger-disabled: #e8a2aa;
   --bs-primary: var(--mdb-primary);
   --bs-primary-rgb: var(--mdb-primary-rgb);
   --bs-success: var(--mdb-success);
   --bs-success-rgb: var(--mdb-success-rgb);
+  --bs-info: var(--mdb-info);
+  --bs-info-rgb: var(--mdb-info-rgb);
+  --bs-danger: var(--mdb-danger);
+  --bs-danger-rgb: var(--mdb-danger-rgb);
+  --bs-secondary: var(--mdb-secondary-button);
+  --bs-secondary-rgb: var(--mdb-secondary-button-rgb);
   --datatable-excel-header: #107c41;
   --datatable-excel-header-rgb: 16, 124, 65;
   --datatable-excel-header-hover: #0b5f2a;
@@ -117,10 +141,7 @@ body {
   --bs-btn-disabled-border-color: var(--btn-disabled-border-color);
 }
 
-.btn-primary,
-.btn-info,
-.btn-danger,
-.btn-secondary {
+.btn-primary {
   --btn-color: var(--mdb-light);
   --btn-bg: var(--mdb-primary);
   --btn-border-color: var(--mdb-primary);
@@ -152,6 +173,54 @@ body {
   --btn-disabled-border-color: var(--mdb-success-disabled);
 }
 
+.btn-info {
+  --btn-color: var(--mdb-light);
+  --btn-bg: var(--mdb-info);
+  --btn-border-color: var(--mdb-info);
+  --btn-hover-color: var(--mdb-light);
+  --btn-hover-bg: var(--mdb-info-hover);
+  --btn-hover-border-color: var(--mdb-info-hover);
+  --btn-focus-shadow-rgb: var(--mdb-info-hover-rgb);
+  --btn-active-color: var(--mdb-light);
+  --btn-active-bg: var(--mdb-info-active);
+  --btn-active-border-color: var(--mdb-info-active);
+  --btn-disabled-color: var(--mdb-light);
+  --btn-disabled-bg: var(--mdb-info-disabled);
+  --btn-disabled-border-color: var(--mdb-info-disabled);
+}
+
+.btn-secondary {
+  --btn-color: var(--mdb-light);
+  --btn-bg: var(--mdb-secondary-button);
+  --btn-border-color: var(--mdb-secondary-button);
+  --btn-hover-color: var(--mdb-light);
+  --btn-hover-bg: var(--mdb-secondary-button-hover);
+  --btn-hover-border-color: var(--mdb-secondary-button-hover);
+  --btn-focus-shadow-rgb: var(--mdb-secondary-button-hover-rgb);
+  --btn-active-color: var(--mdb-light);
+  --btn-active-bg: var(--mdb-secondary-button-active);
+  --btn-active-border-color: var(--mdb-secondary-button-active);
+  --btn-disabled-color: var(--mdb-light);
+  --btn-disabled-bg: var(--mdb-secondary-button-disabled);
+  --btn-disabled-border-color: var(--mdb-secondary-button-disabled);
+}
+
+.btn-danger {
+  --btn-color: var(--mdb-light);
+  --btn-bg: var(--mdb-danger);
+  --btn-border-color: var(--mdb-danger);
+  --btn-hover-color: var(--mdb-light);
+  --btn-hover-bg: var(--mdb-danger-hover);
+  --btn-hover-border-color: var(--mdb-danger-hover);
+  --btn-focus-shadow-rgb: var(--mdb-danger-hover-rgb);
+  --btn-active-color: var(--mdb-light);
+  --btn-active-bg: var(--mdb-danger-active);
+  --btn-active-border-color: var(--mdb-danger-active);
+  --btn-disabled-color: var(--mdb-light);
+  --btn-disabled-bg: var(--mdb-danger-disabled);
+  --btn-disabled-border-color: var(--mdb-danger-disabled);
+}
+
 .btn-warning {
   --mdb-btn-color: #0f351f;
   --mdb-btn-bg: #a7d948;
@@ -165,8 +234,7 @@ body {
   --mdb-btn-active-border-color: #4f7f22;
 }
 
-.btn-outline-primary,
-.btn-outline-secondary {
+.btn-outline-primary {
   --btn-color: var(--mdb-primary);
   --btn-bg: transparent;
   --btn-border-color: var(--mdb-primary);
@@ -180,6 +248,22 @@ body {
   --btn-disabled-color: var(--mdb-primary-disabled);
   --btn-disabled-bg: transparent;
   --btn-disabled-border-color: var(--mdb-primary-disabled);
+}
+
+.btn-outline-secondary {
+  --btn-color: var(--mdb-secondary-button);
+  --btn-bg: transparent;
+  --btn-border-color: var(--mdb-secondary-button);
+  --btn-hover-color: var(--mdb-light);
+  --btn-hover-bg: var(--mdb-secondary-button-hover);
+  --btn-hover-border-color: var(--mdb-secondary-button-hover);
+  --btn-focus-shadow-rgb: var(--mdb-secondary-button-hover-rgb);
+  --btn-active-color: var(--mdb-light);
+  --btn-active-bg: var(--mdb-secondary-button-active);
+  --btn-active-border-color: var(--mdb-secondary-button-active);
+  --btn-disabled-color: var(--mdb-secondary-button-disabled);
+  --btn-disabled-bg: transparent;
+  --btn-disabled-border-color: var(--mdb-secondary-button-disabled);
 }
 
 .btn-outline-success {
