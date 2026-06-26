@@ -19,7 +19,7 @@ const isResponsiveColumnVisible = (table, columnIndex) => {
     return isDataTablesVisible && isResponsiveVisible;
 };
 
-const getHeaderColumnMap = (tableNode) => {
+const getHeaderGrid = (tableNode) => {
 
     const headerRows = Array.from(tableNode?.querySelectorAll?.('thead tr') || []);
     const grid = [];
@@ -46,31 +46,61 @@ const getHeaderColumnMap = (tableNode) => {
         });
     });
 
-    return grid.reduce((cellMap, row) => {
-        row.forEach((cell, columnIndex) => {
-            if (cell && !cellMap.has(cell)) cellMap.set(cell, columnIndex);
-        });
+    return grid;
+};
 
-        return cellMap;
-    }, new Map());
+const getHeaderColumnMapFromGrid = (grid) => grid.reduce((cellMap, row) => {
+    row.forEach((cell, columnIndex) => {
+        if (cell && !cellMap.has(cell)) cellMap.set(cell, columnIndex);
+    });
+
+    return cellMap;
+}, new Map());
+
+const addGroupChild = (groups, groupName, header, columnIndex) => {
+
+    if (!groupName || columnIndex === undefined) return;
+
+    groups[groupName] ||= [];
+
+    if (!groups[groupName].some(child => child.header === header)) {
+        groups[groupName].push({ header, columnIndex });
+    }
 };
 
 const resolveResponsiveHeaderGroups = (tableNode) => {
 
-    const columnMap = getHeaderColumnMap(tableNode);
+    const grid = getHeaderGrid(tableNode);
+    const columnMap = getHeaderColumnMapFromGrid(grid);
+    const groups = {};
     const childHeaders = Array.from(tableNode?.querySelectorAll?.('thead th[data-responsive-parent]') || []);
 
-    return childHeaders.reduce((groups, header) => {
-        const groupName = header.getAttribute('data-responsive-parent');
-        const columnIndex = columnMap.get(header);
+    childHeaders.forEach((header) => {
+        addGroupChild(groups, header.getAttribute('data-responsive-parent'), header, columnMap.get(header));
+    });
 
-        if (!groupName || columnIndex === undefined) return groups;
+    Array.from(tableNode?.querySelectorAll?.('thead th[colspan]') || []).forEach((groupHeader, groupIndex) => {
+        const colspan = Number(groupHeader.getAttribute('colspan')) || 1;
+
+        if (colspan <= 1) return;
+
+        const groupName = groupHeader.getAttribute('data-responsive-group') || `__responsive_colspan_${ groupIndex }`;
+        const startColumn = columnMap.get(groupHeader);
+
+        if (startColumn === undefined) return;
 
         groups[groupName] ||= [];
-        groups[groupName].push({ header, columnIndex });
+        groups[groupName].groupHeader = groupHeader;
 
-        return groups;
-    }, {});
+        grid.forEach((row) => {
+            row.slice(startColumn, startColumn + colspan).forEach((header, offset) => {
+                if (!header || header === groupHeader) return;
+                addGroupChild(groups, groupName, header, startColumn + offset);
+            });
+        });
+    });
+
+    return groups;
 };
 
 const syncResponsiveHeaderGroups = (table, groupedHeaders) => {
@@ -80,7 +110,11 @@ const syncResponsiveHeaderGroups = (table, groupedHeaders) => {
     if (!tableNode || typeof table?.column !== 'function' || !groupedHeaders) return;
 
     Object.entries(groupedHeaders).forEach(([groupName, children]) => {
-        const groupHeader = tableNode.querySelector(`thead th[data-responsive-group="${ groupName }"]`);
+        const groupHeader = children.groupHeader
+            || tableNode.querySelector?.(`thead th[data-responsive-group="${ groupName }"]`)
+            || Array.from(tableNode.querySelectorAll('thead th[colspan]'))
+                .find(header => header.getAttribute('data-responsive-group') === groupName)
+            || null;
         const visibleChildren = children.filter(({ columnIndex }) => isResponsiveColumnVisible(table, columnIndex));
         const isGroupVisible = visibleChildren.length > 0;
 
@@ -95,11 +129,15 @@ const syncResponsiveHeaderGroups = (table, groupedHeaders) => {
     });
 };
 
+const configuredTables = new WeakSet();
+
 export const configureResponsiveHeaderGroups = (table) => {
 
     const tableNode = table?.table?.().node?.();
 
-    if (!tableNode) return;
+    if (!tableNode || configuredTables.has(tableNode)) return;
+
+    configuredTables.add(tableNode);
 
     const groupedHeaders = resolveResponsiveHeaderGroups(tableNode);
 
