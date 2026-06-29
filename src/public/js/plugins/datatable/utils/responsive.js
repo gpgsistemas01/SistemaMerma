@@ -159,21 +159,42 @@ const syncResponsiveHeaderGroups = (table, groupedHeaders) => {
     });
 };
 
-const configuredTables = new WeakSet();
+const configuredTableHeaderState = new WeakMap();
+
+const getHeaderSignature = (tableNode) => Array.from(tableNode?.querySelectorAll?.('thead tr') || [])
+    .map(row => Array.from(row.children)
+        .map(cell => [
+            cell.tagName,
+            cell.textContent?.replace(/\s+/g, ' ').trim() || '',
+            cell.getAttribute('rowspan') || '1',
+            cell.getAttribute('colspan') || '1',
+            cell.getAttribute('data-responsive-group') || '',
+            cell.getAttribute('data-responsive-parent') || ''
+        ].join(':'))
+        .join('|'))
+    .join('||');
 
 export const configureResponsiveHeaderGroups = (table) => {
 
     const tableNode = table?.table?.().node?.();
 
-    if (!tableNode || configuredTables.has(tableNode)) return;
+    if (!tableNode) return;
 
-    configuredTables.add(tableNode);
+    const headerSignature = getHeaderSignature(tableNode);
+    const tableSettings = typeof table?.settings === 'function' ? table.settings()[0] : null;
+    const configuredState = configuredTableHeaderState.get(tableNode);
+
+    if (configuredState?.headerSignature === headerSignature && configuredState?.tableSettings === tableSettings) return;
+
+    configuredTableHeaderState.set(tableNode, { headerSignature, tableSettings });
+
+    $(tableNode).off('.responsiveHeaderGroups');
 
     const groupedHeaders = resolveResponsiveHeaderGroups(tableNode);
 
     syncResponsiveHeaderGroups(table, groupedHeaders);
 
-    $(tableNode).on('responsive-resize.dt column-visibility.dt draw.dt', () => {
+    $(tableNode).on('responsive-resize.dt.responsiveHeaderGroups column-visibility.dt.responsiveHeaderGroups draw.dt.responsiveHeaderGroups', () => {
         syncResponsiveHeaderGroups(table, groupedHeaders);
     });
 };
