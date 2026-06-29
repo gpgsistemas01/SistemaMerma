@@ -337,6 +337,8 @@ body {
   border: 1px solid #b7d7bf;
   border-radius: var(--form-field-border-radius);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), inset 0 -1px 0 rgba(var(--mdb-secondary-rgb), 0.04);
+  -webkit-text-fill-color: var(--mdb-body-color);
+  color: var(--mdb-body-color) !important;
   min-height: 2.45rem;
   padding: var(--form-field-padding);
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
@@ -1042,7 +1044,7 @@ a:hover {
   background-color: var(--mdb-primary) !important;
 }
 
-.form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked:focus:before {
+.form-check-input:checked:focus:before {
   box-shadow: rgb(var(--mdb-primary-rgb)) 0px 0px 0px 13px !important;
 }
 
