@@ -745,8 +745,8 @@ table.dataTable > tbody > tr.child td.child {
 }
 
 
-#productTable.product-detail-table,
-table.dataTable#productTable.product-detail-table {
+.modal-detail-table,
+table.dataTable.modal-detail-table {
   background-color: #ffffff;
   border: 1px solid var(--product-detail-border) !important;
   border-collapse: separate !important;
@@ -760,16 +760,16 @@ table.dataTable#productTable.product-detail-table {
   width: 100% !important;
 }
 
-.modal #productTable_wrapper .dataTables_scroll,
-.modal #productTable_wrapper .dataTables_scrollHead,
-.modal #productTable_wrapper .dataTables_scrollHeadInner,
-.modal #productTable_wrapper .dataTables_scrollBody {
+.modal .dataTables_wrapper .dataTables_scroll,
+.modal .dataTables_wrapper .dataTables_scrollHead,
+.modal .dataTables_wrapper .dataTables_scrollHeadInner,
+.modal .dataTables_wrapper .dataTables_scrollBody {
   max-width: 100%;
   width: 100% !important;
 }
 
-#productTable.product-detail-table thead th,
-table.dataTable#productTable.product-detail-table thead th {
+.modal-detail-table thead th,
+table.dataTable.modal-detail-table thead th {
   background: var(--product-detail-header);
   border-bottom: 2px solid var(--product-detail-header-hover) !important;
   border-inline-end: 1px solid rgba(255, 255, 255, 0.28);
@@ -783,15 +783,15 @@ table.dataTable#productTable.product-detail-table thead th {
   vertical-align: middle;
 }
 
-#productTable.product-detail-table thead tr:not(:first-child) th,
-table.dataTable#productTable.product-detail-table thead tr:not(:first-child) th {
+.modal-detail-table thead tr:not(:first-child) th,
+table.dataTable.modal-detail-table thead tr:not(:first-child) th {
   background: #e9f9f1;
   color: var(--product-detail-header-hover);
   font-size: 0.85rem;
 }
 
-#productTable.product-detail-table tbody td,
-table.dataTable#productTable.product-detail-table tbody td {
+.modal-detail-table tbody td,
+table.dataTable.modal-detail-table tbody td {
   border-block-end: 1px solid var(--product-detail-border-soft);
   border-inline-end: 1px solid var(--product-detail-border-soft);
   color: var(--mdb-secondary);
@@ -799,41 +799,41 @@ table.dataTable#productTable.product-detail-table tbody td {
   vertical-align: middle;
 }
 
-#productTable.product-detail-table tbody tr:nth-child(even),
-table.dataTable#productTable.product-detail-table tbody tr:nth-child(even) {
+.modal-detail-table tbody tr:nth-child(even),
+table.dataTable.modal-detail-table tbody tr:nth-child(even) {
   background-color: var(--product-detail-row-alt);
 }
 
-#productTable.product-detail-table tbody tr:hover,
-table.dataTable#productTable.product-detail-table tbody tr:hover {
+.modal-detail-table tbody tr:hover,
+table.dataTable.modal-detail-table tbody tr:hover {
   background-color: var(--product-detail-row-hover);
 }
 
-#productTable.product-detail-table tbody tr.selected,
-table.dataTable#productTable.product-detail-table tbody tr.selected,
-table.dataTable#productTable.product-detail-table tbody tr.selected > * {
+.modal-detail-table tbody tr.selected,
+table.dataTable.modal-detail-table tbody tr.selected,
+table.dataTable.modal-detail-table tbody tr.selected > * {
   background-color: var(--product-detail-selection) !important;
   color: var(--mdb-secondary) !important;
 }
 
-#productTable.product-detail-table .sorting::before,
-#productTable.product-detail-table .sorting::after,
-#productTable.product-detail-table .sorting_asc::before,
-#productTable.product-detail-table .sorting_asc::after,
-#productTable.product-detail-table .sorting_desc::before,
-#productTable.product-detail-table .sorting_desc::after,
-table.dataTable#productTable.product-detail-table .sorting::before,
-table.dataTable#productTable.product-detail-table .sorting::after,
-table.dataTable#productTable.product-detail-table .sorting_asc::before,
-table.dataTable#productTable.product-detail-table .sorting_asc::after,
-table.dataTable#productTable.product-detail-table .sorting_desc::before,
-table.dataTable#productTable.product-detail-table .sorting_desc::after {
+.modal-detail-table .sorting::before,
+.modal-detail-table .sorting::after,
+.modal-detail-table .sorting_asc::before,
+.modal-detail-table .sorting_asc::after,
+.modal-detail-table .sorting_desc::before,
+.modal-detail-table .sorting_desc::after,
+table.dataTable.modal-detail-table .sorting::before,
+table.dataTable.modal-detail-table .sorting::after,
+table.dataTable.modal-detail-table .sorting_asc::before,
+table.dataTable.modal-detail-table .sorting_asc::after,
+table.dataTable.modal-detail-table .sorting_desc::before,
+table.dataTable.modal-detail-table .sorting_desc::after {
   color: var(--mdb-light);
   opacity: 0.9 !important;
 }
 
-#productTable.product-detail-table .form-control,
-#productTable.product-detail-table .form-select {
+.modal-detail-table .form-control,
+.modal-detail-table .form-select {
   background-color: #eefaf4;
   border: 1px solid var(--product-detail-border);
   border-radius: 0.55rem;
@@ -1158,15 +1158,15 @@ body section {
 
 .table.datatable-table td:has(.table-action-btn),
 table.dataTable.datatable-table td:has(.table-action-btn),
-#productTable.product-detail-table td:has(.table-action-btn),
-table.dataTable#productTable.product-detail-table td:has(.table-action-btn) {
+.modal-detail-table td:has(.table-action-btn),
+table.dataTable.modal-detail-table td:has(.table-action-btn) {
   text-align: center;
   white-space: nowrap;
 }
 
 .table.datatable-table td:has(.table-action-btn) > *,
 table.dataTable.datatable-table td:has(.table-action-btn) > *,
-#productTable.product-detail-table td:has(.table-action-btn) > *,
-table.dataTable#productTable.product-detail-table td:has(.table-action-btn) > * {
+.modal-detail-table td:has(.table-action-btn) > *,
+table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
   vertical-align: middle;
 }
