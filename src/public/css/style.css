@@ -322,24 +322,28 @@ body {
 
 .dataTables_wrapper .dataTables_filter {
   display: flex;
+  float: none;
   justify-content: flex-end;
+  margin-block-end: 0.85rem;
+  width: 100%;
 }
 
 .dataTables_wrapper .dataTables_filter label {
   align-items: center;
   display: inline-grid;
   gap: 0.55rem;
-  grid-template-columns: auto minmax(16rem, 1fr);
+  grid-template-columns: auto minmax(0, 18rem);
   margin: 0;
+  max-width: 100%;
   text-align: left;
 }
 
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_length select {
   background-color: var(--mdb-light);
-  border: 1px solid #b7d7bf;
+  border: 1px solid var(--form-field-border);
   border-radius: var(--form-field-border-radius);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), inset 0 -1px 0 rgba(var(--mdb-secondary-rgb), 0.04);
+  box-shadow: none;
   -webkit-text-fill-color: var(--mdb-body-color);
   color: var(--mdb-body-color) !important;
   min-height: 2.45rem;
