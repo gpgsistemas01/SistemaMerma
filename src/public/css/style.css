@@ -334,9 +334,6 @@ body {
   text-align: left;
 }
 
-/* DataTables genera su propio markup de búsqueda; imitar el notch de MDB
-   requeriría envolver/reinicializar el control. Se conserva independiente y
-   se alinea visualmente mediante los mismos tokens de los formularios. */
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_length select {
   background-color: var(--mdb-light);
