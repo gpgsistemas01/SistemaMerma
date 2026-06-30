@@ -7,4 +7,12 @@ services:
     ports:
       - "3000:3000"
     command: npm start
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    user: node
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
