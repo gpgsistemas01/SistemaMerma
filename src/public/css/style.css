@@ -33,6 +33,11 @@
   --datatable-child-header-bg: #fff3d9;
   --datatable-child-header-color: #332D2D;
   --datatable-child-header-border: #d88500;
+  --datatable-sort-inactive-color: rgba(255, 255, 255, 0.48);
+  --datatable-sort-active-color: #ffffff;
+  --datatable-sort-active-shadow: rgba(0, 0, 0, 0.45);
+  --datatable-child-sort-inactive-color: rgba(var(--mdb-secondary-rgb), 0.42);
+  --datatable-child-sort-active-color: var(--datatable-child-header-color);
   --product-detail-header: #16875b;
   --product-detail-header-rgb: 22, 135, 91;
   --product-detail-header-light: #e7f7ef;
@@ -542,8 +547,17 @@ table.dataTable.datatable-table .sorting_asc::before,
 table.dataTable.datatable-table .sorting_asc::after,
 table.dataTable.datatable-table .sorting_desc::before,
 table.dataTable.datatable-table .sorting_desc::after {
-  color: var(--mdb-light);
-  opacity: 0.9 !important;
+  color: var(--datatable-sort-inactive-color);
+  opacity: 1 !important;
+}
+
+.table.datatable-table .sorting_asc::before,
+.table.datatable-table .sorting_desc::after,
+table.dataTable.datatable-table .sorting_asc::before,
+table.dataTable.datatable-table .sorting_desc::after {
+  color: var(--datatable-sort-active-color);
+  opacity: 1 !important;
+  text-shadow: 0 0.0625rem 0.1875rem var(--datatable-sort-active-shadow);
 }
 
 .table.datatable-table thead tr:not(:first-child) th.sorting::before,
@@ -558,7 +572,15 @@ table.dataTable.datatable-table thead tr:not(:first-child) th.sorting_asc::befor
 table.dataTable.datatable-table thead tr:not(:first-child) th.sorting_asc::after,
 table.dataTable.datatable-table thead tr:not(:first-child) th.sorting_desc::before,
 table.dataTable.datatable-table thead tr:not(:first-child) th.sorting_desc::after {
-  color: var(--datatable-child-header-color);
+  color: var(--datatable-child-sort-inactive-color);
+  text-shadow: none;
+}
+
+.table.datatable-table thead tr:not(:first-child) th.sorting_asc::before,
+.table.datatable-table thead tr:not(:first-child) th.sorting_desc::after,
+table.dataTable.datatable-table thead tr:not(:first-child) th.sorting_asc::before,
+table.dataTable.datatable-table thead tr:not(:first-child) th.sorting_desc::after {
+  color: var(--datatable-child-sort-active-color);
 }
 
 /* DataTables Responsive detail rows */
@@ -1304,32 +1326,35 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 }
 
 .login-form .form-outline .form-control {
-  background-color: #ffffff;
-  border-color: rgba(var(--mdb-secondary-rgb), 0.45);
-  border-radius: 0.95rem;
-  color: #1f2933;
-  padding: 0.8rem 0.9rem;
+  background-color: var(--mdb-light);
+  border: 1px solid var(--form-field-border);
+  border-radius: var(--form-field-border-radius);
+  box-shadow: none;
+  color: var(--mdb-body-color);
+  min-height: 2.45rem;
+  padding: var(--form-field-padding);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .login-form .form-outline .form-control::placeholder {
-  color: #5f6c7b;
+  color: rgba(var(--mdb-secondary-rgb), 0.65);
   opacity: 1;
 }
 
 .login-form .form-outline .form-label {
-  color: #3e4c59;
+  color: rgba(var(--mdb-secondary-rgb), 0.82);
 }
 
 .login-form .form-outline .form-control:focus {
-  background-color: #ffffff;
-  border-color: var(--mdb-primary);
-  color: #1f2933;
-  box-shadow: 0 0 0 0.2rem rgba(var(--mdb-primary-rgb), 0.18);
+  background-color: var(--mdb-light);
+  border-color: var(--mdb-primary) !important;
+  color: var(--mdb-body-color);
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
 }
 
 .login-form .form-outline .form-control:focus ~ .form-label,
 .login-form .form-outline .form-control.active ~ .form-label {
-  color: #0f5132;
+  color: var(--mdb-primary-active);
 }
 
 .login-form .form-check {
