@@ -1,3 +1,9 @@
+const isReturnMode = (mode) => mode === 'return';
+
+const shouldShowTransactionQuantity = (mode) => !isReturnMode(mode);
+
+const shouldShowReceiptPurchaseColumns = ({ type, mode }) => type === 'receipt' && !isReturnMode(mode);
+
 const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => (
     type === 'issue'
     && ((isWarehouse && isCoordinator) || isSystem)
@@ -7,8 +13,15 @@ const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator,
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
-    const suppliedQuantityHeader = type === 'issue' && (mode === 'edit-detail' || mode === 'view' || mode === 'return')
+    const showReturnColumns = (type === 'issue' || type === 'receipt') && isReturnMode(mode);
+    const suppliedQuantityHeader = type === 'issue' && (mode === 'edit-detail' || mode === 'view')
         ? '<th rowspan="2">Cantidad surtida</th>'
+        : '';
+    const transactionQuantityHeader = shouldShowTransactionQuantity(mode)
+        ? `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`
+        : '';
+    const availableReturnQuantityHeader = showReturnColumns
+        ? '<th rowspan="2">Disponible para devolver</th>'
         : '';
 
     if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {
@@ -19,7 +32,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         `;
     }
 
-    if (type === 'receipt') {
+    if (shouldShowReceiptPurchaseColumns({ type, mode })) {
         extraHeaders += `
             <th rowspan="2">Costo Unitario de Conversión</th>
             <th rowspan="2">Costo por Presentación</th>
@@ -32,7 +45,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         extraHeaders += `<th rowspan="2">Surtir</th>`;
     }
 
-    if ((type === 'issue' || type === 'receipt') && mode === 'return') {
+    if (showReturnColumns) {
         extraHeaders += `
             <th rowspan="2">Total devuelto</th>
             <th rowspan="2">Cantidad devuelta registrada</th>
@@ -49,8 +62,9 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
             <tr>
                 <th rowspan="2">Material</th>
                 <th colspan="2">Medidas</th>
-                <th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>
+                ${ transactionQuantityHeader }
                 ${ suppliedQuantityHeader }
+                ${ availableReturnQuantityHeader }
                 <th rowspan="2">Presentación</th>
                 <th colspan="2">Conversión</th>
                 ${ extraHeaders }
@@ -67,6 +81,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
 
 export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordinator, isSystem }) => {
 
+    const showReturnColumns = (type === 'issue' || type === 'receipt') && isReturnMode(mode);
     const columns = [
         {
             data: null,
@@ -74,8 +89,9 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         },
         { data: 'productBase' },
         { data: 'productHeight' },
-        { data: 'quantity' },
-        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view' || mode === 'return') ? [{ data: 'suppliedQuantity' }] : []),
+        ...(shouldShowTransactionQuantity(mode) ? [{ data: 'quantity' }] : []),
+        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity' }] : []),
+        ...(showReturnColumns ? [{ data: 'availableReturnQuantity', defaultContent: 0 }] : []),
         { data: 'presentationName' },
         { data: 'convertedQuantity' },
         { data: 'unitMeasureName' },
@@ -112,7 +128,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         );
     }
 
-    if (type === 'receipt') {
+    if (shouldShowReceiptPurchaseColumns({ type, mode })) {
         columns.push(
             { data: 'conversionUnitCost' },
             { data: 'costPerUnitType' },
@@ -121,7 +137,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         );
     }
 
-    if ((type === 'issue' || type === 'receipt') && mode === 'return') {
+    if (showReturnColumns) {
         columns.push(
             { data: 'returnedQuantityTotal', defaultContent: 0 },
             {
