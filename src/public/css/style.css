@@ -1211,6 +1211,10 @@ body section {
   padding: 0;
 }
 
+.select2-container {
+  width: 100% !important;
+}
+
 .select2-container--default .select2-selection--single .select2-selection__rendered {
   color: var(--mdb-body-color);
   line-height: 2.35rem;
