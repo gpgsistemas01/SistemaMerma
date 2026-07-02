@@ -96,7 +96,7 @@ const getSelectColumnClass = col => {
         <div class="modal-body dark overflow-auto">
             <form id="<%= form.id %>" class="row g-3" novalidate>
                 <% if (form.invoice) { %>
-                    <div class="row g-2">
+                    <div class="col-12 row g-2">
                         <div class="col-6 mb-2">
                             <label class="form-label">Tipo de comprobante</label>
 
@@ -167,7 +167,7 @@ const getSelectColumnClass = col => {
                 <% } %>
 
                 <% if (form.table) { %>
-                    <div class="row g-2 mb-3 add-product-container">
+                    <div class="col-12 row g-2 mb-3 add-product-container">
                         <div class="<%= getSelectColumnClass(form.table.select.col) %> mb-2">
                             <%- include('./select', { input: form.table.select }) %>
                         </div>
@@ -185,7 +185,7 @@ const getSelectColumnClass = col => {
 
                     <%- include('./productTable') %>
 
-                    <div class="row g-2 mb-3 total-container">
+                    <div class="col-12 row g-2 mb-3 total-container">
                         <%- include('./outlineInputList', { inputs: totalInputs }) %>
                     </div>
                 <% } %>
