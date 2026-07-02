@@ -7,7 +7,7 @@ import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../..
 import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
-import { handleSubmit, hasValidationErrors, toggleContainerElements, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
+import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggleContainerElements, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
@@ -281,6 +281,13 @@ on('change', '.supply-checkbox', (e, checkbox) => {
     if (!product) return;
 
     product.isSupplied = checkbox.checked;
+
+    syncCheckboxControlledInputs({
+        root: document.querySelector(formId),
+        inputSelector: '.project-converted-quantity-input',
+        detailId: checkbox.dataset.detailId,
+        isChecked: checkbox.checked
+    });
 });
 on('input', '.project-converted-quantity-input', (e, input) => {
 

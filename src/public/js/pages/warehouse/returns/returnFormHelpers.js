@@ -1,4 +1,5 @@
 import { on } from "../../../utils/domUtils.js";
+import { syncCheckboxControlledInputs } from "../../../utils/formUtils.js";
 import { validateReturnDetails } from "../../../utils/validations/validators.js";
 
 export const RETURN_MODE = 'return';
@@ -75,14 +76,14 @@ export const bindReturnDetailEvents = ({
             isReturned: checkbox.checked
         });
 
-        const input = checkbox
-            .closest('tr')
-            ?.querySelector(`.return-quantity-input[data-detail-id="${ checkbox.dataset.detailId }"]`);
-
-        if (!input) return;
-
-        input.disabled = !checkbox.checked;
-        input.value = detail?.returnedQuantity || '';
+        syncCheckboxControlledInputs({
+            inputSelector: `${ selectorPrefix }.return-quantity-input`,
+            detailId: checkbox.dataset.detailId,
+            isChecked: checkbox.checked,
+            onSync: input => {
+                input.value = detail?.returnedQuantity || '';
+            }
+        });
     });
 
     on('input', `${ selectorPrefix }.return-quantity-input`, (_event, input) => {

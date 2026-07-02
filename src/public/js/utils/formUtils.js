@@ -79,6 +79,28 @@ export const toggleDisabledElement = ({ element, isDisabled }) => {
     }
 };
 
+
+export const syncCheckboxControlledInputs = ({
+    root = document,
+    inputSelector,
+    detailId,
+    isChecked,
+    onSync
+}) => {
+
+    if (!root || !inputSelector || !detailId) return;
+
+    root
+        .querySelectorAll(`${ inputSelector }[data-detail-id="${ detailId }"]`)
+        .forEach(input => {
+            toggleDisabledElement({
+                element: input,
+                isDisabled: !isChecked
+            });
+            onSync?.(input);
+        });
+};
+
 export const toggleContainerElements = ({
     selector,
     isDisabled = true,
