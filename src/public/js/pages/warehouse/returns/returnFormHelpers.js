@@ -64,19 +64,38 @@ const updateReturnDetail = (params) => {
     return detail;
 };
 
+const findReturnQuantityInput = (checkbox) => {
+    const row = checkbox.closest('tr');
+    const detailId = checkbox.dataset.detailId;
+
+    return row?.querySelector(`.return-quantity-input[data-detail-id="${ detailId }"]`)
+        || document.querySelector(`.return-quantity-input[data-detail-id="${ detailId }"]`);
+};
+
+const toggleReturnQuantityInput = ({ checkbox, detail }) => {
+    const input = findReturnQuantityInput(checkbox);
+
+    if (!input) return;
+
+    input.disabled = !checkbox.checked;
+
+    if (!checkbox.checked) input.value = detail?.returnedQuantity || '';
+};
+
 export const bindReturnDetailEvents = ({
     details,
     selectorPrefix = '',
     afterToggle = null
 }) => {
     on('change', `${ selectorPrefix }.return-checkbox`, (_event, checkbox) => {
-        updateReturnDetail({
+        const detail = updateReturnDetail({
             details,
             detailId: checkbox.dataset.detailId,
             isReturned: checkbox.checked
         });
 
-        afterToggle?.({ details, checkbox });
+        toggleReturnQuantityInput({ checkbox, detail });
+        afterToggle?.({ details, checkbox, detail });
     });
 
     on('input', `${ selectorPrefix }.return-quantity-input`, (_event, input) => {
